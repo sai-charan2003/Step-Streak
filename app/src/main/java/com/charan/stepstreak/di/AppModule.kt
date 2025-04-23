@@ -1,9 +1,12 @@
 package com.charan.stepstreak.di
 
 import android.content.Context
+import androidx.health.connect.client.HealthConnectClient
 import com.charan.stepstreak.data.local.AppDatabase
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
+import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.data.repository.impl.HealthConnectRepoImpl
 import com.charan.stepstreak.data.repository.impl.StepsRecordRepoImp
 import dagger.Module
 import dagger.Provides
@@ -32,6 +35,20 @@ class AppModule {
     @Singleton
     fun provideStepsRecordRepo(stepsRecordDao: StepsRecordDao): StepsRecordRepo {
         return StepsRecordRepoImp(stepsRecordDao)
+
+    }
+
+    @Provides
+    @Singleton
+    fun provideHealthConnectClient(@ApplicationContext context: Context): HealthConnectClient {
+        return HealthConnectClient.getOrCreate(context)
+
+    }
+
+    @Provides
+    @Singleton
+    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient): HealthConnectRepo {
+        return HealthConnectRepoImpl(healthConnectClient)
 
     }
 

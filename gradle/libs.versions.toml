@@ -1,12 +1,12 @@
 [versions]
 accompanistPermissions = "0.37.2"
 accompanistSwiperefresh = "0.34.0"
-agp = "8.4.2"
+agp = "8.9.1"
 connectClient = "1.1.0-beta02"
 converterGson = "2.11.0"
 glance = "1.1.1"
 hiltWork = "1.2.0"
-kotlin = "2.1.0"
+kotlin = "2.1.20"
 kotlinxSerializationJson = "1.8.0"
 lifecycleViewmodelCompose = "2.8.7"
 coreKtx = "1.16.0"
@@ -15,7 +15,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 roomCompiler = "2.7.0"
 
-hiltAndroid = "2.49"
+hiltAndroid = "2.56.1"
 hiltNavigationCompose = "1.2.0"
 
 composeBom = "2025.04.00"
@@ -27,7 +27,7 @@ lifecycleRuntimeKtx = "2.8.7"
 aboutlibrariesCore = "11.2.3"
 roomCompilerVersion = "2.7.0"
 splash-screen = "1.0.1"
-google-ksp = "2.0.21-1.0.27"
+google-ksp = "2.1.20-2.0.0"
 
 [libraries]
 androidx-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }

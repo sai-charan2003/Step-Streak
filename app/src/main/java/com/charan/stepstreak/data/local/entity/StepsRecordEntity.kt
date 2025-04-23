@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class StepsRecordEntity(
     @PrimaryKey(autoGenerate = true)
     val id : Long?= null,
-    val steps: Int? = null,
-    val stepTarget : Int? = null,
+    val steps: Long? = null,
+    val stepTarget : Long? = null,
     val uuid : String? = null,
     val date : Long? = null
 )

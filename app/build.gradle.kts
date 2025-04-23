@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "com.charan.stepstreak"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.charan.stepstreak"
-        minSdk = 24
-        targetSdk = 35
+        minSdk = 26
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -41,6 +41,9 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    hilt {
+        enableAggregatingTask = false
     }
 }
 
@@ -73,7 +76,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation (libs.hilt.android)
-    kapt (libs.hilt.compiler)
+    ksp (libs.hilt.compiler)
     implementation (libs.androidx.hilt.navigation.compose)
     implementation (libs.accompanist.permissions)
     implementation (libs.androidx.hilt.work)
@@ -81,7 +84,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation (libs.aboutlibraries.core)
     implementation(libs.aboutlibraries.compose.m3)
-    annotationProcessor (libs.androidx.room.compiler)
     ksp(libs.androidx.room.compiler)
     implementation (libs.androidx.room.runtime)
     implementation (libs.androidx.room.ktx)
