@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StepsRecordDao {
@@ -15,6 +16,6 @@ interface StepsRecordDao {
     suspend fun insertStepsRecord(stepsRecordEntity: List<StepsRecordEntity>)
 
     @Query("SELECT * FROM steps_record")
-    suspend fun getAllStepsRecords(): List<StepsRecordEntity>
+    suspend fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>
 
 }

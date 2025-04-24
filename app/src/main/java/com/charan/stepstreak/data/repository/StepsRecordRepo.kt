@@ -1,6 +1,7 @@
 package com.charan.stepstreak.data.repository
 
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import kotlinx.coroutines.flow.Flow
 
 interface StepsRecordRepo {
 
@@ -8,5 +9,5 @@ interface StepsRecordRepo {
 
     suspend fun insertStepRecord(stepsRecordEntity: StepsRecordEntity)
 
-    suspend fun getAllStepRecords() : List<StepsRecordEntity>
+    suspend fun getAllStepRecords() : Flow<List<StepsRecordEntity>>
 }
