@@ -59,12 +59,8 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(true) {
                         permissionLaunch.launch(permissions)
                         Log.d("TAG", "onCreate: ${healthConnectRepo.hasPermission()}")
-                        healthConnectRepo.getTotalSteps().collect {  }
+                        healthConnectRepo.fetchAndSaveAllStepRecords().collect {  }
                     }
-
-
-
-
 
                 }
             }

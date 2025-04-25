@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 
-@Database(entities = [StepsRecordEntity::class], version = 1,exportSchema = false)
+@Database(entities = [StepsRecordEntity::class], version = 2,exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun stepsRecordDao(): StepsRecordDao
 

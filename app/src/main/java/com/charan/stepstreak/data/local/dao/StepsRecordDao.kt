@@ -16,6 +16,6 @@ interface StepsRecordDao {
     suspend fun insertStepsRecord(stepsRecordEntity: List<StepsRecordEntity>)
 
     @Query("SELECT * FROM steps_record")
-    suspend fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>
+    fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>
 
 }

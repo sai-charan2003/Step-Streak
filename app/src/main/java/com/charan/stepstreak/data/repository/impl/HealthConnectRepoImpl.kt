@@ -7,6 +7,8 @@ import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.readRecord
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.records.metadata.DataOrigin
+import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -18,6 +20,7 @@ import com.charan.stepstreak.utils.ProcessState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDateTime
+import java.time.Period
 import java.util.UUID
 import javax.inject.Inject
 
@@ -37,18 +40,11 @@ class HealthConnectRepoImpl @Inject constructor(
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
+                    dataOriginFilter = setOf(DataOrigin("com.sec.android.app.shealth")),
+                    ascendingOrder = false
                 )
             )
-            response.records.forEach { record->
-                stepsRecordDao.insertStepsRecord(
-                    StepsRecordEntity(
-                        steps = record.count,
-                        uuid = record.metadata.id,
-                        date = DateUtils.convertUtcToLocalTime(utcTimeString = record.startTime, zoneOffsetString = record.startZoneOffset),
 
-                    )
-                )
-            }
 
         } catch (e: Exception){
             e.printStackTrace()
@@ -56,6 +52,7 @@ class HealthConnectRepoImpl @Inject constructor(
             emit(ProcessState.Error(e.message ?: "Something went wrong"))
 
         }
+
 
     }
 
@@ -67,9 +64,55 @@ class HealthConnectRepoImpl @Inject constructor(
         return PermissionController.createRequestPermissionResultContract()
     }
 
-    override suspend fun fetchAndSaveAllStepRecords() {
-        getTotalSteps().collect {
+    override suspend fun fetchAndSaveAllStepRecords() : Flow<ProcessState<Boolean>> = flow{
+        emit(ProcessState.Loading)
+        try {
+            val response = healthConnectClient.readRecords(
+                ReadRecordsRequest<StepsRecord>(
+                    timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
+                    dataOriginFilter = setOf(DataOrigin("com.sec.android.app.shealth")),
+                    ascendingOrder = false
+                )
+            )
+            response.records.forEach {
+                Log.d("TAG", "fetchAndSaveAllStepRecords: $it")
+                stepsRecordDao.insertStepsRecord(
+                    StepsRecordEntity(
+                        steps = it.count,
+                        stepTarget = 10000,
+                        uuid = UUID.randomUUID().toString(),
+                        date = DateUtils.convertUtcToLocalTime(it.startTime,it.startZoneOffset)
+                    )
+                )
+            }
+
+        } catch (e: Exception){
+            e.printStackTrace()
+            emit(ProcessState.Error(e.message ?: "Something went wrong"))
 
         }
+
+
+
+    }
+
+    override fun getOriginProviders(): Flow<ProcessState<List<String>>> = flow{
+        emit(ProcessState.Loading)
+        try {
+            val response = healthConnectClient.readRecords(
+                ReadRecordsRequest<StepsRecord>(
+                    timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
+                    ascendingOrder = false
+                )
+            )
+            val distinctProviders = response.records.map { it.metadata.dataOrigin.packageName }.distinct()
+            emit(ProcessState.Success(distinctProviders))
+
+        }catch (e: Exception){
+            e.printStackTrace()
+            emit(ProcessState.Error(e.message ?: "Something went wrong"))
+
+        }
+
     }
 }
