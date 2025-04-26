@@ -29,7 +29,9 @@ import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.navigation.compose.rememberNavController
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.presentation.navigation.NavAppHost
 import com.charan.stepstreak.ui.theme.StepStreakTheme
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,7 +44,6 @@ import kotlin.collections.containsAll
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject lateinit var healthConnectRepo: HealthConnectRepo
     val permissions = setOf(
         HealthPermission.getReadPermission(StepsRecord::class)
     )
@@ -52,17 +53,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StepStreakTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val permissionLaunch = rememberLauncherForActivityResult(healthConnectRepo.requestPermission()){
+                NavAppHost(navHostController = rememberNavController())
 
-                    }
-                    LaunchedEffect(true) {
-                        permissionLaunch.launch(permissions)
-                        Log.d("TAG", "onCreate: ${healthConnectRepo.hasPermission()}")
-                        healthConnectRepo.fetchAndSaveAllStepRecords().collect {  }
-                    }
-
-                }
             }
         }
     }

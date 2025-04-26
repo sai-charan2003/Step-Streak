@@ -2,6 +2,7 @@ package com.charan.stepstreak.data.repository
 
 import androidx.activity.result.contract.ActivityResultContract
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.utils.ProcessState
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +16,6 @@ interface HealthConnectRepo {
 
     fun requestPermission() : ActivityResultContract<Set<String>, Set<String>>
 
-    fun getOriginProviders() : Flow<ProcessState<List<String>>>
+    fun getOriginProviders() : Flow<ProcessState<List<DataProviders>>>
 
 }

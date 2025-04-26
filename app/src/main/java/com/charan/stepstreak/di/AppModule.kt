@@ -47,8 +47,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao): HealthConnectRepo {
-        return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao)
+    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context): HealthConnectRepo {
+        return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao,context)
 
     }
 

@@ -1,7 +1,11 @@
 package com.charan.stepstreak.data.repository.impl
 
+import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.content.ContextCompat
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -12,8 +16,10 @@ import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import com.charan.stepstreak.R
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
@@ -26,7 +32,8 @@ import javax.inject.Inject
 
 class HealthConnectRepoImpl @Inject constructor(
     private val healthConnectClient: HealthConnectClient,
-    private val stepsRecordDao: StepsRecordDao
+    private val stepsRecordDao: StepsRecordDao,
+    private val context : Context
 
 ) : HealthConnectRepo {
     companion object{
@@ -85,6 +92,7 @@ class HealthConnectRepoImpl @Inject constructor(
                     )
                 )
             }
+            emit(ProcessState.Success(true))
 
         } catch (e: Exception){
             e.printStackTrace()
@@ -96,8 +104,9 @@ class HealthConnectRepoImpl @Inject constructor(
 
     }
 
-    override fun getOriginProviders(): Flow<ProcessState<List<String>>> = flow{
+    override fun getOriginProviders(): Flow<ProcessState<List<DataProviders>>> = flow{
         emit(ProcessState.Loading)
+        val dataProviders : MutableList<DataProviders> = mutableListOf()
         try {
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
@@ -106,7 +115,16 @@ class HealthConnectRepoImpl @Inject constructor(
                 )
             )
             val distinctProviders = response.records.map { it.metadata.dataOrigin.packageName }.distinct()
-            emit(ProcessState.Success(distinctProviders))
+            distinctProviders.forEach {
+                val dataProvider = DataProviders(
+                    packageName = it,
+                    name = getApplicationName(it),
+                    icon = getApplicationIcon(it)
+                )
+                dataProviders.add(dataProvider)
+
+            }
+            emit(ProcessState.Success(dataProviders))
 
         }catch (e: Exception){
             e.printStackTrace()
@@ -115,4 +133,24 @@ class HealthConnectRepoImpl @Inject constructor(
         }
 
     }
+
+    private fun getApplicationIcon(packageName: String): Drawable {
+        return try {
+            context.packageManager.getApplicationIcon(packageName)
+        } catch (e: Exception) {
+            ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)
+                ?: throw RuntimeException("Default icon not found")
+        }
+    }
+
+
+    private fun getApplicationName(packageName: String): String {
+        return try {
+            val applicationInfo = context.packageManager.getApplicationInfo(packageName, 0)
+            context.packageManager.getApplicationLabel(applicationInfo).toString()
+        } catch (e: Exception) {
+            packageName
+        }
+    }
+
 }
