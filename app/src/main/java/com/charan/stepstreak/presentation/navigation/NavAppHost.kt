@@ -20,11 +20,12 @@ import com.charan.stepstreak.presentation.onboarding.OnBoardingScreen
 @Composable
 fun NavAppHost(
     navHostController: NavHostController,
+    isOnBoardingCompleted : Boolean
 
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = OnBoardingScreenNav,
+        startDestination = if(isOnBoardingCompleted) HomeScreenNav else OnBoardingScreenNav,
         enterTransition = {
             fadeIn() + slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Start,

@@ -15,15 +15,19 @@ import androidx.health.connect.client.records.metadata.DataOrigin
 import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.DataProviders
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDateTime
 import java.time.Period
@@ -33,7 +37,8 @@ import javax.inject.Inject
 class HealthConnectRepoImpl @Inject constructor(
     private val healthConnectClient: HealthConnectClient,
     private val stepsRecordDao: StepsRecordDao,
-    private val context : Context
+    private val context : Context,
+    private val dataStore : DataStoreRepo
 
 ) : HealthConnectRepo {
     companion object{
@@ -74,13 +79,20 @@ class HealthConnectRepoImpl @Inject constructor(
     override suspend fun fetchAndSaveAllStepRecords() : Flow<ProcessState<Boolean>> = flow{
         emit(ProcessState.Loading)
         try {
+            val packageName = dataStore.dataProviders.first()
+
+
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
-                    dataOriginFilter = setOf(DataOrigin("com.sec.android.app.shealth")),
+                    dataOriginFilter = setOf(DataOrigin(packageName)),
                     ascendingOrder = false
                 )
             )
+
+
+
+
             response.records.forEach {
                 Log.d("TAG", "fetchAndSaveAllStepRecords: $it")
                 stepsRecordDao.insertStepsRecord(
@@ -88,7 +100,7 @@ class HealthConnectRepoImpl @Inject constructor(
                         steps = it.count,
                         stepTarget = 10000,
                         uuid = UUID.randomUUID().toString(),
-                        date = DateUtils.convertUtcToLocalTime(it.startTime,it.startZoneOffset)
+                        date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
                     )
                 )
             }
@@ -138,6 +150,7 @@ class HealthConnectRepoImpl @Inject constructor(
         return try {
             context.packageManager.getApplicationIcon(packageName)
         } catch (e: Exception) {
+            e.printStackTrace()
             ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)
                 ?: throw RuntimeException("Default icon not found")
         }
@@ -149,6 +162,7 @@ class HealthConnectRepoImpl @Inject constructor(
             val applicationInfo = context.packageManager.getApplicationInfo(packageName, 0)
             context.packageManager.getApplicationLabel(applicationInfo).toString()
         } catch (e: Exception) {
+            e.printStackTrace()
             packageName
         }
     }

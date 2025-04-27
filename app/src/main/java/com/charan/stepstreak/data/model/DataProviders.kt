@@ -5,6 +5,6 @@ import android.graphics.drawable.Drawable
 data class DataProviders(
     val name : String = "",
     val icon : Drawable,
-    val isConnected : Boolean = false,
+    var isConnected : Boolean = false,
     val packageName : String = ""
 )

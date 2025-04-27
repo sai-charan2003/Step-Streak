@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.health.connect.client.HealthConnectClient
 import com.charan.stepstreak.data.local.AppDatabase
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.data.repository.impl.DataStoreRepoImp
 import com.charan.stepstreak.data.repository.impl.HealthConnectRepoImpl
 import com.charan.stepstreak.data.repository.impl.StepsRecordRepoImp
 import dagger.Module
@@ -47,8 +49,15 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context): HealthConnectRepo {
-        return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao,context)
+    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context,dataStoreRepo: DataStoreRepo): HealthConnectRepo {
+        return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao,context,dataStoreRepo)
+
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataStoreRepo(@ApplicationContext context : Context) : DataStoreRepo {
+        return DataStoreRepoImp(context)
 
     }
 

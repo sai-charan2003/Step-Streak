@@ -30,6 +30,7 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.navigation.compose.rememberNavController
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.presentation.navigation.NavAppHost
 import com.charan.stepstreak.ui.theme.StepStreakTheme
@@ -37,6 +38,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -44,16 +46,17 @@ import kotlin.collections.containsAll
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    val permissions = setOf(
-        HealthPermission.getReadPermission(StepsRecord::class)
-    )
-
+    @Inject lateinit var dataStoreRepo: DataStoreRepo
+    private var isOnBoardingCompleted = mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            LaunchedEffect(Unit) {
+                isOnBoardingCompleted.value = dataStoreRepo.isOnBoardingCompleted.first()
+            }
             StepStreakTheme {
-                NavAppHost(navHostController = rememberNavController())
+                NavAppHost(navHostController = rememberNavController(), isOnBoardingCompleted = isOnBoardingCompleted.value)
 
             }
         }
