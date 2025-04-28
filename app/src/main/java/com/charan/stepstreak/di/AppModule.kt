@@ -7,9 +7,11 @@ import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.DataStoreRepoImp
 import com.charan.stepstreak.data.repository.impl.HealthConnectRepoImpl
 import com.charan.stepstreak.data.repository.impl.StepsRecordRepoImp
+import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,6 +61,12 @@ class AppModule {
     fun provideDataStoreRepo(@ApplicationContext context : Context) : DataStoreRepo {
         return DataStoreRepoImp(context)
 
+    }
+
+    @Provides
+    @Singleton
+    fun provideWidgetRepo(@ApplicationContext context : Context,healthConnectRepo: HealthConnectRepo,stepsRecordRepo: StepsRecordRepo) : WidgetRepo{
+        return WidgetRepoImp(healthConnectRepo,stepsRecordRepo,context)
     }
 
 }

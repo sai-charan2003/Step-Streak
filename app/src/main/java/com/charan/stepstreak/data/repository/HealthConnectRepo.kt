@@ -18,4 +18,6 @@ interface HealthConnectRepo {
 
     fun getOriginProviders() : Flow<ProcessState<List<DataProviders>>>
 
+    suspend fun getCurrentWeekSteps() : Flow<ProcessState<List<StepsRecordEntity>>>
+
 }

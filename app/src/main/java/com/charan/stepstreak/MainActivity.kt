@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -47,20 +48,24 @@ import kotlin.collections.containsAll
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var dataStoreRepo: DataStoreRepo
-    private var isOnBoardingCompleted = mutableStateOf(false)
+    private var isOnBoardingCompleted = mutableStateOf<Boolean>(true)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CoroutineScope(Dispatchers.Main).launch {
+            isOnBoardingCompleted.value = dataStoreRepo.isOnBoardingCompleted.first()
+        }
+        installSplashScreen()
         enableEdgeToEdge()
         setContent {
-            LaunchedEffect(Unit) {
-                isOnBoardingCompleted.value = dataStoreRepo.isOnBoardingCompleted.first()
-            }
             StepStreakTheme {
-                NavAppHost(navHostController = rememberNavController(), isOnBoardingCompleted = isOnBoardingCompleted.value)
-
+                NavAppHost(
+                    navHostController = rememberNavController(),
+                    isOnBoardingCompleted = isOnBoardingCompleted.value == true
+                )
             }
         }
     }
+
 }
 
 

@@ -18,4 +18,8 @@ interface StepsRecordDao {
     @Query("SELECT * FROM steps_record")
     fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>
 
+    @Query("SELECT * FROM steps_record WHERE date BETWEEN :startDate AND :endDate")
+    suspend fun getStepsRecordsByDateRange(startDate: String, endDate: String): List<StepsRecordEntity>
+
+
 }

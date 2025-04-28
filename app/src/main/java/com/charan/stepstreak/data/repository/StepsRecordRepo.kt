@@ -10,4 +10,6 @@ interface StepsRecordRepo {
     suspend fun insertStepRecord(stepsRecordEntity: StepsRecordEntity)
 
     suspend fun getAllStepRecords() : Flow<List<StepsRecordEntity>>
+
+    suspend fun getWeeklyStepsRecords() : List<StepsRecordEntity>
 }

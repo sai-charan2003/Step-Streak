@@ -51,6 +51,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.presentation.navigation.HomeScreenNav
+import com.charan.stepstreak.utils.DateUtils
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +64,8 @@ fun OnBoardingScreen(
     viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
     val permissions = setOf(
-        HealthPermission.getReadPermission(StepsRecord::class)
+        HealthPermission.getReadPermission(StepsRecord::class),
+        HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
     )
     val state = viewModel.state.collectAsState()
     val pageState = rememberPagerState(initialPage = 0, pageCount = { 3 })

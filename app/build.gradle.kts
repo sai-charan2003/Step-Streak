@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.connect.client)
     implementation (libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance)
+    implementation(libs.glance.material)
     implementation(libs.androidx.navigation.compose)
     implementation (libs.androidx.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

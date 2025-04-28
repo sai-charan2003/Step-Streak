@@ -49,13 +49,27 @@ class HealthConnectRepoImpl @Inject constructor(
     override suspend fun getTotalSteps() : Flow<ProcessState<List<StepsRecordEntity>>> = flow {
         emit(ProcessState.Loading)
         try {
+            val records = mutableListOf<StepsRecordEntity>()
+            val provider = dataStore.dataProviders.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
-                    dataOriginFilter = setOf(DataOrigin("com.sec.android.app.shealth")),
+                    dataOriginFilter = setOf(DataOrigin(provider)),
                     ascendingOrder = false
                 )
             )
+            response.records.forEach { record->
+                val stepRecord = StepsRecordEntity(
+                    steps = record.count,
+                    stepTarget = 10000,
+                    uuid = UUID.randomUUID().toString(),
+                    date = DateUtils.convertUtcToLocalTime(record.startTime, record.startZoneOffset)
+
+                )
+                records.add(stepRecord)
+
+            }
+            emit(ProcessState.Success(records))
 
 
         } catch (e: Exception){
@@ -89,12 +103,7 @@ class HealthConnectRepoImpl @Inject constructor(
                     ascendingOrder = false
                 )
             )
-
-
-
-
             response.records.forEach {
-                Log.d("TAG", "fetchAndSaveAllStepRecords: $it")
                 stepsRecordDao.insertStepsRecord(
                     StepsRecordEntity(
                         steps = it.count,
@@ -167,4 +176,34 @@ class HealthConnectRepoImpl @Inject constructor(
         }
     }
 
+    override suspend fun getCurrentWeekSteps(): Flow<ProcessState<List<StepsRecordEntity>>> = flow{
+        emit(ProcessState.Loading)
+        try {
+            val packageName = dataStore.dataProviders.first()
+            val response = healthConnectClient.readRecords(
+                ReadRecordsRequest<StepsRecord>(
+                    timeRangeFilter = TimeRangeFilter.between(DateUtils.getWeekStartDate(),
+                        DateUtils.getWeekEndDate()),
+                    dataOriginFilter = setOf(DataOrigin(packageName)),
+                    ascendingOrder = false
+                )
+            )
+            response.records.forEach {
+                stepsRecordDao.insertStepsRecord(
+                    StepsRecordEntity(
+                        steps = it.count,
+                        stepTarget = 10000,
+                        uuid = UUID.randomUUID().toString(),
+                        date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
+                    )
+                )
+            }
+
+
+        } catch (e: Exception){
+            e.printStackTrace()
+            emit(ProcessState.Error(e.message ?: "Something went wrong"))
+
+        }
+    }
 }
