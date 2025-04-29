@@ -10,6 +10,8 @@ import com.charan.stepstreak.presentation.widget.StepsData
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
+import com.charan.stepstreak.utils.getMotivationQuote
+import com.charan.stepstreak.utils.getStreak
 import com.charan.stepstreak.utils.toWidgetState
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -57,6 +59,7 @@ class WidgetRepoImp @Inject constructor(
     override fun getWeeklyStreak(): Flow<WidgetState> = flow{
         val weekList = DateUtils.weekList
         val data = stepsRecordRepo.getWeeklyStepsRecords().toWidgetState()
+        val allData = stepsRecordRepo.getAllStepsRecords()
         val widgetContent = mutableListOf<StepsData>()
         weekList.forEach { day->
             val steps = data.stepsData.find { it.day == day }
@@ -70,7 +73,13 @@ class WidgetRepoImp @Inject constructor(
             widgetContent.add(stepsData)
 
         }
-        emit(WidgetState(stepsData = widgetContent))
+        emit(
+            WidgetState(
+                streak = allData.getStreak(),
+                motiText = allData.getMotivationQuote(),
+                stepsData = widgetContent
+            )
+        )
 
     }
 }

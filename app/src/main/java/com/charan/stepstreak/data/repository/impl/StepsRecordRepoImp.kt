@@ -6,7 +6,6 @@ import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.Date
 import javax.inject.Inject
 
 class StepsRecordRepoImp @Inject constructor(
@@ -25,7 +24,10 @@ class StepsRecordRepoImp @Inject constructor(
     }
 
     override suspend fun getWeeklyStepsRecords(): List<StepsRecordEntity> {
-        return stepsRecordDao.getStepsRecordsByDateRange(DateUtils.getWeekStartDate().toString(), DateUtils.getWeekEndDate().toString())
+        return stepsRecordDao.getStepsRecordsByDateRange(DateUtils.getWeekStartDate().toString(), DateUtils.getWeekEndData().toString())
     }
 
+    override suspend fun getAllStepsRecords(): List<StepsRecordEntity> {
+        return stepsRecordDao.getAllStepRecords()
+    }
 }

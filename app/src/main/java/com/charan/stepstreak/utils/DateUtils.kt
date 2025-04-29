@@ -1,7 +1,5 @@
 package com.charan.stepstreak.utils
 
-import androidx.glance.text.TextStyle
-import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -9,8 +7,6 @@ import java.time.format.DateTimeFormatter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.util.Calendar
 import java.util.Locale
 
 object DateUtils {
@@ -37,28 +33,40 @@ object DateUtils {
         return (0..6).map { startOfWeek.plusDays(it.toLong()).format(formatter) }
     }
 
-    fun getWeekStartDate() : LocalDateTime {
+    fun getWeekStartDateInISO() : LocalDateTime {
         val today = LocalDateTime.now()
         return today.with(DayOfWeek.MONDAY)
     }
 
-    fun getWeekEndDate() : LocalDateTime {
+    fun getWeekEndDateInISO() : LocalDateTime {
         val today = LocalDateTime.now()
         return today.with(DayOfWeek.SUNDAY)
     }
 
     fun getDateNumberFromIso(date: String): Int {
-        val localDateTime = LocalDateTime.parse(date)
+        val localDateTime = LocalDate.parse(date)
         return localDateTime.dayOfMonth
     }
 
     fun getWeekFromIso(date: String): String {
-        val localDateTime = LocalDateTime.parse(date)
+        val localDateTime = LocalDate.parse(date)
         return localDateTime.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT,Locale.getDefault())
     }
 
     fun getCurrentDate() : LocalDate{
         return LocalDate.now()
+    }
+
+    fun getWeekStartDate() : LocalDate{
+        val today = LocalDate.now()
+        return today.with(DayOfWeek.MONDAY)
+
+    }
+
+    fun getWeekEndData() : LocalDate {
+        val today = LocalDate.now()
+        return today.with(DayOfWeek.SUNDAY)
+
     }
 
 }

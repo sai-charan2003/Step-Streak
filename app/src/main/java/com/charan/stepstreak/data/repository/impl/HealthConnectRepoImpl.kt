@@ -1,7 +1,6 @@
 package com.charan.stepstreak.data.repository.impl
 
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
@@ -9,13 +8,9 @@ import androidx.core.content.ContextCompat
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.readRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
-import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
-import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.response.ReadRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
@@ -26,11 +21,9 @@ import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDateTime
-import java.time.Period
 import java.util.UUID
 import javax.inject.Inject
 
@@ -182,8 +175,8 @@ class HealthConnectRepoImpl @Inject constructor(
             val packageName = dataStore.dataProviders.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
-                    timeRangeFilter = TimeRangeFilter.between(DateUtils.getWeekStartDate(),
-                        DateUtils.getWeekEndDate()),
+                    timeRangeFilter = TimeRangeFilter.between(DateUtils.getWeekStartDateInISO(),
+                        DateUtils.getWeekEndDateInISO()),
                     dataOriginFilter = setOf(DataOrigin(packageName)),
                     ascendingOrder = false
                 )

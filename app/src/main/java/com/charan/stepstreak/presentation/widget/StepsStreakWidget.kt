@@ -17,10 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.AndroidResourceImageProvider
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceComposable
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.background
@@ -39,6 +42,7 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.text.FontStyle
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -49,6 +53,8 @@ import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
 import com.charan.stepstreak.presentation.components.ProgressTickMark
 import com.charan.stepstreak.utils.AppUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class WeeklyStreakWidget : GlanceAppWidget() {
     override suspend fun provideGlance(
@@ -71,6 +77,7 @@ class WeeklyStreakWidgetReceiver() : GlanceAppWidgetReceiver(){
 
 }
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun WeeklyStreakWidgetContent(
     repo: WidgetRepo
@@ -78,8 +85,10 @@ fun WeeklyStreakWidgetContent(
     var weeklyStreak by remember { mutableStateOf(WidgetState()) }
 
     LaunchedEffect(Unit) {
-        repo.getWeeklyStreak().collect {
-            weeklyStreak = it
+        launch(Dispatchers.IO) {
+            repo.getWeeklyStreak().collect {
+                weeklyStreak = it
+            }
         }
     }
 
@@ -91,14 +100,43 @@ fun WeeklyStreakWidgetContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.Start
     ) {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth().padding(bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                provider = AndroidResourceImageProvider(R.drawable.streak),
+                contentDescription = null,
+                modifier = GlanceModifier.size(24.dp).padding(end = 6.dp)
+            )
+            Text(
+                text = weeklyStreak.streak.toString(),
+                style = TextStyle(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = GlanceTheme.colors.primary
+                )
+            )
+            Spacer(GlanceModifier.width(4.dp))
+            Text(
+                text = "Days",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = GlanceTheme.colors.onSurfaceVariant
+                ),
+                modifier = GlanceModifier.padding(top = 4.dp)
+            )
+        }
         Text(
-            text = "🔥 Weekly Streak",
+            text = weeklyStreak.motiText,
+            modifier = GlanceModifier.padding(bottom = 20.dp),
             style = TextStyle(
-                color = GlanceTheme.colors.primary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            ),
-            modifier = GlanceModifier.padding(bottom = 20.dp)
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                color = GlanceTheme.colors.primary
+            )
+
         )
 
         Row(
@@ -109,7 +147,7 @@ fun WeeklyStreakWidgetContent(
             weeklyStreak.stepsData.forEachIndexed { index, day ->
                 Column(
                     modifier = GlanceModifier.defaultWeight(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WeekStreakItem(
@@ -127,36 +165,44 @@ fun WeeklyStreakWidgetContent(
     }
 }
 
+
 @SuppressLint("RestrictedApi")
 @GlanceComposable
 @Composable
 fun WeekStreakItem(
     weekName: String,
-    steps : Long,
-    targetSteps : Long,
+    steps: Long,
+    targetSteps: Long,
     isCompleted: Boolean
 ) {
+    val progressColor = AppUtils.getProgressColor(steps, targetSteps)
+
     Column(
+        modifier = GlanceModifier
+            .padding(horizontal = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Box(
             modifier = GlanceModifier
                 .size(20.dp)
                 .cornerRadius(100.dp)
-                .background(AppUtils.getProgressColor(steps,targetSteps))
-                ,
-
+                .background(progressColor),
             contentAlignment = Alignment.Center
         ) {
-
+            if (isCompleted) {
+                Image(
+                    provider = AndroidResourceImageProvider(R.drawable.rounded_check_24),
+                    contentDescription = null,
+                    modifier = GlanceModifier.size(12.dp),
+                    colorFilter = ColorFilter.tint(colorProvider = ColorProvider(Color.White))
+                )
+            }
         }
 
-        Spacer(GlanceModifier.defaultWeight())
-
+        Spacer(GlanceModifier.height(4.dp))
         Text(
-            text = weekName,
+            text = weekName.uppercase(),
             style = TextStyle(
                 color = GlanceTheme.colors.onSurface,
                 fontSize = 12.sp,
@@ -165,3 +211,4 @@ fun WeekStreakItem(
         )
     }
 }
+
