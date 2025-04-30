@@ -50,6 +50,7 @@ import androidx.glance.unit.ColorProvider
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
+import com.charan.stepstreak.data.worker.StepsUpdateWorker
 import com.charan.stepstreak.presentation.components.ProgressTickMark
 import com.charan.stepstreak.utils.AppUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,6 +65,7 @@ class WeeklyStreakWidget : GlanceAppWidget() {
         val repo = WidgetRepoImp.getInstance(context)
         provideContent {
             GlanceTheme {
+                StepsUpdateWorker.setup(context)
                 WeeklyStreakWidgetContent(repo)
 
             }
@@ -72,6 +74,11 @@ class WeeklyStreakWidget : GlanceAppWidget() {
 }
 @AndroidEntryPoint
 class WeeklyStreakWidgetReceiver() : GlanceAppWidgetReceiver(){
+
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+
+    }
     override val glanceAppWidget: GlanceAppWidget
         get() = WeeklyStreakWidget()
 

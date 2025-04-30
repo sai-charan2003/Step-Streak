@@ -89,4 +89,5 @@ dependencies {
     implementation (libs.androidx.room.ktx)
     implementation (libs.accompanist.drawablepainter)
     implementation (libs.androidx.datastore)
+    implementation(libs.androidx.work.runtime)
 }
