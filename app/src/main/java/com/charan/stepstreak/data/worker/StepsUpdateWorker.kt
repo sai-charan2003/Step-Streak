@@ -52,6 +52,7 @@ class StepsUpdateWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
+            println("Starting workerManager")
             if (healthConnectRepo.hasPermission()) {
                 healthConnectRepo.fetchAndSaveAllStepRecords()
             }

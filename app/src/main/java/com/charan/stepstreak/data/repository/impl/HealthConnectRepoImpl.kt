@@ -36,7 +36,8 @@ class HealthConnectRepoImpl @Inject constructor(
 ) : HealthConnectRepo {
     companion object{
         val permissions = setOf(
-            HealthPermission.getReadPermission(StepsRecord::class)
+            HealthPermission.getReadPermission(StepsRecord::class),
+            HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
         )
     }
     override suspend fun getTotalSteps() : Flow<ProcessState<List<StepsRecordEntity>>> = flow {
@@ -87,6 +88,7 @@ class HealthConnectRepoImpl @Inject constructor(
         emit(ProcessState.Loading)
         try {
             val packageName = dataStore.dataProviders.first()
+            Log.d("TAG", "fetchAndSaveAllStepRecords: hi")
 
 
             val response = healthConnectClient.readRecords(
