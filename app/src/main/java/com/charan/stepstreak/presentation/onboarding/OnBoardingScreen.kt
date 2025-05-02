@@ -43,12 +43,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.glance.AndroidResourceImageProvider
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.charan.stepstreak.R
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.presentation.navigation.HomeScreenNav
 import com.charan.stepstreak.utils.DateUtils
@@ -189,11 +191,17 @@ fun IntroPage() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
+        Image(
+            painter = painterResource(R.drawable.applogo),
+            null
+        )
             Text(
                 text = "Welcome to StepStreak!",
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
             )
+
+
 
             Text(
                 text = "Stay motivated by tracking your daily steps and achieving streaks!",
@@ -217,18 +225,19 @@ fun HealthConnectPermissionScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
+        HealthConnectAnimationItem(
+            modifier = Modifier
+                .size(150.dp)
+                .padding(vertical = 16.dp),
+            isConnected = isConnected
+        )
             Text(
                 text = "Connect with Health Connect",
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
             )
 
-            HealthConnectAnimationItem(
-                modifier = Modifier
-                    .size(150.dp)
-                    .padding(vertical = 16.dp),
-                isConnected = isConnected
-            )
+
 
             Text(
                 text = "Allow access to your steps data so we can track your streaks!",
@@ -262,6 +271,7 @@ fun SelectProviderPage(
                     .fillMaxSize()
                     .weight(0.5f)
             ) {
+                ProviderConnectImageitem(providers.map { it.icon })
                 Text(
                     text = "Choose Your Step Tracking App",
                     style = MaterialTheme.typography.headlineLarge,
@@ -269,7 +279,7 @@ fun SelectProviderPage(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                ProviderConnectImageitem(providers.map { it.icon })
+
 
                 Text(
                     text = "We need a provider that tracks your steps and writes them to Health Connect.",

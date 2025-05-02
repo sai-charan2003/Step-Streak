@@ -65,7 +65,6 @@ class WeeklyStreakWidget : GlanceAppWidget() {
         val repo = WidgetRepoImp.getInstance(context)
         provideContent {
             GlanceTheme {
-                StepsUpdateWorker.setup(context)
                 WeeklyStreakWidgetContent(repo)
 
             }
@@ -77,6 +76,7 @@ class WeeklyStreakWidgetReceiver() : GlanceAppWidgetReceiver(){
 
     override fun onEnabled(context: Context?) {
         super.onEnabled(context)
+        StepsUpdateWorker.setup(context!!)
 
     }
     override val glanceAppWidget: GlanceAppWidget

@@ -1,6 +1,7 @@
 package com.charan.stepstreak.data.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.glance.appwidget.updateAll
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
@@ -15,6 +16,7 @@ import com.charan.stepstreak.presentation.widget.WeeklyStreakWidgetReceiver
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class StepsUpdateWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted workerParams: WorkerParameters,
+    @Assisted val healthConnectRepo: HealthConnectRepo
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
@@ -34,6 +37,7 @@ class StepsUpdateWorker @AssistedInject constructor(
                 15,
                 TimeUnit.MINUTES
             )
+                .setInitialDelay(Duration.ofSeconds(15))
                 .setConstraints(constraints)
 
                 .build()
@@ -47,7 +51,16 @@ class StepsUpdateWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result {
-        WeeklyStreakWidget().updateAll(appContext)
+        try {
+            if (healthConnectRepo.hasPermission()) {
+                healthConnectRepo.fetchAndSaveAllStepRecords()
+            }
+            WeeklyStreakWidget().updateAll(appContext)
+
+        } catch (e: Exception) {
+            Log.d("TAG", "doWork: $e")
+
+        }
         return Result.success()
 
     }
