@@ -56,11 +56,18 @@ class StepsUpdateWorker @AssistedInject constructor(
         try {
             println("Starting workerManager")
             healthConnectRepo.fetchAndSaveAllStepRecords().collectLatest {
-                if (it == ProcessState.Success) {
-                    WeeklyStreakWidget().updateAll(appContext)
+                when(it){
 
+                    is ProcessState.Error -> {
+                    }
+                    ProcessState.Loading -> {}
+                    is ProcessState.Success<*> -> {
+                        WeeklyStreakWidget().updateAll(appContext)
+                    }
                 }
             }
+
+
         } catch (e: Exception) {
             Log.d("TAG", "doWork: $e")
 
