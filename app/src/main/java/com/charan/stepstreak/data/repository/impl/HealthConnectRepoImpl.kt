@@ -95,9 +95,10 @@ class HealthConnectRepoImpl @Inject constructor(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
                     dataOriginFilter = setOf(DataOrigin(packageName)),
-                    ascendingOrder = false
+                    ascendingOrder = true
                 )
             )
+            Log.d("TAG", "fetchAndSaveAllStepRecords: ${response.records}")
             response.records.forEach {
                 stepsRecordDao.insertStepsRecord(
                     StepsRecordEntity(
@@ -111,6 +112,7 @@ class HealthConnectRepoImpl @Inject constructor(
             emit(ProcessState.Success(true))
 
         } catch (e: Exception){
+            Log.d("TAG", "fetchAndSaveAllStepRecords: $e")
             e.printStackTrace()
             emit(ProcessState.Error(e.message ?: "Something went wrong"))
 

@@ -13,9 +13,11 @@ import androidx.work.WorkerParameters
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidget
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidgetReceiver
+import com.charan.stepstreak.utils.ProcessState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.collectLatest
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -44,7 +46,7 @@ class StepsUpdateWorker @AssistedInject constructor(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 TAG,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 request
             )
         }
@@ -53,11 +55,12 @@ class StepsUpdateWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         try {
             println("Starting workerManager")
-            if (healthConnectRepo.hasPermission()) {
-                healthConnectRepo.fetchAndSaveAllStepRecords()
-            }
-            WeeklyStreakWidget().updateAll(appContext)
+            healthConnectRepo.fetchAndSaveAllStepRecords().collectLatest {
+                if (it == ProcessState.Success) {
+                    WeeklyStreakWidget().updateAll(appContext)
 
+                }
+            }
         } catch (e: Exception) {
             Log.d("TAG", "doWork: $e")
 

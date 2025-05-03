@@ -21,7 +21,7 @@ object DateUtils {
         "Sun"
     )
     fun convertUtcToLocalTime(utcTimeString: Instant, zoneOffsetString: ZoneOffset?): String {
-        val localDateTime = ZonedDateTime.ofInstant(utcTimeString, zoneOffsetString)
+        val localDateTime = ZonedDateTime.ofInstant(utcTimeString, zoneOffsetString ?: ZoneOffset.systemDefault())
         return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
