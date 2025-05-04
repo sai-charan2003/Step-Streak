@@ -4,6 +4,9 @@ data class HomeState(
     val stepsData : List<StepsData> = emptyList(),
     val isSyncing : Boolean = true,
     val isPermissionGranted : Boolean = true,
+    val streakCount : String = "0",
+    val motiText : String = "",
+    val todaysStepData : StepsData = StepsData()
 )
 
 data class StepsData(

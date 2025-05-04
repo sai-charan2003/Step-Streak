@@ -6,9 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.utils.ProcessState
+import com.charan.stepstreak.utils.getMotivationQuote
+import com.charan.stepstreak.utils.getStreak
+import com.charan.stepstreak.utils.getTodaysStepsData
 import com.charan.stepstreak.utils.toStepsData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,9 +62,23 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun observeSteps() = viewModelScope.launch (Dispatchers.IO){
         stepsRecordDao.getAllStepsRecords().collectLatest { status ->
-            _state.update { it.copy(stepsData = status.toStepsData()) }
+            _state.update { it.copy(
+                streakCount = status.getStreak().toString(),
+                motiText = status.getMotivationQuote(),
+                stepsData = status.toStepsData(),
+                todaysStepData = status.getTodaysStepsData() ?: StepsData()
+            ) }
 
         }
+    }
+
+    fun onEvent(event: HomeEvent){
+        when(event){
+            HomeEvent.OnRefresh -> {
+                fetchSteps()
+            }
+        }
+
     }
 
 }

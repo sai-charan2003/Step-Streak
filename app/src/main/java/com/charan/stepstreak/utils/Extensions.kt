@@ -13,9 +13,15 @@ fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
         StepsData(
             steps = it.steps ?: 0L,
             date = it.date ?: "" ,
-            targetSteps = it.stepTarget ?: 0L
+            targetSteps = it.stepTarget ?: 0L,
         )
     }
+
+}
+
+fun List<StepsRecordEntity>.getTodaysStepsData() : StepsData?{
+    val todayRecord = this.filter { it.date == DateUtils.getCurrentDate().toString() }
+    return todayRecord.toStepsData().firstOrNull()
 
 }
 
