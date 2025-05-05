@@ -18,6 +18,7 @@ import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
 import kotlinx.coroutines.flow.Flow
@@ -88,9 +89,6 @@ class HealthConnectRepoImpl @Inject constructor(
         emit(ProcessState.Loading)
         try {
             val packageName = dataStore.dataProviders.first()
-            Log.d("TAG", "fetchAndSaveAllStepRecords: hi")
-
-
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
@@ -98,7 +96,6 @@ class HealthConnectRepoImpl @Inject constructor(
                     ascendingOrder = true
                 )
             )
-            Log.d("TAG", "fetchAndSaveAllStepRecords: ${response.records}")
             response.records.forEach {
                 stepsRecordDao.insertStepsRecord(
                     StepsRecordEntity(
@@ -112,7 +109,6 @@ class HealthConnectRepoImpl @Inject constructor(
             emit(ProcessState.Success(true))
 
         } catch (e: Exception){
-            Log.d("TAG", "fetchAndSaveAllStepRecords: $e")
             e.printStackTrace()
             emit(ProcessState.Error(e.message ?: "Something went wrong"))
 

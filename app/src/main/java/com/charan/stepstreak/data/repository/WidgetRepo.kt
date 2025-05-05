@@ -8,5 +8,7 @@ interface WidgetRepo {
 
     fun getWeeklyStreak() : Flow<WidgetState>
 
+    suspend fun updateWidget()
+
 
 }

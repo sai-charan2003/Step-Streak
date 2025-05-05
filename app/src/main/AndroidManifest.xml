@@ -16,7 +16,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApp.MySplash"
-        tools:targetApi="31">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="33">
         <receiver
             android:name=".presentation.widget.WeeklyStreakWidgetReceiver"
             android:description="@string/weekly_streak"

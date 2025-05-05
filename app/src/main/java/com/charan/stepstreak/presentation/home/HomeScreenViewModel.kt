@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
@@ -26,7 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val healthConnectRepo: HealthConnectRepo,
-    private val stepsRecordDao: StepsRecordDao
+    private val stepsRecordDao: StepsRecordDao,
+    private val widgetRepo: WidgetRepo
 
 ): ViewModel() {
     private val _state = MutableStateFlow(HomeState())
@@ -67,7 +69,9 @@ class HomeScreenViewModel @Inject constructor(
                 motiText = status.getMotivationQuote(),
                 stepsData = status.toStepsData(),
                 todaysStepData = status.getTodaysStepsData() ?: StepsData()
-            ) }
+            )
+            }
+            widgetRepo.updateWidget()
 
         }
     }

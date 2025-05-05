@@ -2,11 +2,14 @@ package com.charan.stepstreak.data.repository.impl
 
 import android.content.Context
 import android.util.Log
+import androidx.glance.appwidget.updateAll
+import androidx.glance.appwidget.updateIf
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.presentation.widget.StepsData
+import com.charan.stepstreak.presentation.widget.WeeklyStreakWidget
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
@@ -81,5 +84,9 @@ class WidgetRepoImp @Inject constructor(
             )
         )
 
+    }
+
+    override suspend fun updateWidget() {
+        WeeklyStreakWidget().updateAll(context)
     }
 }
