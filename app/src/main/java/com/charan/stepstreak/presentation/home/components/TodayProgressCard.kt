@@ -36,6 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.charan.stepstreak.R
 import kotlin.math.min
 
@@ -44,11 +48,21 @@ fun TodayProgressCard(
     steps: Long,
     targetSteps: Long,
 ) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.confetti))
+    var showConfetti by remember { mutableStateOf(true) }
+    val lottieProgress by animateLottieCompositionAsState(
+        composition,
+    )
     val progress = (steps / targetSteps.toFloat()).coerceIn(0f, 1f)
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
     )
+    LaunchedEffect(lottieProgress) {
+        if (lottieProgress == 1f) {
+            showConfetti = false
+        }
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -58,9 +72,19 @@ fun TodayProgressCard(
             defaultElevation = 6.dp
         ),
     ) {
+
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
+            if(steps>=targetSteps && showConfetti){
+                LottieAnimation(
+                    composition = composition,
+                    progress = { lottieProgress },
+                    modifier = Modifier.fillMaxWidth().matchParentSize(),
+                    safeMode = true
+                )
+            }
+
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.DirectionsRun,
                 contentDescription = "Steps Icon",

@@ -91,4 +91,5 @@ dependencies {
     implementation (libs.accompanist.drawablepainter)
     implementation (libs.androidx.datastore)
     implementation(libs.androidx.work.runtime)
+    implementation( libs.lottie)
 }
