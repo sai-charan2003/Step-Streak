@@ -9,8 +9,9 @@ data class HomeState(
     val todaysStepData : StepsData = StepsData()
 )
 
-data class StepsData(
+data class  StepsData(
     val steps : Long = 0L,
     val date : String = "",
     val targetSteps : Long = 10000,
+    val day : String = ""
 )

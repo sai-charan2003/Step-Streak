@@ -15,7 +15,7 @@ interface StepsRecordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStepsRecord(stepsRecordEntity: List<StepsRecordEntity>)
 
-    @Query("SELECT * FROM steps_record")
+    @Query("SELECT * FROM steps_record ORDER BY date desc")
     fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>
 
     @Query("SELECT * FROM steps_record WHERE date BETWEEN :startDate AND :endDate")

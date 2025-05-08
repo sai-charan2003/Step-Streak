@@ -130,7 +130,7 @@ fun TodayProgressCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "${(progress * 100).toInt()}% of daily goal",
+                    text = "${((steps / targetSteps.toFloat()) * 100).toInt()}% of daily goal",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )

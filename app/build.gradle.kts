@@ -92,4 +92,7 @@ dependencies {
     implementation (libs.androidx.datastore)
     implementation(libs.androidx.work.runtime)
     implementation( libs.lottie)
+    implementation(libs.vico.compose.m3)
+    implementation(libs.charts)
+    implementation(libs.charty)
 }

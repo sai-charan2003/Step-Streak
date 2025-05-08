@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.HomeTopBar
 import com.charan.stepstreak.presentation.home.components.StreakCard
 import com.charan.stepstreak.presentation.home.components.TodayProgressCard
@@ -60,11 +61,13 @@ fun HomeScreen(
 ){
     val state = viewModel.state.collectAsState()
     val effects = viewModel.effects.collectAsState(initial = null)
-    val scroll = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val pullToRefreshState = rememberPullToRefreshState()
 
 
     Scaffold(
+        modifier = Modifier
+            .nestedScroll(scroll.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
@@ -73,7 +76,8 @@ fun HomeScreen(
                 actions = {
 
                 },
-                modifier = Modifier.nestedScroll(scroll.nestedScrollConnection)
+                scrollBehavior = scroll,
+                modifier = Modifier
 
 
             )
@@ -105,6 +109,10 @@ fun HomeScreen(
                     TodayProgressCard(
                         steps = state.value.todaysStepData.steps,
                         targetSteps = state.value.todaysStepData.targetSteps,
+                    )
+                    Spacer(Modifier.height(15.dp))
+                    DailyStepsCard(
+                        stepsData = state.value.stepsData
                     )
                 }
 

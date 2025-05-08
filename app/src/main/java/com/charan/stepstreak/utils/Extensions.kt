@@ -5,6 +5,7 @@ import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.presentation.home.StepsData
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.Constants.walkingMotivationMessages
+import com.himanshoe.charty.bar.model.BarData
 import java.util.Date
 
 
@@ -14,10 +15,13 @@ fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
             steps = it.steps ?: 0L,
             date = it.date ?: "" ,
             targetSteps = it.stepTarget ?: 0L,
+            day = DateUtils.getWeekFromIso(it.date ?: "")
         )
     }
 
 }
+
+
 
 fun List<StepsRecordEntity>.getTodaysStepsData() : StepsData?{
     val todayRecord = this.filter { it.date == DateUtils.getCurrentDate().toString() }
@@ -43,6 +47,15 @@ fun List<StepsRecordEntity>.toWidgetState(): WidgetState{
     return WidgetState(
         stepsData = stepsData
     )
+}
+
+fun List<StepsData>.toBarChar() : List<BarData> {
+    return this.map {
+        BarData(
+            yValue = it.steps.toFloat(),
+            xValue = it.day,
+        )
+    }
 }
 
 

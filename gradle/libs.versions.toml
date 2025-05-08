@@ -3,12 +3,15 @@ accompanistDrawablepainter = "0.37.2"
 accompanistPermissions = "0.37.2"
 accompanistSwiperefresh = "0.34.0"
 agp = "8.9.2"
+charts = "2.0.0"
 connectClient = "1.1.0-rc01"
 converterGson = "2.11.0"
 datastore = "1.1.1"
 lottie = "6.6.6"
 material = "1.12.0"
 workRuntime = "2.10.0"
+vico = "2.1.2"
+charty = "2.1.0-beta03.4"
 glance = "1.1.1"
 hiltWork = "1.2.0"
 kotlin = "2.1.20"
@@ -39,6 +42,7 @@ accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-dra
 androidx-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+charts = { module = "io.github.dautovicharis:charts", version.ref = "charts" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -75,6 +79,8 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomCompiler" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomCompiler" }
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+charty = { module = "com.himanshoe:charty", version.ref = "charty" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
