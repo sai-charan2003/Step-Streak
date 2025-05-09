@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -40,9 +42,49 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    signingConfigs {
+        create("release") {
+            val properties = Properties().apply {
+                load(project.rootProject.file("local.properties").inputStream())
+            }
+            keyAlias = properties.getProperty("KEY_ALIAS") ?: ""
+            keyPassword = properties.getProperty("KEY_PASSWORD") ?: ""
+            storeFile = file(properties.getProperty("KEY_LOCATION") ?: "")
+            storePassword = properties.getProperty("KEY_STORE_PASSWORD") ?: ""
+        }
     }
     hilt {
         enableAggregatingTask = false
+    }
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                val outputFileName = "Step-Streak-${variant.buildType.name}-${variant.versionName}.apk"
+                output.outputFileName = outputFileName
+            }
+    }
+
+
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
+            resValue("string","app_name","Step Streak-Debug")
+
+
+        }
+        release {
+            isMinifyEnabled = false
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
 }
 
