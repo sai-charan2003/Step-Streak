@@ -20,8 +20,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +52,7 @@ import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.HomeTopBar
 import com.charan.stepstreak.presentation.home.components.StreakCard
 import com.charan.stepstreak.presentation.home.components.TodayProgressCard
+import com.charan.stepstreak.presentation.navigation.SettingsScreenNav
 import com.charan.stepstreak.utils.DateUtils
 import kotlin.math.roundToInt
 
@@ -74,6 +78,16 @@ fun HomeScreen(
 
                 },
                 actions = {
+                    IconButton(
+                        onClick = {
+                            navHostController.navigate(SettingsScreenNav)
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            null
+                        )
+                    }
 
                 },
                 scrollBehavior = scroll,

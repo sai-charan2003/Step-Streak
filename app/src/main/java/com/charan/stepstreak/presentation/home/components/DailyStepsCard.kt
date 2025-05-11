@@ -145,7 +145,6 @@ fun StepsCard(
                 )
             }
 
-            // Steps Info
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = "%,d".format(totalSteps),

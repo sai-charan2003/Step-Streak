@@ -8,6 +8,8 @@ interface DataStoreRepo {
     suspend fun clearDataProviders()
     val isOnBoardingCompleted : Flow<Boolean>
     suspend fun setOnBoardingStatus(status : Boolean)
+    val targetSteps : Flow<String>
+    suspend fun setTargetSteps(steps : String)
 
 
 

@@ -46,6 +46,7 @@ class HealthConnectRepoImpl @Inject constructor(
         try {
             val records = mutableListOf<StepsRecordEntity>()
             val provider = dataStore.dataProviders.first()
+            val targetSteps = dataStore.targetSteps.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
@@ -89,6 +90,7 @@ class HealthConnectRepoImpl @Inject constructor(
         emit(ProcessState.Loading)
         try {
             val packageName = dataStore.dataProviders.first()
+            val targetSteps = dataStore.targetSteps.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
@@ -100,7 +102,7 @@ class HealthConnectRepoImpl @Inject constructor(
                 stepsRecordDao.insertStepsRecord(
                     StepsRecordEntity(
                         steps = it.count,
-                        stepTarget = 10000,
+                        stepTarget = targetSteps.toLong(),
                         uuid = UUID.randomUUID().toString(),
                         date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
                     )
@@ -121,6 +123,7 @@ class HealthConnectRepoImpl @Inject constructor(
     override fun getOriginProviders(): Flow<ProcessState<List<DataProviders>>> = flow{
         emit(ProcessState.Loading)
         val dataProviders : MutableList<DataProviders> = mutableListOf()
+        val selectedDataProviderPackage = dataStore.dataProviders.first()
         try {
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
@@ -133,7 +136,8 @@ class HealthConnectRepoImpl @Inject constructor(
                 val dataProvider = DataProviders(
                     packageName = it,
                     name = getApplicationName(it),
-                    icon = getApplicationIcon(it)
+                    icon = getApplicationIcon(it),
+                    isConnected = selectedDataProviderPackage == it
                 )
                 dataProviders.add(dataProvider)
 
