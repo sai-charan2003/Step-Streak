@@ -1,6 +1,7 @@
 package com.charan.stepstreak.utils
 
 import android.util.Log
+import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.presentation.home.StepsData
 import com.charan.stepstreak.presentation.widget.WidgetState
@@ -126,6 +127,6 @@ fun List<StepsRecordEntity>.getMotivationQuote(): String {
         quotes.add(Constants.ongoingStreakMessages.random())
     }
 
-    return if (quotes.isNotEmpty()) quotes.random() else walkingMotivationMessages.random()
+    return if (quotes.isNotEmpty()) quotes.random() else Constants.walkingMotivationMessages.random()
 }
 

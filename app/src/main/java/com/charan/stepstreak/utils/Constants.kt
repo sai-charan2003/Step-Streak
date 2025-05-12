@@ -21,9 +21,16 @@ object Constants {
         "No zero days 🚫",
         "Today is yours 🗓️",
         "Ready, set, go! 🏁",
-        "Push the start ▶️"
+        "Push the start ▶️",
+        "Small steps, big dreams 🌠",
+        "One step closer 🏞️",
+        "Keep the energy flowing ⚡",
+        "Start your journey 🚶‍♀️",
+        "Momentum starts now 🌀",
+        "Take charge today 🏋️",
+        "Every step is progress 📈",
+        "Move forward with purpose 🎯"
     )
-
     val midProgressMessages = listOf(
         "Halfway there! 🟰",
         "Keep it up! 👍",
@@ -44,9 +51,12 @@ object Constants {
         "Final push! 🏋️",
         "Almost finished 🎉",
         "You’ve come far 🛣️",
-        "Don’t stop now ⛔"
+        "Don’t stop now ⛔",
+        "Keep climbing 🧗‍♂️",
+        "Focus on the finish 🏁",
+        "You're unstoppable 🚀",
+        "Keep the streak alive 🔥"
     )
-
     val highProgressMessages = listOf(
         "Great job! 🌟",
         "Well done! 👏",
@@ -67,9 +77,12 @@ object Constants {
         "Peak performance ⛰️",
         "Total win 🏅",
         "Smashed goals 🚀",
-        "Perfection! 💯"
+        "Perfection! 💯",
+        "Legendary effort 🏅",
+        "Unstoppable force 🌟",
+        "Master of steps 👑",
+        "Epic win 🎆"
     )
-
     val brokenStreakMessages = listOf(
         "Start fresh 🌱",
         "New day, go! 🌞",
@@ -90,9 +103,12 @@ object Constants {
         "Try again 🔁",
         "Today's new! 🆕",
         "No giving up 🚫",
-        "New streak time 🕒"
+        "New streak time 🕒",
+        "Fresh energy 🌟",
+        "Reignite the fire 🔥",
+        "Start over strong 💪",
+        "New chapter begins 📖"
     )
-
     val ongoingStreakMessages = listOf(
         "Keep going ➡️",
         "Streak strong 💪",
@@ -113,9 +129,12 @@ object Constants {
         "Daily victory 🎖️",
         "Keep the fire 🔥",
         "Stack the days 📚",
-        "Unstoppable now 💥"
+        "Unstoppable now 💥",
+        "Consistency is key 🔑",
+        "Every day matters 📆",
+        "Keep the streak alive 🔄",
+        "One day at a time 🕒"
     )
-
     val rebuildingStreakMessages = listOf(
         "Back at it! 🎯",
         "Let’s rebuild 🧱",
@@ -136,9 +155,12 @@ object Constants {
         "Let's go again ♻️",
         "Back in motion 🚶",
         "Step one done ✅",
-        "Off to start 🚀"
+        "Off to start 🚀",
+        "Reclaim your streak 🏆",
+        "New day, new chance 🌅",
+        "Rise stronger 💪",
+        "Fresh start, fresh goals 🎯"
     )
-
     val walkingMotivationMessages = listOf(
         "One step at a time 👣",
         "Walk with purpose 🎯",
@@ -159,6 +181,10 @@ object Constants {
         "Your feet got this 🦶",
         "Flow with every step 🌊",
         "Small steps, big impact 💥",
-        "Walking wins the day 🏆"
+        "Walking wins the day 🏆",
+        "Every step matters 🌟",
+        "Walk to greatness 🏔️",
+        "Feel the rhythm 🎵",
+        "Walking is winning 🏅"
     )
 }
