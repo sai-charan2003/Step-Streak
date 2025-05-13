@@ -14,4 +14,6 @@ interface StepsRecordRepo {
     suspend fun getWeeklyStepsRecords() : List<StepsRecordEntity>
 
     suspend fun getAllStepsRecords() : List<StepsRecordEntity>
+
+    suspend fun deleteAllStepRecords()
 }

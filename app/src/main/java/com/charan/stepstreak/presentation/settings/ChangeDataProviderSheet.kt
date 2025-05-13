@@ -94,6 +94,26 @@ fun ChangeDataProviderSheet(
                     )
                 }
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = { onSave() }
+                ) {
+                    Text(text = "Set goal")
+                }
+
+                OutlinedButton(
+                    modifier = Modifier.weight(1f),
+                    onClick = { onDismiss() }
+                ) {
+                    Text(text = "Cancel")
+                }
+            }
         }
 
     }

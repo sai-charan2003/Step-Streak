@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.utils.ProcessState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val dataStoreRepo: DataStoreRepo,
-    private val healthConnectRepo: HealthConnectRepo
+    private val healthConnectRepo: HealthConnectRepo,
+    private val stepsRecordRepo: StepsRecordRepo
 ) : ViewModel() {
     private val _settingsState = MutableStateFlow(SettingsState())
     val settingsState = _settingsState.asStateFlow()
@@ -90,7 +93,19 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvents.OnDataProviderChange -> {
                 onDataProviderChange(event.provider)
             }
+
+            SettingsEvents.OnSaveDataProvider -> {
+               saveDataProvider()
+            }
         }
+    }
+
+    private fun saveDataProvider() = viewModelScope.launch(Dispatchers.IO){
+        if(dataStoreRepo.dataProviders.first() != _settingsState.value.selectedDataProvider?.packageName.toString()){
+            stepsRecordRepo.deleteAllStepRecords()
+        }
+        dataStoreRepo.setDataProviders(_settingsState.value.selectedDataProvider?.packageName.toString())
+        _settingsState.update { it.copy(showDataProviderSheet = false) }
     }
 
     private fun onStepTargetValueChange(value: String) = viewModelScope.launch(Dispatchers.IO) {

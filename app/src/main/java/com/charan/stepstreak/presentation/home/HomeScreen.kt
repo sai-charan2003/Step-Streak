@@ -47,6 +47,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.HomeTopBar
@@ -67,6 +69,14 @@ fun HomeScreen(
     val effects = viewModel.effects.collectAsState(initial = null)
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val pullToRefreshState = rememberPullToRefreshState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    when(lifecycleState){
+        Lifecycle.State.RESUMED -> {
+            viewModel.onEvent(HomeEvent.OnRefresh)
+        }
+        else -> Unit
+    }
 
 
     Scaffold(

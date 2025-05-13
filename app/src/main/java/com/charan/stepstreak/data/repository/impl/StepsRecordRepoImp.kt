@@ -19,9 +19,10 @@ class StepsRecordRepoImp @Inject constructor(
         stepsRecordDao.insertStepsRecord(stepsRecordEntity)
     }
 
-    override suspend fun getAllStepRecords(): Flow<List<StepsRecordEntity>> = flow{
-        stepsRecordDao.getAllStepsRecords()
+    override suspend fun getAllStepRecords(): Flow<List<StepsRecordEntity>> {
+        return stepsRecordDao.getAllStepsRecords()
     }
+
 
     override suspend fun getWeeklyStepsRecords(): List<StepsRecordEntity> {
         return stepsRecordDao.getStepsRecordsByDateRange(DateUtils.getWeekStartDate().toString(), DateUtils.getWeekEndData().toString())
@@ -29,5 +30,9 @@ class StepsRecordRepoImp @Inject constructor(
 
     override suspend fun getAllStepsRecords(): List<StepsRecordEntity> {
         return stepsRecordDao.getAllStepRecords()
+    }
+
+    override suspend fun deleteAllStepRecords() {
+        stepsRecordDao.deleteAllStepsRecords()
     }
 }

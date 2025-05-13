@@ -79,7 +79,7 @@ fun SettingsScreen(
         ChangeDataProviderSheet(
             dataProvider = state.dataProviders,
             onValueChange = { viewModel.onEvent(SettingsEvents.OnDataProviderChange(it)) },
-            onSave = { viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(false)) },
+            onSave = { viewModel.onEvent(SettingsEvents.OnSaveDataProvider) },
             onDismiss = { viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(false)) },
             sheetState = dataProviderSheetState
 

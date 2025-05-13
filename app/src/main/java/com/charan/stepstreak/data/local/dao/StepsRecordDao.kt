@@ -24,5 +24,8 @@ interface StepsRecordDao {
     @Query("SELECT * FROM steps_record")
     fun getAllStepRecords(): List<StepsRecordEntity>
 
+    @Query("DELETE FROM steps_record")
+    fun deleteAllStepsRecords()
+
 
 }

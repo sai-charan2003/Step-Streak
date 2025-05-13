@@ -10,6 +10,7 @@ sealed interface SettingsEvents {
     object OnSaveStepsTarget : SettingsEvents
     data class OnStepsTargetValueChange(val value : String) : SettingsEvents
     data class OnDataProviderChange(val provider : DataProviders) : SettingsEvents
+    data object OnSaveDataProvider : SettingsEvents
 
 
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
@@ -27,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val healthConnectRepo: HealthConnectRepo,
-    private val stepsRecordDao: StepsRecordDao,
+    private val stepsRecordRepo: StepsRecordRepo,
     private val widgetRepo: WidgetRepo
 
 ): ViewModel() {
@@ -36,8 +37,6 @@ class HomeScreenViewModel @Inject constructor(
 
     private val _effects = MutableSharedFlow<HomeViewEffect>()
     val effects = _effects.asSharedFlow()
-
-    val stepsRecord = stepsRecordDao.getAllStepsRecords()
 
     init {
         fetchSteps()
@@ -63,7 +62,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun observeSteps() = viewModelScope.launch (Dispatchers.IO){
-        stepsRecordDao.getAllStepsRecords().collectLatest { status ->
+        stepsRecordRepo.getAllStepRecords().collectLatest { status ->
             _state.update { it.copy(
                 streakCount = status.getStreak().toString(),
                 motiText = status.getMotivationQuote(),
