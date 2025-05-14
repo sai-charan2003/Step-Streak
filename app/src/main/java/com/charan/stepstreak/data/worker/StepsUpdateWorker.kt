@@ -26,7 +26,7 @@ import javax.inject.Inject
 class StepsUpdateWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted workerParams: WorkerParameters,
-    @Assisted val healthConnectRepo: HealthConnectRepo
+    @Assisted val healthConnectRepo: HealthConnectRepo,
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {

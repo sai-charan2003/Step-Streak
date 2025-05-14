@@ -43,6 +43,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.charan.stepstreak.R
 import kotlin.math.min
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TodayProgressCard(
     steps: Long,
@@ -98,7 +99,7 @@ fun TodayProgressCard(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = "Today's Progress",
-                    style = MaterialTheme.typography.titleMedium.copy(
+                    style = MaterialTheme.typography.titleMediumEmphasized.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     ),
@@ -110,7 +111,7 @@ fun TodayProgressCard(
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = "$steps",
-                        style = MaterialTheme.typography.displayMedium.copy(
+                        style = MaterialTheme.typography.displayMediumEmphasized.copy(
                             fontWeight = FontWeight.ExtraBold,
                         ),
                         color = MaterialTheme.colorScheme.primary
@@ -118,7 +119,7 @@ fun TodayProgressCard(
 
                     Text(
                         text = " / $targetSteps",
-                        style = MaterialTheme.typography.bodyLarge.copy(
+                        style = MaterialTheme.typography.bodyLargeEmphasized.copy(
                             fontWeight = FontWeight.Medium
                         ),
                         modifier = Modifier
@@ -131,7 +132,7 @@ fun TodayProgressCard(
 
                 Text(
                     text = "${((steps / targetSteps.toFloat()) * 100).toInt()}% of daily goal",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMediumEmphasized,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
 

@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.glance.AndroidResourceImageProvider
+import androidx.glance.ButtonDefaults
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
@@ -60,6 +62,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OnBoardingScreen(
     navHostController: NavHostController,
@@ -139,6 +142,7 @@ fun OnBoardingScreen(
                         viewModel.onEvent(OnBoardingEvents.OnChangePage)
                     }
                 },
+                shapes = androidx.compose.material3.ButtonDefaults.shapes(),
 
                 modifier = Modifier.fillMaxWidth()
             ) {

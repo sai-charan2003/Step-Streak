@@ -7,5 +7,7 @@ data class SettingsState(
     val dataProviders: List<DataProviders> = emptyList(),
     val selectedDataProvider : DataProviders? = null,
     var showGoalsSheet : Boolean = false,
-    var showDataProviderSheet : Boolean = false
+    var showDataProviderSheet : Boolean = false,
+    var showFrequencySheet : Boolean = false,
+    var frequency : Long = 0,
 )

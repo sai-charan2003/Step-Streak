@@ -8,8 +8,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(
     navAppHost : NavHostController,
@@ -47,20 +50,8 @@ fun SettingsScreen(
     val state by viewModel.settingsState.collectAsState()
     val goalsBottomSheetState = rememberModalBottomSheetState()
     val dataProviderSheetState = rememberModalBottomSheetState()
+    val syncFrequencySheetState = rememberModalBottomSheetState()
     var showSteps by remember { mutableStateOf(false) }
-    var showGoalsSheet by remember { mutableStateOf(false) }
-    LaunchedEffect(viewEffects) {
-        when(viewEffects){
-            null -> Unit
-            SettingsViewEffect.ToggleDataProviderSheet -> {
-
-            }
-            SettingsViewEffect.ToggleGoalsBottomSheet -> {
-                showGoalsSheet =!showGoalsSheet
-
-            }
-        }
-    }
     if(state.showGoalsSheet){
         SetStepGoalDialog(
             targetSteps = state.targetSteps,
@@ -86,17 +77,28 @@ fun SettingsScreen(
         )
     }
 
+    if(state.showFrequencySheet){
+        ChangeSyncFrequencySheet(
+            currentFrequency = state.frequency,
+            onValueChange = { viewModel.onEvent(SettingsEvents.OnChangeFrequency(it)) },
+            onSave = { viewModel.onEvent(SettingsEvents.OnSaveFrequency) },
+            onDismiss = { viewModel.onEvent(SettingsEvents.ToggleFrequencySheet(false)) },
+            sheetState = dataProviderSheetState
+        )
+    }
+
     Scaffold (
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
+            LargeFlexibleTopAppBar(
                 title = { Text("Settings") },
                 scrollBehavior = scroll,
                 navigationIcon = {
                     IconButton(
                         onClick = {
                             navAppHost.popBackStack()
-                        }
+                        },
+                        shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
                     }
@@ -108,13 +110,13 @@ fun SettingsScreen(
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .padding(top = 10.dp, start = 20.dp)
+                .padding(top = 20.dp, start = 20.dp)
         ) {
 
             item{
                 Text(
                     "Goals",
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.labelLargeEmphasized,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
 
                 )
@@ -124,7 +126,7 @@ fun SettingsScreen(
                     trailingContent = {
                         Text(
                             text = "%,d".format(state.targetSteps),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMediumEmphasized
                         )
                     },
                     modifier = Modifier.clickable{
@@ -143,7 +145,11 @@ fun SettingsScreen(
                 )
                 ListItem(
                     headlineContent = { Text("Frequency Sync")},
-                    trailingContent = { Text("15 mins")}
+                    trailingContent = { Text(state.frequency.toString())},
+                    modifier = Modifier.clickable{
+                        viewModel.onEvent(SettingsEvents.ToggleFrequencySheet(true))
+
+                    }
                 )
             }
 

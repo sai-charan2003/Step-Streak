@@ -34,6 +34,7 @@ class SettingsViewModel @Inject constructor(
         setTargetSteps()
         getAllDataProviders()
         setSelectedDataProvider()
+        setSyncFrequency()
     }
 
     private fun setTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
@@ -46,6 +47,12 @@ class SettingsViewModel @Inject constructor(
         _settingsState.collectLatest {
             _settingsState.update { it.copy(selectedDataProvider = it.dataProviders.firstOrNull { it.isConnected == true }) }
 
+        }
+    }
+
+    private fun setSyncFrequency() = viewModelScope.launch (Dispatchers.IO){
+        dataStoreRepo.syncFrequency.collectLatest { frequency->
+            _settingsState.update { it.copy(frequency = frequency) }
         }
     }
 
@@ -97,6 +104,20 @@ class SettingsViewModel @Inject constructor(
             SettingsEvents.OnSaveDataProvider -> {
                saveDataProvider()
             }
+
+            is SettingsEvents.OnChangeFrequency -> {
+                onSyncFrequencyChange(event.frequency)
+
+
+            }
+            SettingsEvents.OnSaveFrequency -> {
+                onSaveSyncFrequency()
+
+            }
+
+            is SettingsEvents.ToggleFrequencySheet -> {
+                _settingsState.update { it.copy(showFrequencySheet = event.shouldShow) }
+            }
         }
     }
 
@@ -142,6 +163,14 @@ class SettingsViewModel @Inject constructor(
         _settingsState.update {
             it.copy(dataProviders = updatedProviders)
         }
+    }
+
+    fun onSyncFrequencyChange(frequency: Long) = viewModelScope.launch(Dispatchers.IO) {
+        _settingsState.update { it.copy(frequency = frequency) }
+    }
+    fun onSaveSyncFrequency() = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.setSyncFrequency(_settingsState.value.frequency)
+        _settingsState.update { it.copy(showFrequencySheet = false) }
     }
 
 

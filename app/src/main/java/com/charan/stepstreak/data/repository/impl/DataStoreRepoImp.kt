@@ -3,6 +3,7 @@ package com.charan.stepstreak.data.repository.impl
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.charan.stepstreak.data.repository.DataStoreRepo
@@ -18,6 +19,7 @@ class DataStoreRepoImp (
         val DATA_PROVIDERS = stringPreferencesKey("data_providers")
         val ON_BOARDING_STATUS = booleanPreferencesKey("on_boarding_status")
         val TARGET_STEPS = stringPreferencesKey("target_steps")
+        val SYNC_FREQUENCY = longPreferencesKey("sync_frequency")
     }
 
     override val dataProviders: Flow<String>
@@ -59,5 +61,17 @@ class DataStoreRepoImp (
         context.dataStore.edit {
             it[TARGET_STEPS] = steps
         }
+    }
+
+    override val syncFrequency: Flow<Long>
+        get() = context.dataStore.data.map {
+            it[SYNC_FREQUENCY] ?: 15L
+        }
+
+    override suspend fun setSyncFrequency(frequency: Long) {
+        context.dataStore.edit {
+            it[SYNC_FREQUENCY] = frequency
+        }
+
     }
 }

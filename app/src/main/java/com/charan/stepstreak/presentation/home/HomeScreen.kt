@@ -10,6 +10,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,15 +25,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumFlexibleTopAppBar
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
@@ -50,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
+import com.charan.stepstreak.presentation.components.CustomIndicator
 import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.HomeTopBar
 import com.charan.stepstreak.presentation.home.components.StreakCard
@@ -58,7 +69,7 @@ import com.charan.stepstreak.presentation.navigation.SettingsScreenNav
 import com.charan.stepstreak.utils.DateUtils
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 
 fun HomeScreen(
@@ -83,15 +94,24 @@ fun HomeScreen(
         modifier = Modifier
             .nestedScroll(scroll.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            MediumFlexibleTopAppBar(
                 title = {
+                    Text(
+                        text = DateUtils.getGreetings(),
 
+                    )
+                },
+                subtitle = {
+                    Text(
+                        text = state.value.motiText,
+                    )
                 },
                 actions = {
-                    IconButton(
+                    IconButton (
                         onClick = {
                             navHostController.navigate(SettingsScreenNav)
-                        }
+                        },
+                        shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(
                             Icons.Default.Settings,
@@ -112,7 +132,14 @@ fun HomeScreen(
             isRefreshing = state.value.isSyncing,
             onRefresh = { viewModel.onEvent(HomeEvent.OnRefresh) },
             state = pullToRefreshState,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            indicator = {
+                PullToRefreshDefaults.LoadingIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = state.value.isSyncing,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -120,10 +147,7 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 item {
-                    HomeTopBar(
-                        greeting = DateUtils.getGreetings(),
-                        motivationText = state.value.motiText
-                    )
+
                     Spacer(Modifier.height(20.dp))
                     StreakCard(
                         streakCount = state.value.streakCount,

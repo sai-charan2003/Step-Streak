@@ -17,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,6 +39,7 @@ import com.charan.stepstreak.utils.toBarChar
 import com.himanshoe.charty.bar.BarChart
 import com.himanshoe.charty.bar.model.BarData
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DailyStepsCard(
     stepsData: List<StepsData>
@@ -55,7 +57,7 @@ fun DailyStepsCard(
         ) {
             Text(
                 text = "Daily Steps",
-                style = MaterialTheme.typography.titleMedium.copy(
+                style = MaterialTheme.typography.titleMediumEmphasized.copy(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 ),
@@ -86,6 +88,7 @@ fun DailyStepsCardPreview(){
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StepsCard(
     totalSteps: Long,
@@ -136,11 +139,11 @@ fun StepsCard(
             ) {
                 Text(
                     text = day,
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleSmallEmphasized.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = date,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmallEmphasized,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
@@ -148,12 +151,12 @@ fun StepsCard(
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = "%,d".format(totalSteps),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    style = MaterialTheme.typography.titleMediumEmphasized.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "$percentage% of goal",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmallEmphasized,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }

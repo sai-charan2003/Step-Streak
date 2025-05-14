@@ -14,9 +14,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -30,7 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SetStepGoalDialog(
     targetSteps: Long,
@@ -66,6 +70,7 @@ fun SetStepGoalDialog(
                 FilledTonalIconButton (
                     onClick = { onDecrement() },
                     enabled = targetSteps>1L,
+                    shapes = IconButtonDefaults.shapes()
 
                     ) {
                     Icon(Icons.Default.Remove, contentDescription = "Remove")
@@ -86,6 +91,7 @@ fun SetStepGoalDialog(
 
                 FilledTonalIconButton(
                     onClick = { onIncrement()},
+                    shapes = IconButtonDefaults.shapes()
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -99,6 +105,7 @@ fun SetStepGoalDialog(
             ) {
                 Button(
                     modifier = Modifier.weight(1f),
+                    shapes = ButtonDefaults.shapes(),
                     onClick = { onSave() }
                 ) {
                     Text(text = "Set goal")
@@ -106,6 +113,7 @@ fun SetStepGoalDialog(
 
                 OutlinedButton(
                     modifier = Modifier.weight(1f),
+                    shapes = ButtonDefaults.shapes(),
                     onClick = { onDismiss() }
                 ) {
                     Text(text = "Cancel")

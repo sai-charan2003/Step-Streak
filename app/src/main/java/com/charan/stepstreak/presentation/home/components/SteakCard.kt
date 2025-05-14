@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.charan.stepstreak.R
 import kotlin.math.min
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StreakCard(
     streakCount: String,
@@ -77,7 +78,7 @@ fun StreakCard(
                 ) {
                     Text(
                         text = "Current Streak",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleMediumEmphasized.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp
                         ),
@@ -90,7 +91,7 @@ fun StreakCard(
                     ) {
                         Text(
                             text = streakCount,
-                            style = MaterialTheme.typography.displayMedium.copy(
+                            style = MaterialTheme.typography.displayMediumEmphasized.copy(
                                 fontWeight = FontWeight.ExtraBold,
                             ),
                             color = MaterialTheme.colorScheme.primary
@@ -98,7 +99,7 @@ fun StreakCard(
 
                         Text(
                             text = " days",
-                            style = MaterialTheme.typography.bodyLarge.copy(
+                            style = MaterialTheme.typography.bodyLargeEmphasized.copy(
                                 fontWeight = FontWeight.Medium
                             ),
                             modifier = Modifier
