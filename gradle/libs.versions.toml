@@ -7,6 +7,7 @@ charts = "2.0.0"
 connectClient = "1.1.0-rc01"
 converterGson = "2.11.0"
 datastore = "1.1.6"
+graphicsShapes = "1.0.1"
 lottie = "6.6.6"
 material = "1.12.0"
 material3 = "1.4.0-alpha14"
@@ -43,6 +44,7 @@ accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-dra
 androidx-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", version.ref = "graphicsShapes" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 charts = { module = "io.github.dautovicharis:charts", version.ref = "charts" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

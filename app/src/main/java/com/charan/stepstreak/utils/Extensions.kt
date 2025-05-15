@@ -16,7 +16,8 @@ fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
             steps = it.steps ?: 0L,
             date = it.date ?: "" ,
             targetSteps = it.stepTarget ?: 0L,
-            day = DateUtils.getWeekFromIso(it.date ?: "")
+            day = DateUtils.getWeekFromIso(it.date ?: ""),
+            formattedDate = DateUtils.formatDateWithSuffix(it.date ?: "")
         )
     }
 

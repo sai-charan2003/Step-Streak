@@ -13,5 +13,6 @@ data class  StepsData(
     val steps : Long = 0L,
     val date : String = "",
     val targetSteps : Long = 10000,
-    val day : String = ""
+    val day : String = "",
+    val formattedDate : String = "",
 )

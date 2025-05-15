@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.format.TextStyle
 import java.util.Locale
 
 object DateUtils {
@@ -76,6 +77,21 @@ object DateUtils {
             in 12..16 -> "Good afternoon"
             in 17..20 -> "Good evening"
             else -> "Good night"
+        }
+    }
+
+    fun formatDateWithSuffix(date: String): String {
+        val inputDate = LocalDate.parse(date)
+        val today = LocalDate.now()
+        return when {
+            inputDate.isEqual(today) -> "Today"
+            inputDate.isEqual(today.minusDays(1)) -> "Yesterday"
+            else -> {
+                val dayOfWeek = inputDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+                val month = inputDate.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
+                val day = inputDate.dayOfMonth
+                "$dayOfWeek, $month $day"
+            }
         }
     }
 

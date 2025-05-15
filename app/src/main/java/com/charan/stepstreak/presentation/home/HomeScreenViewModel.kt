@@ -67,7 +67,7 @@ class HomeScreenViewModel @Inject constructor(
                 streakCount = status.getStreak().toString(),
                 motiText = status.getMotivationQuote(),
                 stepsData = status.toStepsData(),
-                todaysStepData = status.getTodaysStepsData() ?: StepsData()
+                todaysStepData = status.getTodaysStepsData() ?: StepsData(),
             )
             }
             widgetRepo.updateWidget()

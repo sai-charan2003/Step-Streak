@@ -137,4 +137,5 @@ dependencies {
     implementation(libs.vico.compose.m3)
     implementation(libs.charts)
     implementation(libs.charty)
+    implementation (libs.androidx.graphics.shapes)
 }
