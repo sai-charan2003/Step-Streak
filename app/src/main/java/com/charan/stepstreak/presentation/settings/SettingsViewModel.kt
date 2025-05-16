@@ -1,9 +1,12 @@
 package com.charan.stepstreak.presentation.settings
 
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charan.stepstreak.BuildConfig
 import com.charan.stepstreak.data.model.DataProviders
+import com.charan.stepstreak.data.model.SyncTime
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
@@ -34,7 +37,8 @@ class SettingsViewModel @Inject constructor(
         setTargetSteps()
         getAllDataProviders()
         setSelectedDataProvider()
-        setSyncFrequency()
+//        setSyncFrequency()
+        setAppVersion()
     }
 
     private fun setTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
@@ -50,9 +54,18 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun setAppVersion() = viewModelScope.launch (Dispatchers.IO){
+        _settingsState.update { it.copy(appVersion = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})") }
+    }
+
     private fun setSyncFrequency() = viewModelScope.launch (Dispatchers.IO){
         dataStoreRepo.syncFrequency.collectLatest { frequency->
-            _settingsState.update { it.copy(frequency = frequency) }
+            _settingsState.update {
+                it.copy(
+                    frequency = frequency,
+                    frequencyString = SyncTime.entries.find { it.minutes == frequency }?.getName() ?: ""
+                )
+            }
         }
     }
 

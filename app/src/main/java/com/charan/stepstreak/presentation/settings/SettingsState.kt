@@ -10,4 +10,6 @@ data class SettingsState(
     var showDataProviderSheet : Boolean = false,
     var showFrequencySheet : Boolean = false,
     var frequency : Long = 0,
+    var frequencyString : String = "",
+    val appVersion : String = ""
 )

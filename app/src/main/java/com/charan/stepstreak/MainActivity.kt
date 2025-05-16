@@ -42,6 +42,7 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.navigation.compose.rememberNavController
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.worker.StepsUpdateWorker
 import com.charan.stepstreak.presentation.navigation.NavAppHost
 import com.charan.stepstreak.ui.theme.StepStreakTheme
 import com.google.accompanist.permissions.rememberPermissionState
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        StepsUpdateWorker.setup(this)
         CoroutineScope(Dispatchers.Main).launch {
             isOnBoardingCompleted.value = dataStoreRepo.isOnBoardingCompleted.first()
         }

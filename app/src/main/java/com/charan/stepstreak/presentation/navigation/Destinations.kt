@@ -10,3 +10,6 @@ object SettingsScreenNav
 
 @Serializable
 object OnBoardingScreenNav
+
+@Serializable
+object LicenseDataScreenNav

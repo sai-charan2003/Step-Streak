@@ -10,6 +10,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidget
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidgetReceiver
@@ -18,6 +19,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -27,6 +29,7 @@ class StepsUpdateWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     @Assisted val healthConnectRepo: HealthConnectRepo,
+    @Assisted val dataStoreRepo: DataStoreRepo
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
@@ -54,7 +57,6 @@ class StepsUpdateWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
-            println("Starting workerManager")
             healthConnectRepo.fetchAndSaveAllStepRecords().collectLatest {
                 when(it){
 

@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.charan.stepstreak.presentation.home.HomeScreen
 import com.charan.stepstreak.presentation.onboarding.OnBoardingScreen
+import com.charan.stepstreak.presentation.settings.LicensesScreen
 import com.charan.stepstreak.presentation.settings.SettingsScreen
 
 @Composable
@@ -71,6 +72,9 @@ fun NavAppHost(
             SettingsScreen(
                 navHostController
             )
+        }
+        composable <LicenseDataScreenNav>{
+            LicensesScreen(navHostController)
         }
 
     }

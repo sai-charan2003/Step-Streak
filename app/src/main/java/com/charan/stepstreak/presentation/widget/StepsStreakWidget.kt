@@ -74,9 +74,7 @@ class WeeklyStreakWidget : GlanceAppWidget() {
         val repo = WidgetRepoImp.getInstance(context)
         provideContent {
             GlanceTheme {
-                StepsUpdateWorker.setup(context!!)
                 WeeklyStreakWidgetContent(repo)
-
             }
         }
     }

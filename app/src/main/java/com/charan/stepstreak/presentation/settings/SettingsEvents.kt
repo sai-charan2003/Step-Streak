@@ -15,5 +15,4 @@ sealed interface SettingsEvents {
     data object OnSaveFrequency : SettingsEvents
     data class OnChangeFrequency(val frequency : Long) : SettingsEvents
 
-
 }

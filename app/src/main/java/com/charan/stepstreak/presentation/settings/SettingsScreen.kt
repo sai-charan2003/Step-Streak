@@ -2,13 +2,26 @@ package com.charan.stepstreak.presentation.settings
 
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.WorkspacePremium
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -17,6 +30,7 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -34,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.charan.stepstreak.data.model.SyncTime
+import com.charan.stepstreak.presentation.navigation.LicenseDataScreenNav
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,53 +57,48 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(
-    navAppHost : NavHostController,
+    navAppHost: NavHostController,
     viewModel: SettingsViewModel = hiltViewModel()
-){
-    val coroutineScope = rememberCoroutineScope()
+) {
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val viewEffects by viewModel.settingsViewEffect.collectAsStateWithLifecycle(null)
     val state by viewModel.settingsState.collectAsState()
     val goalsBottomSheetState = rememberModalBottomSheetState()
     val dataProviderSheetState = rememberModalBottomSheetState()
     val syncFrequencySheetState = rememberModalBottomSheetState()
-    var showSteps by remember { mutableStateOf(false) }
-    if(state.showGoalsSheet){
+
+    if (state.showGoalsSheet) {
         SetStepGoalDialog(
             targetSteps = state.targetSteps,
             onIncrement = { viewModel.onEvent(SettingsEvents.OnStepsTargetIncrement) },
             onDecrement = { viewModel.onEvent(SettingsEvents.OnStepsTargetDecrement) },
             onValueChange = { viewModel.onEvent(SettingsEvents.OnStepsTargetValueChange(it)) },
-            onSave = { viewModel.onEvent(SettingsEvents.OnSaveStepsTarget) },
+            onSave = {viewModel.onEvent(SettingsEvents.OnSaveStepsTarget) },
             onDismiss = { viewModel.onEvent(SettingsEvents.ToggleGoalsSheet(false)) },
             sheetState = goalsBottomSheetState
-
         )
-
     }
 
-    if(state.showDataProviderSheet){
+    if (state.showDataProviderSheet) {
         ChangeDataProviderSheet(
             dataProvider = state.dataProviders,
             onValueChange = { viewModel.onEvent(SettingsEvents.OnDataProviderChange(it)) },
             onSave = { viewModel.onEvent(SettingsEvents.OnSaveDataProvider) },
             onDismiss = { viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(false)) },
             sheetState = dataProviderSheetState
-
         )
     }
 
-    if(state.showFrequencySheet){
+    if (state.showFrequencySheet) {
         ChangeSyncFrequencySheet(
             currentFrequency = state.frequency,
             onValueChange = { viewModel.onEvent(SettingsEvents.OnChangeFrequency(it)) },
             onSave = { viewModel.onEvent(SettingsEvents.OnSaveFrequency) },
             onDismiss = { viewModel.onEvent(SettingsEvents.ToggleFrequencySheet(false)) },
-            sheetState = dataProviderSheetState
+            sheetState = syncFrequencySheetState
         )
     }
 
-    Scaffold (
+    Scaffold(
         modifier = Modifier.nestedScroll(scroll.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
@@ -95,67 +106,111 @@ fun SettingsScreen(
                 scrollBehavior = scroll,
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            navAppHost.popBackStack()
-                        },
+                        onClick = { navAppHost.popBackStack() },
                         shapes = IconButtonDefaults.shapes()
                     ) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
                 }
             )
         }
-
-    ){ padding->
+    ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .padding(top = 20.dp, start = 20.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-
-            item{
+            item {
                 Text(
-                    "Goals",
-                    style = MaterialTheme.typography.labelLargeEmphasized,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
-
+                    text = "Health Data",
+                    style = MaterialTheme.typography.titleSmallEmphasized,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
 
                 ListItem(
-                    headlineContent = { Text("Daily Steps Goal")},
+                    headlineContent = { Text("Daily Steps Goal") },
                     trailingContent = {
                         Text(
                             text = "%,d".format(state.targetSteps),
-                            style = MaterialTheme.typography.titleMediumEmphasized
+                            style = MaterialTheme.typography.bodyLargeEmphasized
                         )
                     },
-                    modifier = Modifier.clickable{
+                    leadingContent = {
+                        Icon(Icons.AutoMirrored.Filled.DirectionsWalk,null)
+                    },
+                    modifier = Modifier.clickable {
                         viewModel.onEvent(SettingsEvents.ToggleGoalsSheet(true))
-
                     }
                 )
+
                 ListItem(
-                    headlineContent = { Text("Health Provider")},
-                    trailingContent = { Text(state.selectedDataProvider?.name ?: "")},
-                    modifier = Modifier.clickable{
+                    headlineContent = { Text("Health Provider") },
+                    trailingContent = {
+                        Text(
+                            text = state.selectedDataProvider?.name ?: "",
+                            style = MaterialTheme.typography.bodyLargeEmphasized
+                        )
+                    },
+                    leadingContent = {
+                        Icon(Icons.Rounded.Favorite,null)
+                    },
+                    modifier = Modifier.clickable {
                         viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(true))
-
                     }
-
                 )
-                ListItem(
-                    headlineContent = { Text("Frequency Sync")},
-                    trailingContent = { Text(state.frequency.toString())},
-                    modifier = Modifier.clickable{
-                        viewModel.onEvent(SettingsEvents.ToggleFrequencySheet(true))
 
+//                ListItem(
+//                    headlineContent = { Text("Sync Frequency") },
+//                    trailingContent = {
+//                        Text(
+//                            text = state.frequencyString,
+//                            style = MaterialTheme.typography.bodyLarge
+//                        )
+//                    },
+//                    modifier = Modifier.clickable {
+//                        viewModel.onEvent(SettingsEvents.ToggleFrequencySheet(true))
+//                    }
+//                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+            }
+
+            item {
+                Text(
+                    text = "About App",
+                    style = MaterialTheme.typography.titleSmallEmphasized,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+
+                ListItem(
+                    headlineContent = { Text("App Version") },
+                    leadingContent = {
+                        Icon(Icons.Rounded.Code,null)
+                    },
+                    trailingContent = {
+                        Text(
+                            text = state.appVersion,
+                            style = MaterialTheme.typography.bodyLargeEmphasized
+                        )
+                    }
+                )
+
+                ListItem(
+                    headlineContent = { Text("Open Source Licenses") },
+                    leadingContent = {
+                        Icon(Icons.Rounded.WorkspacePremium,null)
+                    },
+                    modifier = Modifier.clickable {
+                        navAppHost.navigate(LicenseDataScreenNav)
                     }
                 )
             }
-
-
         }
-
     }
-
 }
+
