@@ -18,6 +18,7 @@ import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
@@ -32,7 +33,8 @@ class HealthConnectRepoImpl @Inject constructor(
     private val healthConnectClient: HealthConnectClient,
     private val stepsRecordDao: StepsRecordDao,
     private val context : Context,
-    private val dataStore : DataStoreRepo
+    private val dataStore : DataStoreRepo,
+    private val usersSettingsRepo: UsersSettingsRepo
 
 ) : HealthConnectRepo {
     companion object{
@@ -46,7 +48,6 @@ class HealthConnectRepoImpl @Inject constructor(
         try {
             val records = mutableListOf<StepsRecordEntity>()
             val provider = dataStore.dataProviders.first()
-            val targetSteps = dataStore.targetSteps.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
@@ -89,12 +90,9 @@ class HealthConnectRepoImpl @Inject constructor(
     override suspend fun fetchAndSaveAllStepRecords() : Flow<ProcessState<Boolean>> = flow{
         emit(ProcessState.Loading)
         try {
-            val packageName = dataStore.dataProviders.first()
-            val targetSteps = dataStore.targetSteps.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
-                    dataOriginFilter = setOf(DataOrigin(packageName)),
                     ascendingOrder = true
                 )
             )
@@ -102,8 +100,8 @@ class HealthConnectRepoImpl @Inject constructor(
                 stepsRecordDao.insertStepsRecord(
                     StepsRecordEntity(
                         steps = it.count,
-                        stepTarget = targetSteps.toLong(),
-                        uuid = UUID.randomUUID().toString(),
+                        stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(DateUtils.convertToTimeMillis(it.startTime,it.startZoneOffset)),
+                        uuid = it.metadata.id,
                         date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
                     )
                 )
@@ -176,12 +174,10 @@ class HealthConnectRepoImpl @Inject constructor(
     override suspend fun getCurrentWeekSteps(): Flow<ProcessState<List<StepsRecordEntity>>> = flow{
         emit(ProcessState.Loading)
         try {
-            val packageName = dataStore.dataProviders.first()
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.between(DateUtils.getWeekStartDateInISO(),
                         DateUtils.getWeekEndDateInISO()),
-                    dataOriginFilter = setOf(DataOrigin(packageName)),
                     ascendingOrder = false
                 )
             )
@@ -189,7 +185,7 @@ class HealthConnectRepoImpl @Inject constructor(
                 stepsRecordDao.insertStepsRecord(
                     StepsRecordEntity(
                         steps = it.count,
-                        stepTarget = 10000,
+                        stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(DateUtils.convertToTimeMillis(it.startTime,it.startZoneOffset)),
                         uuid = UUID.randomUUID().toString(),
                         date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
                     )

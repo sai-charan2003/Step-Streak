@@ -147,21 +147,21 @@ fun SettingsScreen(
                     }
                 )
 
-                ListItem(
-                    headlineContent = { Text("Health Provider") },
-                    trailingContent = {
-                        Text(
-                            text = state.selectedDataProvider?.name ?: "",
-                            style = MaterialTheme.typography.bodyLargeEmphasized
-                        )
-                    },
-                    leadingContent = {
-                        Icon(Icons.Rounded.Favorite,null)
-                    },
-                    modifier = Modifier.clickable {
-                        viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(true))
-                    }
-                )
+//                ListItem(
+//                    headlineContent = { Text("Health Provider") },
+//                    trailingContent = {
+//                        Text(
+//                            text = state.selectedDataProvider?.name ?: "",
+//                            style = MaterialTheme.typography.bodyLargeEmphasized
+//                        )
+//                    },
+//                    leadingContent = {
+//                        Icon(Icons.Rounded.Favorite,null)
+//                    },
+//                    modifier = Modifier.clickable {
+//                        viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(true))
+//                    }
+//                )
 
 //                ListItem(
 //                    headlineContent = { Text("Sync Frequency") },

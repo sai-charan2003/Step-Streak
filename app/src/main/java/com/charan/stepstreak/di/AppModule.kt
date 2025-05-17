@@ -4,13 +4,16 @@ import android.content.Context
 import androidx.health.connect.client.HealthConnectClient
 import com.charan.stepstreak.data.local.AppDatabase
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
+import com.charan.stepstreak.data.local.dao.UserSettingsDao
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.DataStoreRepoImp
 import com.charan.stepstreak.data.repository.impl.HealthConnectRepoImpl
 import com.charan.stepstreak.data.repository.impl.StepsRecordRepoImp
+import com.charan.stepstreak.data.repository.impl.UserSettingsRepoImp
 import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
 import dagger.Module
 import dagger.Provides
@@ -37,8 +40,20 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideSettingsDao(database: AppDatabase) : UserSettingsDao{
+        return database.userSettingsDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideStepsRecordRepo(stepsRecordDao: StepsRecordDao): StepsRecordRepo {
         return StepsRecordRepoImp(stepsRecordDao)
+
+    }
+    @Provides
+    @Singleton
+    fun provideUserSettingsRepo(settingsDao: UserSettingsDao): UsersSettingsRepo {
+        return UserSettingsRepoImp(settingsDao)
 
     }
 
@@ -51,8 +66,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context,dataStoreRepo: DataStoreRepo): HealthConnectRepo {
-        return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao,context,dataStoreRepo)
+    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context,dataStoreRepo: DataStoreRepo,usersSettingsRepo: UsersSettingsRepo): HealthConnectRepo {
+        return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao,context,dataStoreRepo,usersSettingsRepo)
 
     }
 

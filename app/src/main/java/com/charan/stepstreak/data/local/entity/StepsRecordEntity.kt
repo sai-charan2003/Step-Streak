@@ -7,7 +7,7 @@ import com.charan.stepstreak.utils.DateUtils
 
 @Entity(
     tableName = "steps_record",
-    indices = [Index(value = ["date"], unique = true)])
+    indices = [Index(value = ["uuid"], unique = true)])
 data class StepsRecordEntity(
     @PrimaryKey(autoGenerate = true)
     val id : Long?= null,

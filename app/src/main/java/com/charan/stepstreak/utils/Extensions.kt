@@ -26,7 +26,7 @@ fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
 
 
 fun List<StepsRecordEntity>.getTodaysStepsData() : StepsData?{
-    val todayRecord = this.filter { it.date == DateUtils.getCurrentDate().toString() }
+    val todayRecord = this.filter { DateUtils.convertLocalDateTimeToLocalDate(it.date.toString()) == DateUtils.getCurrentDate().toString() }
     return todayRecord.toStepsData().firstOrNull()
 
 }

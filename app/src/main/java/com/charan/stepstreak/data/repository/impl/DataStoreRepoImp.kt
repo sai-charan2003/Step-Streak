@@ -18,7 +18,6 @@ class DataStoreRepoImp (
         private val Context.dataStore by preferencesDataStore("settings")
         val DATA_PROVIDERS = stringPreferencesKey("data_providers")
         val ON_BOARDING_STATUS = booleanPreferencesKey("on_boarding_status")
-        val TARGET_STEPS = stringPreferencesKey("target_steps")
         val SYNC_FREQUENCY = longPreferencesKey("sync_frequency")
     }
 
@@ -49,17 +48,6 @@ class DataStoreRepoImp (
     override suspend fun setOnBoardingStatus(status: Boolean) {
         context.dataStore.edit {pref->
             pref[ON_BOARDING_STATUS] = status
-        }
-    }
-
-    override val targetSteps: Flow<String>
-        get() = context.dataStore.data.map {
-            it[TARGET_STEPS] ?: "10000"
-        }
-
-    override suspend fun setTargetSteps(steps: String) {
-        context.dataStore.edit {
-            it[TARGET_STEPS] = steps
         }
     }
 

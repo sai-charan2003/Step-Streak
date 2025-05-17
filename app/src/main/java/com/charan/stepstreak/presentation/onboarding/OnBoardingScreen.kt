@@ -73,7 +73,7 @@ fun OnBoardingScreen(
         HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
     )
     val state = viewModel.state.collectAsState()
-    val pageState = rememberPagerState(initialPage = 0, pageCount = { 3 })
+    val pageState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val permissionLaunch = rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { result->
         if(result == permissions){
             viewModel.onEvent(OnBoardingEvents.OnPermissionGranted)
@@ -119,15 +119,15 @@ fun OnBoardingScreen(
                 when (page) {
                     0 -> IntroPage()
                     1 -> HealthConnectPermissionScreen(state.value.isPermissionGranted)
-                    2 -> SelectProviderPage(state.value.dataProviders) {
-                        viewModel.onEvent(OnBoardingEvents.OnSelectProvider(it))
-                    }
+//                    2 -> SelectProviderPage(state.value.dataProviders) {
+//                        viewModel.onEvent(OnBoardingEvents.OnSelectProvider(it))
+//                    }
                 }
             }
 
             PagerIndicator(
                 currentPage = pageState.currentPage,
-                pageCount = 3
+                pageCount = 2
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -136,7 +136,7 @@ fun OnBoardingScreen(
                 onClick = {
                     if(pageState.currentPage == 1 && state.value.isPermissionGranted == false){
                         viewModel.onEvent(OnBoardingEvents.OnRequestPermission)
-                    } else if(pageState.currentPage == 2 && state.value.dataProviders.any { it.isConnected == true }) {
+                    } else if(pageState.currentPage == 1 && state.value.isPermissionGranted == true) {
                         viewModel.onEvent(OnBoardingEvents.OnBoardingComplete)
                     } else {
                         viewModel.onEvent(OnBoardingEvents.OnChangePage)
@@ -153,7 +153,7 @@ fun OnBoardingScreen(
                         if(!state.value.isPermissionGranted){
                             "Grant"
                         } else {
-                            "Next"
+                            "Finish"
                         }
                     }
                     else "Finish"

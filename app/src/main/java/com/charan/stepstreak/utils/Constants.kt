@@ -187,4 +187,6 @@ object Constants {
         "Feel the rhythm 🎵",
         "Walking is winning 🏅"
     )
+
+    const val STEPS_TARGET_SETTING = "steps_target_setting"
 }

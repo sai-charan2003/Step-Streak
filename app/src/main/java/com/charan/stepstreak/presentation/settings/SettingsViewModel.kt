@@ -10,6 +10,8 @@ import com.charan.stepstreak.data.model.SyncTime
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.data.repository.UsersSettingsRepo
+import com.charan.stepstreak.utils.Constants
 import com.charan.stepstreak.utils.ProcessState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +29,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val dataStoreRepo: DataStoreRepo,
     private val healthConnectRepo: HealthConnectRepo,
-    private val stepsRecordRepo: StepsRecordRepo
+    private val stepsRecordRepo: StepsRecordRepo,
+    private val usersSettingsRepo: UsersSettingsRepo
 ) : ViewModel() {
     private val _settingsState = MutableStateFlow(SettingsState())
     val settingsState = _settingsState.asStateFlow()
@@ -42,8 +45,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun setTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
-       dataStoreRepo.targetSteps.collectLatest { targetSteps->
-           _settingsState.update { it.copy(targetSteps = targetSteps.toLong()) }
+       usersSettingsRepo.getStepsTarget().collectLatest { target->
+           _settingsState.update { it.copy(targetSteps = target) }
+
        }
     }
 
@@ -161,7 +165,7 @@ class SettingsViewModel @Inject constructor(
 
     }
     private fun saveTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
-        dataStoreRepo.setTargetSteps(_settingsState.value.targetSteps.toString())
+        usersSettingsRepo.insertSetting(setting = Constants.STEPS_TARGET_SETTING, value = _settingsState.value.targetSteps.toString())
         _settingsState.update { it.copy(showGoalsSheet = false) }
 
     }

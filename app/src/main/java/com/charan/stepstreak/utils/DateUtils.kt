@@ -1,5 +1,6 @@
 package com.charan.stepstreak.utils
 
+import android.util.Log
 import java.time.DayOfWeek
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -7,6 +8,7 @@ import java.time.format.DateTimeFormatter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -25,6 +27,11 @@ object DateUtils {
         val localDateTime = ZonedDateTime.ofInstant(utcTimeString, zoneOffsetString ?: ZoneOffset.systemDefault())
         return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE)
     }
+
+fun convertLocalDateTimeToLocalDate(localDateTime: String): String {
+    val parsedDateTime = LocalDate.parse(localDateTime, DateTimeFormatter.ISO_DATE)
+    return parsedDateTime.toString()
+}
 
     fun getCurrentWeekDates(): List<String> {
         val today = LocalDate.now()
@@ -94,5 +101,16 @@ object DateUtils {
             }
         }
     }
+
+    fun convertToTimeMillis(date : Instant, zoneOffset: ZoneOffset?): Long {
+        val zonedDateTime = ZonedDateTime.ofInstant(date, zoneOffset ?: ZoneOffset.systemDefault())
+        return zonedDateTime.toInstant().toEpochMilli()
+    }
+
+    val currentDayMillis = ZonedDateTime.now()
+        .toLocalDate() // Get only the date part (year, month, day)
+        .atStartOfDay(ZoneId.systemDefault()) // Set time to midnight in the system's default time zone
+        .toInstant()
+        .toEpochMilli()
 
 }
