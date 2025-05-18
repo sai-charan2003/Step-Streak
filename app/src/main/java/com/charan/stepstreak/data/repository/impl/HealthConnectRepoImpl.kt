@@ -87,36 +87,41 @@ class HealthConnectRepoImpl @Inject constructor(
         return PermissionController.createRequestPermissionResultContract()
     }
 
-    override suspend fun fetchAndSaveAllStepRecords() : Flow<ProcessState<Boolean>> = flow{
+    override suspend fun fetchAndSaveAllStepRecords(): Flow<ProcessState<Boolean>> = flow {
         emit(ProcessState.Loading)
         try {
-            val response = healthConnectClient.readRecords(
-                ReadRecordsRequest<StepsRecord>(
-                    timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
-                    ascendingOrder = true
-                )
-            )
-            response.records.forEach {
-                stepsRecordDao.insertStepsRecord(
-                    StepsRecordEntity(
-                        steps = it.count,
-                        stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(DateUtils.convertToTimeMillis(it.startTime,it.startZoneOffset)),
-                        uuid = it.metadata.id,
-                        date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
+            var pageToken: String? = null
+            do {
+                val response = healthConnectClient.readRecords(
+                    ReadRecordsRequest<StepsRecord>(
+                        timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
+                        ascendingOrder = true,
+                        pageToken = pageToken,
                     )
                 )
-            }
-            emit(ProcessState.Success(true))
 
-        } catch (e: Exception){
+                response.records.forEach {
+                    stepsRecordDao.insertStepsRecord(
+                        StepsRecordEntity(
+                            steps = it.count,
+                            stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(
+                                DateUtils.convertToTimeMillis(it.startTime, it.startZoneOffset)
+                            ),
+                            uuid = it.metadata.id,
+                            date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
+                        )
+                    )
+                }
+
+                pageToken = response.pageToken
+            } while (pageToken.isNullOrEmpty().not())
+            emit(ProcessState.Success(true))
+        } catch (e: Exception) {
             e.printStackTrace()
             emit(ProcessState.Error(e.message ?: "Something went wrong"))
-
         }
-
-
-
     }
+
 
     override fun getOriginProviders(): Flow<ProcessState<List<DataProviders>>> = flow{
         emit(ProcessState.Loading)

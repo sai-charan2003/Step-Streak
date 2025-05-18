@@ -89,11 +89,6 @@ fun HomeScreen(
 
                     )
                 },
-                subtitle = {
-                    Text(
-                        text = state.value.motiText,
-                    )
-                },
                 actions = {
                     IconButton (
                         onClick = {

@@ -45,8 +45,10 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun fetchSteps() = viewModelScope.launch(Dispatchers.IO){
         healthConnectRepo.fetchAndSaveAllStepRecords().collectLatest { processState ->
+            Log.d("TAG", "fetchSteps: $processState")
             when(processState){
                 is ProcessState.Error -> {
+                    _state.update { it.copy(isSyncing = false) }
                     _effects.emit(HomeViewEffect.ShowError(processState.message))
 
                 }
