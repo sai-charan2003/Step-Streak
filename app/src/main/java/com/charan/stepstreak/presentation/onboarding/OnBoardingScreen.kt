@@ -70,7 +70,8 @@ fun OnBoardingScreen(
 ) {
     val permissions = setOf(
         HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
+        HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND,
+        HealthPermission.PERMISSION_READ_HEALTH_DATA_HISTORY
     )
     val state = viewModel.state.collectAsState()
     val pageState = rememberPagerState(initialPage = 0, pageCount = { 2 })
