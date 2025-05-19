@@ -5,6 +5,7 @@ import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 

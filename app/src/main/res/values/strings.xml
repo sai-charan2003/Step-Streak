@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Step Streak</string>
     <string name="weekly_streak">Weekly Streak</string>
+    <string name="daily_progress">Daily Progress</string>
 </resources>

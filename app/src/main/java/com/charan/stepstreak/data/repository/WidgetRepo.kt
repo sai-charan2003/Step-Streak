@@ -10,5 +10,7 @@ interface WidgetRepo {
 
     suspend fun updateWidget()
 
+    fun getDailyStreak() : Flow<WidgetState>
+
 
 }

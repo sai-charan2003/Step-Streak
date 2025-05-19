@@ -35,6 +35,22 @@
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".presentation.widget.DailyProgressWidgetReceiver"
+            android:description="@string/daily_progress"
+            android:exported="true"
+            android:label="Weekly Streak"
+            >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/daily_streak"/>
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".MainActivity"

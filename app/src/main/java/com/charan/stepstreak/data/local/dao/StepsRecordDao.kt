@@ -16,14 +16,14 @@ interface StepsRecordDao {
     suspend fun insertStepsRecord(stepsRecordEntity: List<StepsRecordEntity>)
 
     @Query("""
-        SELECT * FROM steps_record 
-        WHERE steps IN (
-            SELECT MAX(steps) 
-            FROM steps_record 
-            GROUP BY date
-        )
-        ORDER BY date DESC
-    """)
+    SELECT * FROM (
+        SELECT *, ROW_NUMBER() OVER (PARTITION BY date ORDER BY steps DESC, id ASC) as rn
+        FROM steps_record
+    )
+    WHERE rn = 1
+    ORDER BY date DESC
+""")
+
     fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>
 
     @Query("SELECT * FROM steps_record WHERE date BETWEEN :startDate AND :endDate")

@@ -12,6 +12,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.presentation.widget.DailyProgressWidget
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidget
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidgetReceiver
 import com.charan.stepstreak.utils.ProcessState
@@ -65,6 +66,7 @@ class StepsUpdateWorker @AssistedInject constructor(
                     ProcessState.Loading -> {}
                     is ProcessState.Success<*> -> {
                         WeeklyStreakWidget().updateAll(appContext)
+                        DailyProgressWidget().updateAll(appContext)
                     }
                 }
             }

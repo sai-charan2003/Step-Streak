@@ -15,6 +15,7 @@ import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
+import com.charan.stepstreak.utils.getTodaysStepsData
 import com.charan.stepstreak.utils.toWidgetState
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -88,5 +89,28 @@ class WidgetRepoImp @Inject constructor(
 
     override suspend fun updateWidget() {
         WeeklyStreakWidget().updateAll(context)
+    }
+
+    override fun getDailyStreak(): Flow<WidgetState> =flow{
+
+        val todayProgress = stepsRecordRepo.getAllStepsRecords().getTodaysStepsData()
+        emit(
+            WidgetState(
+                streak = stepsRecordRepo.getAllStepsRecords().getStreak(),
+                motiText = stepsRecordRepo.getAllStepsRecords().getMotivationQuote(),
+                stepsData = listOf(
+                    StepsData(
+                        steps = todayProgress?.steps ?: 0L,
+                        targetSteps = todayProgress?.targetSteps ?: 0L,
+                        targetCompleted = todayProgress?.let {
+                            it.steps > 0 && it.targetSteps > 0 && it.steps >= it.targetSteps
+                        } ?: false,
+                        date = todayProgress?.date ?: "",
+                        day = DateUtils.getCurrentDate().toString()
+                    )
+                )
+            )
+
+        )
     }
 }
