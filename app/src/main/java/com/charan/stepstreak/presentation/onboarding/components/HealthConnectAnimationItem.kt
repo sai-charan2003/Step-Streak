@@ -1,4 +1,4 @@
-package com.charan.stepstreak.presentation.onboarding
+package com.charan.stepstreak.presentation.onboarding.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -38,7 +38,7 @@ fun HealthConnectAnimationItem(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()) {
+        modifier = Modifier.fillMaxWidth().then(modifier)) {
         Image(
             painter = painterResource(R.drawable.health_connect_logo),
             contentDescription = "Health Connect Logo",

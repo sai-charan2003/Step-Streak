@@ -138,4 +138,5 @@ dependencies {
     implementation(libs.charts)
     implementation(libs.charty)
     implementation (libs.androidx.graphics.shapes)
+    implementation(libs.androidx.animation)
 }

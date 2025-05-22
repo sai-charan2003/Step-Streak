@@ -1,7 +1,12 @@
 package com.charan.stepstreak.presentation.onboarding
 
+
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +19,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +36,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +46,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.glance.AndroidResourceImageProvider
 import androidx.glance.ButtonDefaults
+import androidx.glance.LocalContext
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
@@ -55,6 +59,8 @@ import androidx.navigation.compose.rememberNavController
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.presentation.navigation.HomeScreenNav
+import com.charan.stepstreak.presentation.onboarding.components.HealthConnectAnimationItem
+import com.charan.stepstreak.presentation.onboarding.components.ProviderConnectImageitem
 import com.charan.stepstreak.utils.DateUtils
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.CoroutineScope
@@ -189,6 +195,13 @@ fun PagerIndicator(currentPage: Int, pageCount: Int) {
 
 @Composable
 fun IntroPage() {
+    val visible = remember { mutableStateOf(false) }
+
+    // Trigger animations on composition
+    LaunchedEffect(Unit) {
+        visible.value = true
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -196,26 +209,47 @@ fun IntroPage() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Image(
-            painter = painterResource(R.drawable.applogo),
-            null
-        )
+        AnimatedVisibility(
+            visible = visible.value,
+            enter = fadeIn(animationSpec = tween(800)) + slideInVertically(
+                initialOffsetY = { -100 },
+                animationSpec = tween(800)
+            )
+        ) {
+            Image(
+                painter = painterResource(R.drawable.applogo),
+                contentDescription = null
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        AnimatedVisibility(
+            visible = visible.value,
+            enter = fadeIn(animationSpec = tween(800, delayMillis = 300)) +
+                    slideInVertically(initialOffsetY = { 100 }, animationSpec = tween(800, delayMillis = 300))
+        ) {
             Text(
                 text = "Welcome to StepStreak!",
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center
             )
+        }
 
-
-
+        AnimatedVisibility(
+            visible = visible.value,
+            enter = fadeIn(animationSpec = tween(800, delayMillis = 600)) +
+                    slideInVertically(initialOffsetY = { 100 }, animationSpec = tween(800, delayMillis = 600))
+        ) {
             Text(
                 text = "Stay motivated by tracking your daily steps and achieving streaks!",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
         }
-
+    }
 }
+
 
 
 @Composable
@@ -252,111 +286,6 @@ fun HealthConnectPermissionScreen(
 
     }
 }
-
-
-@Composable
-fun SelectProviderPage(
-    providers: List<DataProviders>,
-    onSelect: (DataProviders) -> Unit
-) {
-    if (providers.isNotEmpty()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .verticalScroll(rememberScrollState())
-                .selectableGroup(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(0.5f)
-            ) {
-                ProviderConnectImageitem(providers.map { it.icon })
-                Text(
-                    text = "Choose Your Step Tracking App",
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-
-
-                Text(
-                    text = "We need a provider that tracks your steps and writes them to Health Connect.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                providers.forEach { provider ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .selectable(
-                                selected = provider.isConnected,
-                                onClick = { onSelect(provider) },
-                                role = Role.RadioButton
-                            )
-                            .padding(16.dp)
-                    ) {
-                        Image(
-                            painter = rememberDrawablePainter(provider.icon),
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Text(
-                            text = provider.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        RadioButton(
-                            selected = provider.isConnected,
-                            onClick = null
-                        )
-                    }
-                }
-            }
-        }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "No Providers Found",
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "Connect an app like Samsung Health or Google Fit that writes steps data to Health Connect.",
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
 
 
 

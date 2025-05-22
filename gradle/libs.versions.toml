@@ -3,6 +3,7 @@ accompanistDrawablepainter = "0.37.2"
 accompanistPermissions = "0.37.2"
 accompanistSwiperefresh = "0.34.0"
 agp = "8.9.2"
+animation = "1.8.1"
 charts = "2.0.0"
 connectClient = "1.1.0-rc01"
 converterGson = "2.11.0"
@@ -41,6 +42,7 @@ google-ksp = "2.1.20-2.0.0"
 
 [libraries]
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
+androidx-animation = { module = "androidx.compose.animation:animation", version.ref = "animation" }
 androidx-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
