@@ -22,7 +22,7 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LicensesScreen(
-    navHostController: NavHostController
+    onBackPress : () -> Unit,
 ) {
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -34,7 +34,7 @@ fun LicensesScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                           navHostController.popBackStack()
+                           onBackPress.invoke()
                         },
                         shapes = IconButtonDefaults.shapes()
                     ) {

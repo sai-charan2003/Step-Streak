@@ -61,7 +61,7 @@ import kotlin.math.roundToInt
 @Composable
 
 fun HomeScreen(
-    navHostController: NavHostController,
+    onSettingNavigate : () -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ){
     val state = viewModel.state.collectAsState()
@@ -92,7 +92,7 @@ fun HomeScreen(
                 actions = {
                     IconButton (
                         onClick = {
-                            navHostController.navigate(SettingsScreenNav)
+                            onSettingNavigate.invoke()
                         },
                         shapes = IconButtonDefaults.shapes()
                     ) {

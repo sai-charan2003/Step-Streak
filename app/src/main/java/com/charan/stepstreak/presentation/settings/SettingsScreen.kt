@@ -57,7 +57,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(
-    navAppHost: NavHostController,
+    onBackPress : () -> Unit,
+    onLicenseScreenNavigate : () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -106,7 +107,7 @@ fun SettingsScreen(
                 scrollBehavior = scroll,
                 navigationIcon = {
                     IconButton(
-                        onClick = { navAppHost.popBackStack() },
+                        onClick = { onBackPress.invoke() },
                         shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(
@@ -206,7 +207,7 @@ fun SettingsScreen(
                         Icon(Icons.Rounded.WorkspacePremium,null)
                     },
                     modifier = Modifier.clickable {
-                        navAppHost.navigate(LicenseDataScreenNav)
+                        onLicenseScreenNavigate.invoke()
                     }
                 )
             }

@@ -39,6 +39,8 @@ aboutlibrariesCore = "11.2.3"
 roomCompilerVersion = "2.7.0"
 splash-screen = "1.0.1"
 google-ksp = "2.1.20-2.0.0"
+nav3Core = "1.0.0-alpha02"
+nav3Lifecycle = "1.0.0-alpha01"
 
 [libraries]
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainter" }
@@ -86,6 +88,9 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomComp
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomCompiler" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 charty = { module = "com.himanshoe:charty", version.ref = "charty" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "nav3Lifecycle" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

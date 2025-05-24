@@ -139,4 +139,7 @@ dependencies {
     implementation(libs.charty)
     implementation (libs.androidx.graphics.shapes)
     implementation(libs.androidx.animation)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 }

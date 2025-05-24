@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OnBoardingScreen(
-    navHostController: NavHostController,
+    onHomeScreenNavigate : () -> Unit,
     viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
     val permissions = setOf(
@@ -100,8 +100,7 @@ fun OnBoardingScreen(
                 }
 
                 OnBoardingViewEffect.OnBoardingComplete -> {
-                    navHostController.popBackStack()
-                    navHostController.navigate(HomeScreenNav)
+                    onHomeScreenNavigate.invoke()
                 }
             }
 
