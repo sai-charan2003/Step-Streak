@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +59,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.model.DataProviders
+import com.charan.stepstreak.data.repository.impl.permissions
 import com.charan.stepstreak.presentation.navigation.HomeScreenNav
 import com.charan.stepstreak.presentation.onboarding.components.HealthConnectAnimationItem
 import com.charan.stepstreak.presentation.onboarding.components.ProviderConnectImageitem
@@ -66,6 +68,7 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -74,26 +77,29 @@ fun OnBoardingScreen(
     onHomeScreenNavigate : () -> Unit,
     viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
-    val permissions = setOf(
-        HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND,
-        HealthPermission.PERMISSION_READ_HEALTH_DATA_HISTORY
-    )
     val state = viewModel.state.collectAsState()
-    val pageState = rememberPagerState(initialPage = 0, pageCount = { 2 })
+    val pageState = rememberPagerState(initialPage = 0, pageCount = { state.value.totalPages })
     val permissionLaunch = rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { result->
         if(result == permissions){
             viewModel.onEvent(OnBoardingEvents.OnPermissionGranted)
         }
 
     }
+    LaunchedEffect(pageState) {
+        snapshotFlow { pageState.currentPage }
+            .distinctUntilChanged()
+            .collect { page ->
+                viewModel.onEvent(OnBoardingEvents.OnChangePage(page))
+            }
+    }
+
 
 
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest {
             when (it) {
-                OnBoardingViewEffect.ScrollPage -> {
-                    pageState.animateScrollToPage(pageState.currentPage + 1)
+                is OnBoardingViewEffect.ScrollPage -> {
+                    pageState.animateScrollToPage(it.page)
                 }
                 OnBoardingViewEffect.RequestPermission -> {
                     permissionLaunch.launch(permissions)
@@ -125,44 +131,26 @@ fun OnBoardingScreen(
                 when (page) {
                     0 -> IntroPage()
                     1 -> HealthConnectPermissionScreen(state.value.isPermissionGranted)
-//                    2 -> SelectProviderPage(state.value.dataProviders) {
-//                        viewModel.onEvent(OnBoardingEvents.OnSelectProvider(it))
-//                    }
                 }
             }
 
             PagerIndicator(
                 currentPage = pageState.currentPage,
-                pageCount = 2
+                pageCount = state.value.totalPages
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    if(pageState.currentPage == 1 && state.value.isPermissionGranted == false){
-                        viewModel.onEvent(OnBoardingEvents.OnRequestPermission)
-                    } else if(pageState.currentPage == 1 && state.value.isPermissionGranted == true) {
-                        viewModel.onEvent(OnBoardingEvents.OnBoardingComplete)
-                    } else {
-                        viewModel.onEvent(OnBoardingEvents.OnChangePage)
-                    }
+                    viewModel.onEvent(OnBoardingEvents.OnNextButtonClick)
                 },
                 shapes = androidx.compose.material3.ButtonDefaults.shapes(),
 
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    if (pageState.currentPage == 0)
-                        "Get Started"
-                    else if(pageState.currentPage == 1) {
-                        if(!state.value.isPermissionGranted){
-                            "Grant"
-                        } else {
-                            "Finish"
-                        }
-                    }
-                    else "Finish"
+                    state.value.buttonText
                 )
             }
         }
@@ -196,7 +184,6 @@ fun PagerIndicator(currentPage: Int, pageCount: Int) {
 fun IntroPage() {
     val visible = remember { mutableStateOf(false) }
 
-    // Trigger animations on composition
     LaunchedEffect(Unit) {
         visible.value = true
     }

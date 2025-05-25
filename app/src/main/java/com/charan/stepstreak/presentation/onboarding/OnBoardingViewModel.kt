@@ -35,7 +35,6 @@ class OnBoardingViewModel @Inject constructor(
     }
 
     fun initData() = viewModelScope.launch(Dispatchers.IO){
-
         _state.update {
             it.copy(
                 isPermissionGranted = healthConnectRepo.hasPermission()
@@ -47,13 +46,17 @@ class OnBoardingViewModel @Inject constructor(
 
     fun onEvent(event: OnBoardingEvents) = viewModelScope.launch{
         when(event){
-            OnBoardingEvents.OnChangePage -> {
-                _event.emit(OnBoardingViewEffect.ScrollPage)
+            is OnBoardingEvents.OnChangePage -> {
+                _state.update {
+                    it.copy(
+                        currentPage = event.page
+                    )
+                }
+
 
             }
             OnBoardingEvents.OnRequestPermission -> {
                 _event.emit(OnBoardingViewEffect.RequestPermission)
-
             }
             is OnBoardingEvents.OnSelectProvider -> {
                 val updatedProviders = _state.value.dataProviders.map { provider ->
@@ -74,10 +77,25 @@ class OnBoardingViewModel @Inject constructor(
                 initData()
             }
 
-            OnBoardingEvents.OnBoardingComplete -> {
-                dataStoreRepo.setOnBoardingStatus(true)
-                _event.emit(OnBoardingViewEffect.OnBoardingComplete)
-
+            OnBoardingEvents.OnNextButtonClick -> {
+                if(_state.value.currentPage == 0){
+                    _event.emit(OnBoardingViewEffect.ScrollPage(1))
+                    _state.update {
+                        it.copy(
+                            currentPage =  1
+                        )
+                    }
+                    return@launch
+                }
+                if(_state.value.currentPage == 1 && !_state.value.isPermissionGranted){
+                    _event.emit(OnBoardingViewEffect.RequestPermission)
+                    return@launch
+                }
+                if(_state.value.currentPage == 1 && _state.value.isPermissionGranted){
+                    _event.emit(OnBoardingViewEffect.OnBoardingComplete)
+                    dataStoreRepo.setOnBoardingStatus(true)
+                    return@launch
+                }
             }
         }
     }

@@ -108,7 +108,6 @@ fun NavAppHost(
                 }
                 is LicenseDataScreenNav -> NavEntry(key){
                     LicensesScreen(onBackPress = {
-                        Log.d("TAG", "NavAppHost: $backStack")
                         backStack.removeLastOrNull()
                     })
                 }

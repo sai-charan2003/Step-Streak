@@ -29,6 +29,12 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
+val permissions = setOf(
+    HealthPermission.getReadPermission(StepsRecord::class),
+    HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND,
+    HealthPermission.PERMISSION_READ_HEALTH_DATA_HISTORY
+)
+
 class HealthConnectRepoImpl @Inject constructor(
     private val healthConnectClient: HealthConnectClient,
     private val stepsRecordDao: StepsRecordDao,
@@ -37,12 +43,6 @@ class HealthConnectRepoImpl @Inject constructor(
     private val usersSettingsRepo: UsersSettingsRepo
 
 ) : HealthConnectRepo {
-    companion object{
-        val permissions = setOf(
-            HealthPermission.getReadPermission(StepsRecord::class),
-            HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
-        )
-    }
     override suspend fun getTotalSteps() : Flow<ProcessState<List<StepsRecordEntity>>> = flow {
         emit(ProcessState.Loading)
         try {
