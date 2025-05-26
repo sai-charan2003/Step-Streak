@@ -1,23 +1,14 @@
 package com.charan.stepstreak.presentation.widget
 
 import android.annotation.SuppressLint
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
-import android.service.autofill.Validators.or
-import android.util.Log
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.AndroidResourceImageProvider
@@ -27,15 +18,8 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
-import androidx.glance.LocalContext
-import androidx.glance.action.ActionParameters
-import androidx.glance.action.actionParametersOf
-import androidx.glance.action.actionStartActivity
-import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.background
-import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -44,24 +28,19 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
-import androidx.glance.text.FontStyle
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.charan.stepstreak.MainActivity
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
-import com.charan.stepstreak.data.worker.StepsUpdateWorker
-import com.charan.stepstreak.presentation.components.ProgressTickMark
-import com.charan.stepstreak.utils.AppUtils
+import com.charan.stepstreak.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -101,7 +80,7 @@ fun WeeklyStreakWidgetContent(
 
     LaunchedEffect(Unit) {
         launch(Dispatchers.IO) {
-            repo.getWeeklyStreak().collect {
+            repo.getStepData().collect {
                 weeklyStreak = it
             }
         }
@@ -144,7 +123,7 @@ fun WeeklyStreakWidgetContent(
             )
         }
         Text(
-            text = weeklyStreak.motiText,
+            text = weeklyStreak.motivationText,
             modifier = GlanceModifier.padding(bottom = 20.dp),
             style = TextStyle(
                 fontSize = 20.sp,
@@ -159,7 +138,7 @@ fun WeeklyStreakWidgetContent(
             horizontalAlignment = Alignment.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            weeklyStreak.stepsData.forEachIndexed { index, day ->
+            weeklyStreak.currentWeekStepData.forEachIndexed { index, day ->
                 Column(
                     modifier = GlanceModifier.defaultWeight(),
                     horizontalAlignment = Alignment.Start,
@@ -190,7 +169,7 @@ fun WeekStreakItem(
     targetSteps: Long,
     isCompleted: Boolean
 ) {
-    val progressColor = AppUtils.getProgressColor(steps, targetSteps)
+    val progressColor = Utils.getProgressColor(steps, targetSteps)
 
     Column(
         modifier = GlanceModifier

@@ -4,13 +4,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
+import com.charan.stepstreak.data.repository.impl.UserSettingsRepoImp
+import com.charan.stepstreak.presentation.common.state.StepsData
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
-import com.charan.stepstreak.utils.getTodaysStepsData
 import com.charan.stepstreak.utils.toStepsData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,8 +32,8 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     private val healthConnectRepo: HealthConnectRepo,
     private val stepsRecordRepo: StepsRecordRepo,
-    private val widgetRepo: WidgetRepo
-
+    private val widgetRepo: WidgetRepo,
+    private val userSettingsRepo: UsersSettingsRepo
 ): ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
@@ -62,17 +65,23 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun observeSteps() = viewModelScope.launch (Dispatchers.IO){
+    private fun observeSteps() = viewModelScope.launch (Dispatchers.IO) {
         stepsRecordRepo.getAllStepRecords().collectLatest { status ->
-            _state.update { it.copy(
-                streakCount = status.getStreak().toString(),
-                motiText = status.getMotivationQuote(),
-                stepsData = status.toStepsData(),
-                todaysStepData = status.getTodaysStepsData() ?: StepsData(),
-            )
+            _state.update {
+                it.copy(
+                    streakCount = status.getStreak().toString(),
+                    motivationText = status.getMotivationQuote(),
+                    allStepsData = status.toStepsData(),
+                )
             }
+            getTodaysData()
             widgetRepo.updateWidget()
+        }
+    }
 
+    private fun getTodaysData() = viewModelScope.launch (Dispatchers.IO){
+        _state.update {
+            it.copy(todayStepsData = stepsRecordRepo.getTodayStepData().toStepsData())
         }
     }
 

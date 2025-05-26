@@ -46,8 +46,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideStepsRecordRepo(stepsRecordDao: StepsRecordDao): StepsRecordRepo {
-        return StepsRecordRepoImp(stepsRecordDao)
+    fun provideStepsRecordRepo(stepsRecordDao: StepsRecordDao,usersSettingsRepo: UsersSettingsRepo): StepsRecordRepo {
+        return StepsRecordRepoImp(stepsRecordDao,usersSettingsRepo)
 
     }
     @Provides

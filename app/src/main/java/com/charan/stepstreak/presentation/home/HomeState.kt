@@ -1,18 +1,14 @@
 package com.charan.stepstreak.presentation.home
 
+import com.charan.stepstreak.presentation.common.state.StepsData
+
 data class HomeState(
-    val stepsData : List<StepsData> = emptyList(),
+    val allStepsData : List<StepsData> = emptyList(),
     val isSyncing : Boolean = true,
     val isPermissionGranted : Boolean = true,
     val streakCount : String = "0",
-    val motiText : String = "",
-    val todaysStepData : StepsData = StepsData()
+    val motivationText : String = "",
+    val todayStepsData : StepsData = StepsData()
 )
 
-data class  StepsData(
-    val steps : Long = 0L,
-    val date : String = "",
-    val targetSteps : Long = 10000,
-    val day : String = "",
-    val formattedDate : String = "",
-)
+

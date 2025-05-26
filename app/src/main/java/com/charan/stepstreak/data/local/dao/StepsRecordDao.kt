@@ -35,5 +35,8 @@ interface StepsRecordDao {
     @Query("DELETE FROM steps_record")
     fun deleteAllStepsRecords()
 
+    @Query("SELECT * FROM steps_record WHERE date = :date")
+    fun getStepsRecordByDate(date: String): StepsRecordEntity?
+
 
 }

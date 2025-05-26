@@ -43,48 +43,9 @@ class HealthConnectRepoImpl @Inject constructor(
     private val usersSettingsRepo: UsersSettingsRepo
 
 ) : HealthConnectRepo {
-    override suspend fun getTotalSteps() : Flow<ProcessState<List<StepsRecordEntity>>> = flow {
-        emit(ProcessState.Loading)
-        try {
-            val records = mutableListOf<StepsRecordEntity>()
-            val provider = dataStore.dataProviders.first()
-            val response = healthConnectClient.readRecords(
-                ReadRecordsRequest<StepsRecord>(
-                    timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
-                    dataOriginFilter = setOf(DataOrigin(provider)),
-                    ascendingOrder = false
-                )
-            )
-            response.records.forEach { record->
-                val stepRecord = StepsRecordEntity(
-                    steps = record.count,
-                    stepTarget = 10000,
-                    uuid = UUID.randomUUID().toString(),
-                    date = DateUtils.convertUtcToLocalTime(record.startTime, record.startZoneOffset)
-
-                )
-                records.add(stepRecord)
-
-            }
-            emit(ProcessState.Success(records))
-
-
-        } catch (e: Exception){
-            e.printStackTrace()
-            Log.d("TAG", "getTotalSteps: $e")
-            emit(ProcessState.Error(e.message ?: "Something went wrong"))
-
-        }
-
-
-    }
 
     override suspend fun hasPermission(): Boolean {
         return healthConnectClient.permissionController.getGrantedPermissions().containsAll(permissions)
-    }
-
-    override fun requestPermission(): ActivityResultContract<Set<String>, Set<String>> {
-        return PermissionController.createRequestPermissionResultContract()
     }
 
     override suspend fun fetchAndSaveAllStepRecords(): Flow<ProcessState<Boolean>> = flow {
@@ -105,10 +66,10 @@ class HealthConnectRepoImpl @Inject constructor(
                         StepsRecordEntity(
                             steps = it.count,
                             stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(
-                                DateUtils.convertToTimeMillis(it.startTime, it.startZoneOffset)
+                                DateUtils.convertInstantToEpochMillis(it.startTime, it.startZoneOffset)
                             ),
                             uuid = it.metadata.id,
-                            date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
+                            date = DateUtils.formatInstantAsIsoLocalDateString(it.startTime, it.startZoneOffset)
                         )
                     )
                 }
@@ -173,35 +134,6 @@ class HealthConnectRepoImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             packageName
-        }
-    }
-
-    override suspend fun getCurrentWeekSteps(): Flow<ProcessState<List<StepsRecordEntity>>> = flow{
-        emit(ProcessState.Loading)
-        try {
-            val response = healthConnectClient.readRecords(
-                ReadRecordsRequest<StepsRecord>(
-                    timeRangeFilter = TimeRangeFilter.between(DateUtils.getWeekStartDateInISO(),
-                        DateUtils.getWeekEndDateInISO()),
-                    ascendingOrder = false
-                )
-            )
-            response.records.forEach {
-                stepsRecordDao.insertStepsRecord(
-                    StepsRecordEntity(
-                        steps = it.count,
-                        stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(DateUtils.convertToTimeMillis(it.startTime,it.startZoneOffset)),
-                        uuid = UUID.randomUUID().toString(),
-                        date = DateUtils.convertUtcToLocalTime(it.startTime, it.startZoneOffset)
-                    )
-                )
-            }
-
-
-        } catch (e: Exception){
-            e.printStackTrace()
-            emit(ProcessState.Error(e.message ?: "Something went wrong"))
-
         }
     }
 }

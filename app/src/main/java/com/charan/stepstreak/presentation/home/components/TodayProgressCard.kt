@@ -51,9 +51,7 @@ fun TodayProgressCard(
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.confetti))
     var showConfetti by remember { mutableStateOf(true) }
-    val lottieProgress by animateLottieCompositionAsState(
-        composition,
-    )
+    val lottieProgress by animateLottieCompositionAsState(composition)
     val progress = (steps / targetSteps.toFloat()).coerceIn(0f, 1f)
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -110,7 +108,7 @@ fun TodayProgressCard(
 
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
-                        text = "$steps",
+                        text = steps.toString(),
                         style = MaterialTheme.typography.displayMediumEmphasized.copy(
                             fontWeight = FontWeight.ExtraBold,
                         ),

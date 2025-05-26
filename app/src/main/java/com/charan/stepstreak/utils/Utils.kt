@@ -1,12 +1,13 @@
 package com.charan.stepstreak.utils
 
 import android.annotation.SuppressLint
-import androidx.glance.color.ColorProvider
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.glance.unit.ColorProvider
 import androidx.glance.unit.FixedColorProvider
 
-object AppUtils {
+object Utils {
     @SuppressLint("RestrictedApi")
     fun getProgressColor(
         steps: Long,
@@ -31,6 +32,25 @@ object AppUtils {
     private fun lerp(start: Float, stop: Float, fraction: Float): Float {
         return start + (stop - start) * fraction
     }
+
+    private val roundedRadius = 12.dp
+    private val squareRadius = 4.dp
+
+    val firstShape = RoundedCornerShape(
+        topStart = roundedRadius,
+        topEnd = roundedRadius,
+        bottomStart = squareRadius,
+        bottomEnd = squareRadius
+    )
+
+    val lastShape = RoundedCornerShape(
+        topStart = squareRadius,
+        topEnd = squareRadius,
+        bottomStart = roundedRadius,
+        bottomEnd = roundedRadius
+    )
+
+    val middleShape = RoundedCornerShape(size = squareRadius)
 
 
 }

@@ -14,70 +14,44 @@ import java.util.Locale
 
 object DateUtils {
 
-    val weekList = listOf(
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat",
-        "Sun"
+    val ISO_LOCAL_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+    private val SHORT_WEEK_MONTH_DAY_FORMATTER = DateTimeFormatter.ofPattern("E, MMM d", Locale.ENGLISH)
+
+    val SHORT_DAY_NAMES_MON_TO_SUN = listOf(
+        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
     )
-    fun convertUtcToLocalTime(utcTimeString: Instant, zoneOffsetString: ZoneOffset?): String {
-        val localDateTime = ZonedDateTime.ofInstant(utcTimeString, zoneOffsetString ?: ZoneOffset.systemDefault())
-        return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+    fun formatInstantAsIsoLocalDateString(utcTimeString: Instant, zoneOffsetString: ZoneOffset?): String {
+        val localDateTime =
+            ZonedDateTime.ofInstant(utcTimeString, zoneOffsetString ?: ZoneOffset.systemDefault())
+        return localDateTime.format(ISO_LOCAL_DATE_FORMATTER)
     }
 
-fun convertLocalDateTimeToLocalDate(localDateTime: String): String {
-    val parsedDateTime = LocalDate.parse(localDateTime, DateTimeFormatter.ISO_DATE)
-    return parsedDateTime.toString()
-}
-
-    fun getCurrentWeekDates(): List<String> {
-        val today = LocalDate.now()
-        val startOfWeek = today.with(DayOfWeek.MONDAY)
-        val formatter = DateTimeFormatter.ISO_LOCAL_DATE
-
-        return (0..6).map { startOfWeek.plusDays(it.toLong()).format(formatter) }
-    }
-
-    fun getWeekStartDateInISO() : LocalDateTime {
-        val today = LocalDateTime.now()
-        return today.with(DayOfWeek.MONDAY)
-    }
-
-    fun getWeekEndDateInISO() : LocalDateTime {
-        val today = LocalDateTime.now()
-        return today.with(DayOfWeek.SUNDAY)
-    }
-
-    fun getDateNumberFromIso(date: String): Int {
+    fun getWeekdayName(date: String): String {
         val localDateTime = LocalDate.parse(date)
-        return localDateTime.dayOfMonth
+        return localDateTime.dayOfWeek.getDisplayName(
+            TextStyle.SHORT,
+            Locale.getDefault()
+        )
     }
 
-    fun getWeekFromIso(date: String): String {
-        val localDateTime = LocalDate.parse(date)
-        return localDateTime.dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT,Locale.getDefault())
-    }
-
-    fun getCurrentDate() : LocalDate{
+    fun getCurrentDate(): LocalDate {
         return LocalDate.now()
     }
 
-    fun getWeekStartDate() : LocalDate{
+    fun getCurrentWeekStartDate(): LocalDate {
         val today = LocalDate.now()
         return today.with(DayOfWeek.MONDAY)
 
     }
 
-    fun getWeekEndData() : LocalDate {
+    fun getCurrentWeekEndDate(): LocalDate {
         val today = LocalDate.now()
         return today.with(DayOfWeek.SUNDAY)
 
     }
 
-    fun getGreetings() : String{
+    fun getGreetings(): String {
         val hour = LocalDateTime.now().hour
         return when (hour) {
             in 5..11 -> "Good morning"
@@ -87,29 +61,30 @@ fun convertLocalDateTimeToLocalDate(localDateTime: String): String {
         }
     }
 
-    fun formatDateWithSuffix(date: String): String {
-        val inputDate = LocalDate.parse(date)
-        val today = LocalDate.now()
-        return when {
-            inputDate.isEqual(today) -> "Today"
-            inputDate.isEqual(today.minusDays(1)) -> "Yesterday"
-            else -> {
-                val dayOfWeek = inputDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-                val month = inputDate.month.getDisplayName(TextStyle.SHORT, Locale.ENGLISH)
-                val day = inputDate.dayOfMonth
-                "$dayOfWeek, $month $day"
+    fun formatDateForDisplay(date: String): String {
+        return try {
+            val inputDate = LocalDate.parse(date)
+            val today = LocalDate.now()
+
+            when {
+                inputDate.isEqual(today) -> "Today"
+                inputDate.isEqual(today.minusDays(1)) -> "Yesterday"
+                else -> inputDate.format(SHORT_WEEK_MONTH_DAY_FORMATTER)
             }
+        } catch (e: Exception) {
+            date
         }
     }
 
-    fun convertToTimeMillis(date : Instant, zoneOffset: ZoneOffset?): Long {
+
+    fun convertInstantToEpochMillis(date: Instant, zoneOffset: ZoneOffset?): Long {
         val zonedDateTime = ZonedDateTime.ofInstant(date, zoneOffset ?: ZoneOffset.systemDefault())
         return zonedDateTime.toInstant().toEpochMilli()
     }
 
-    val currentDayMillis = ZonedDateTime.now()
-        .toLocalDate() // Get only the date part (year, month, day)
-        .atStartOfDay(ZoneId.systemDefault()) // Set time to midnight in the system's default time zone
+    val startOfCurrentDayMillis = ZonedDateTime.now()
+        .toLocalDate()
+        .atStartOfDay(ZoneId.systemDefault())
         .toInstant()
         .toEpochMilli()
 

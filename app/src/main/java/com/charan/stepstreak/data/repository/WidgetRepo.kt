@@ -6,11 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface WidgetRepo {
 
-    fun getWeeklyStreak() : Flow<WidgetState>
+    fun getStepData() : Flow<WidgetState>
 
     suspend fun updateWidget()
-
-    fun getDailyStreak() : Flow<WidgetState>
-
 
 }

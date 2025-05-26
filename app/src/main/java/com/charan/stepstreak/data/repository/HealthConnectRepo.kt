@@ -8,16 +8,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface HealthConnectRepo {
 
-    suspend fun getTotalSteps() : Flow<ProcessState<List<StepsRecordEntity>>>
 
     suspend fun fetchAndSaveAllStepRecords() : Flow<ProcessState<Boolean>>
 
     suspend fun hasPermission() : Boolean
 
-    fun requestPermission() : ActivityResultContract<Set<String>, Set<String>>
-
     fun getOriginProviders() : Flow<ProcessState<List<DataProviders>>>
 
-    suspend fun getCurrentWeekSteps() : Flow<ProcessState<List<StepsRecordEntity>>>
 
 }

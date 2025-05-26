@@ -3,7 +3,8 @@ package com.charan.stepstreak.utils
 import android.util.Log
 import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
-import com.charan.stepstreak.presentation.home.StepsData
+import com.charan.stepstreak.presentation.common.state.StepsData
+import com.charan.stepstreak.presentation.home.HomeState
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.Constants.walkingMotivationMessages
 import com.himanshoe.charty.bar.model.BarData
@@ -12,53 +13,32 @@ import java.util.Date
 
 fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
     return this.map {
-        StepsData(
-            steps = it.steps ?: 0L,
-            date = it.date ?: "" ,
-            targetSteps = it.stepTarget ?: 0L,
-            day = DateUtils.getWeekFromIso(it.date ?: ""),
-            formattedDate = DateUtils.formatDateWithSuffix(it.date ?: "")
-        )
+        it.toStepsData()
     }
-
 }
 
+fun StepsRecordEntity.toStepsData(): StepsData = StepsData(
+    steps = steps ?: 0L,
+    date = date ?: "",
+    targetSteps = stepTarget ?: 0L,
+    day = DateUtils.getWeekdayName(date ?: ""),
+    formattedDate = DateUtils.formatDateForDisplay(date ?: ""),
+    targetCompleted = (steps ?: 0L) >= (stepTarget ?: 0L)
+)
 
-
-fun List<StepsRecordEntity>.getTodaysStepsData() : StepsData?{
-    val todayRecord = this.filter { DateUtils.convertLocalDateTimeToLocalDate(it.date.toString()) == DateUtils.getCurrentDate().toString() }
-    return todayRecord.toStepsData().firstOrNull()
-
-}
-
-fun List<StepsRecordEntity>.toWidgetState(): WidgetState{
-    val stepsData : MutableList<com.charan.stepstreak.presentation.widget.StepsData> = mutableListOf()
-    this.forEach {
-        val steps = it.steps ?: 0L
-        val targetSteps = it.stepTarget ?: 0L
-        val stepData = com.charan.stepstreak.presentation.widget.StepsData(
-            steps = it.steps ?: 0L,
-            targetSteps = it.stepTarget ?: 0L,
-            targetCompleted = steps >= targetSteps,
-            date = DateUtils.getDateNumberFromIso(it.date ?: "").toString(),
-            day = DateUtils.getWeekFromIso(it.date ?: "")
-
-        )
-        stepsData.add(stepData)
+fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>): WidgetState {
+    val weekList = DateUtils.SHORT_DAY_NAMES_MON_TO_SUN
+    val currentWeekData = this.toStepsData()
+    val paddedWeekData = weekList.map { day ->
+        currentWeekData.find { it.day == day } ?: StepsData(day = day)
     }
     return WidgetState(
-        stepsData = stepsData
+        currentWeekStepData = paddedWeekData,
+        streak = allData.getStreak(),
+        motivationText = allData.getMotivationQuote(),
     )
 }
 
-fun List<StepsData>.toBarChar() : List<BarData> {
-    return this.map {
-        BarData(
-            yValue = it.steps.toFloat(),
-            xValue = it.day,
-        )
-    }
-}
 
 
 fun List<StepsRecordEntity>.getStreak(): Int {

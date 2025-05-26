@@ -82,13 +82,13 @@ fun DailyProgressWidgetContent(
 
     LaunchedEffect(Unit) {
         launch(Dispatchers.IO) {
-            repo.getDailyStreak().collect {
+            repo.getStepData().collect {
                 todayData = it
             }
         }
     }
 
-    val stepsData = todayData.stepsData.firstOrNull()
+    val stepsData = todayData.todayData
     val steps = stepsData?.steps ?: 0
     val targetSteps = stepsData?.targetSteps ?: 10000
     val percentage = (steps.toFloat() / targetSteps).coerceIn(0f, 1f)

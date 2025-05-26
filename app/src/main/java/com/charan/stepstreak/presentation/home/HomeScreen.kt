@@ -48,9 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-import com.charan.stepstreak.presentation.components.CustomIndicator
 import com.charan.stepstreak.presentation.home.components.DailyStepsCard
-import com.charan.stepstreak.presentation.home.components.HomeTopBar
 import com.charan.stepstreak.presentation.home.components.StreakCard
 import com.charan.stepstreak.presentation.home.components.TodayProgressCard
 import com.charan.stepstreak.presentation.navigation.SettingsScreenNav
@@ -130,20 +128,19 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 item {
-
                     Spacer(Modifier.height(20.dp))
                     StreakCard(
                         streakCount = state.value.streakCount,
-                        motivationText = state.value.motiText
+                        motivationText = state.value.motivationText
                     )
                     Spacer(Modifier.height(15.dp))
                     TodayProgressCard(
-                        steps = state.value.todaysStepData.steps,
-                        targetSteps = state.value.todaysStepData.targetSteps,
+                        steps = state.value.todayStepsData.steps,
+                        targetSteps = state.value.todayStepsData.targetSteps,
                     )
                     Spacer(Modifier.height(15.dp))
                     DailyStepsCard(
-                        stepsData = state.value.stepsData
+                        stepsData = state.value.allStepsData
                     )
                 }
 

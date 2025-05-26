@@ -8,14 +8,15 @@ import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
-import com.charan.stepstreak.presentation.widget.StepsData
+import com.charan.stepstreak.presentation.common.state.StepsData
+import com.charan.stepstreak.presentation.widget.DailyProgressWidget
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidget
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
-import com.charan.stepstreak.utils.getTodaysStepsData
+import com.charan.stepstreak.utils.toStepsData
 import com.charan.stepstreak.utils.toWidgetState
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
@@ -60,57 +61,16 @@ class WidgetRepoImp @Inject constructor(
         }
     }
 
-    override fun getWeeklyStreak(): Flow<WidgetState> = flow{
-        val weekList = DateUtils.weekList
-        val data = stepsRecordRepo.getWeeklyStepsRecords().toWidgetState()
+    override fun getStepData(): Flow<WidgetState> = flow {
         val allData = stepsRecordRepo.getAllStepsRecords()
-        val widgetContent = mutableListOf<StepsData>()
-        weekList.forEach { day->
-            val steps = data.stepsData.find { it.day == day }
-            val stepsData = StepsData(
-                steps = steps?.steps ?: 0L,
-                targetSteps = steps?.targetSteps ?: 0L,
-                targetCompleted = steps?.targetCompleted ?: false,
-                date = steps?.date ?: "",
-                day = day
-            )
-            widgetContent.add(stepsData)
+        val weekData = stepsRecordRepo.getWeeklyStepsRecords()
 
-        }
-        emit(
-            WidgetState(
-                streak = allData.getStreak(),
-                motiText = allData.getMotivationQuote(),
-                stepsData = widgetContent
-            )
-        )
-
+        emit(weekData.toWidgetState(allData).copy(todayData = stepsRecordRepo.getTodayStepData().toStepsData()))
     }
+
 
     override suspend fun updateWidget() {
         WeeklyStreakWidget().updateAll(context)
-    }
-
-    override fun getDailyStreak(): Flow<WidgetState> =flow{
-
-        val todayProgress = stepsRecordRepo.getAllStepsRecords().getTodaysStepsData()
-        emit(
-            WidgetState(
-                streak = stepsRecordRepo.getAllStepsRecords().getStreak(),
-                motiText = stepsRecordRepo.getAllStepsRecords().getMotivationQuote(),
-                stepsData = listOf(
-                    StepsData(
-                        steps = todayProgress?.steps ?: 0L,
-                        targetSteps = todayProgress?.targetSteps ?: 0L,
-                        targetCompleted = todayProgress?.let {
-                            it.steps > 0 && it.targetSteps > 0 && it.steps >= it.targetSteps
-                        } ?: false,
-                        date = todayProgress?.date ?: "",
-                        day = DateUtils.getCurrentDate().toString()
-                    )
-                )
-            )
-
-        )
+        DailyProgressWidget().updateAll(context)
     }
 }

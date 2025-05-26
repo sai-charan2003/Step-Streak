@@ -17,7 +17,7 @@ class UserSettingsRepoImp @Inject constructor(
             UserSetting(
                 settingType = setting,
                 settingValue = value,
-                timestamp = DateUtils.currentDayMillis
+                timestamp = DateUtils.startOfCurrentDayMillis
             )
         )
     }

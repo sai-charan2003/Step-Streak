@@ -42,7 +42,6 @@ import kotlin.math.min
 fun StreakCard(
     streakCount: String,
     motivationText: String,
-    onInfoClick: () -> Unit = {}
 ) {
 
     ElevatedCard (
