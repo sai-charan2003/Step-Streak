@@ -1,4 +1,4 @@
-package com.charan.stepstreak.presentation.common.state
+package com.charan.stepstreak.presentation.common
 
 data class StepsData(
     val steps : Long = 0L,

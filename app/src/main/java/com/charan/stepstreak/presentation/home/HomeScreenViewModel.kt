@@ -10,7 +10,7 @@ import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.UserSettingsRepoImp
-import com.charan.stepstreak.presentation.common.state.StepsData
+import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak

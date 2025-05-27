@@ -35,7 +35,7 @@ import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
 import androidx.graphics.shapes.toPath
-import com.charan.stepstreak.presentation.common.state.StepsData
+import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.utils.Utils.firstShape
 import com.charan.stepstreak.utils.Utils.lastShape
 import com.charan.stepstreak.utils.Utils.middleShape

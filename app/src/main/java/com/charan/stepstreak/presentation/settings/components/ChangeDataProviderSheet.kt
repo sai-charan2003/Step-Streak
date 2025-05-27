@@ -1,4 +1,4 @@
-package com.charan.stepstreak.presentation.settings
+package com.charan.stepstreak.presentation.settings.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -27,19 +27,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.charan.stepstreak.data.model.SyncTime
+import com.charan.stepstreak.data.model.DataProviders
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ChangeSyncFrequencySheet(
-    currentFrequency : Long,
-    onValueChange: (Long) -> Unit,
+fun ChangeDataProviderSheet(
+    dataProvider: List<DataProviders>,
+    onValueChange: (DataProviders) -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit,
     sheetState : SheetState
 ){
-
 
 
     ModalBottomSheet(
@@ -53,36 +52,39 @@ fun ChangeSyncFrequencySheet(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            SyncTime.entries.forEach {
+            dataProvider.forEach { provider ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .selectable(
-                            selected = currentFrequency == it.minutes,
-                            onClick = { onValueChange(it.minutes) },
+                            selected = provider.isConnected,
+                            onClick = { onValueChange(provider) },
                             role = Role.RadioButton
                         )
                         .padding(16.dp)
                 ) {
-
-                    RadioButton(
-                        selected = currentFrequency == it.minutes,
-                        onClick = null
+                    Image(
+                        painter = rememberDrawablePainter(provider.icon),
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+
+                    Spacer(modifier = Modifier.width(16.dp))
 
                     Text(
-                        text = it.getName().toString(),
+                        text = provider.name,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )
 
+                    RadioButton(
+                        selected = provider.isConnected,
+                        onClick = null
+                    )
                 }
-
             }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,9 +94,10 @@ fun ChangeSyncFrequencySheet(
                 Button(
                     modifier = Modifier.weight(1f),
                     shapes = ButtonDefaults.shapes(),
+
                     onClick = { onSave() }
                 ) {
-                    Text(text = "Set Frequency")
+                    Text(text = "Set goal")
                 }
 
                 OutlinedButton(

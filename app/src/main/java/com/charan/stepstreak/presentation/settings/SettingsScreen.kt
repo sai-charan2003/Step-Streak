@@ -1,23 +1,12 @@
 package com.charan.stepstreak.presentation.settings
 
-import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.rounded.Code
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -26,33 +15,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import com.charan.stepstreak.data.model.SyncTime
-import com.charan.stepstreak.presentation.navigation.LicenseDataScreenNav
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.charan.stepstreak.presentation.settings.components.ChangeDataProviderSheet
+import com.charan.stepstreak.presentation.settings.components.ChangeSyncFrequencySheet
+import com.charan.stepstreak.presentation.settings.components.SetStepGoalDialog
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -73,7 +51,7 @@ fun SettingsScreen(
             onIncrement = { viewModel.onEvent(SettingsEvents.OnStepsTargetIncrement) },
             onDecrement = { viewModel.onEvent(SettingsEvents.OnStepsTargetDecrement) },
             onValueChange = { viewModel.onEvent(SettingsEvents.OnStepsTargetValueChange(it)) },
-            onSave = {viewModel.onEvent(SettingsEvents.OnSaveStepsTarget) },
+            onSave = { viewModel.onEvent(SettingsEvents.OnSaveStepsTarget) },
             onDismiss = { viewModel.onEvent(SettingsEvents.ToggleGoalsSheet(false)) },
             sheetState = goalsBottomSheetState
         )

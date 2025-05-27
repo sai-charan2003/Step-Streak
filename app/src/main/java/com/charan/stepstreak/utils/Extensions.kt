@@ -3,7 +3,7 @@ package com.charan.stepstreak.utils
 import android.util.Log
 import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
-import com.charan.stepstreak.presentation.common.state.StepsData
+import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.home.HomeState
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.Constants.walkingMotivationMessages

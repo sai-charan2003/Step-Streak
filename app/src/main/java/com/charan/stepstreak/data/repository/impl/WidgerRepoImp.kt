@@ -8,7 +8,7 @@ import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
-import com.charan.stepstreak.presentation.common.state.StepsData
+import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.widget.DailyProgressWidget
 import com.charan.stepstreak.presentation.widget.WeeklyStreakWidget
 import com.charan.stepstreak.presentation.widget.WidgetState

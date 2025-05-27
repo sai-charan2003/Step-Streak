@@ -1,29 +1,18 @@
-package com.charan.stepstreak.presentation.settings
+package com.charan.stepstreak.presentation.settings.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -34,23 +23,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.charan.stepstreak.data.model.DataProviders
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.charan.stepstreak.data.model.SyncTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ChangeDataProviderSheet(
-    dataProvider: List<DataProviders>,
-    onValueChange: (DataProviders) -> Unit,
+fun ChangeSyncFrequencySheet(
+    currentFrequency : Long,
+    onValueChange: (Long) -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit,
     sheetState : SheetState
 ){
+
 
 
     ModalBottomSheet(
@@ -64,39 +50,36 @@ fun ChangeDataProviderSheet(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            dataProvider.forEach { provider ->
+            SyncTime.entries.forEach {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .selectable(
-                            selected = provider.isConnected,
-                            onClick = { onValueChange(provider) },
+                            selected = currentFrequency == it.minutes,
+                            onClick = { onValueChange(it.minutes) },
                             role = Role.RadioButton
                         )
                         .padding(16.dp)
                 ) {
-                    Image(
-                        painter = rememberDrawablePainter(provider.icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp)
-                    )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    RadioButton(
+                        selected = currentFrequency == it.minutes,
+                        onClick = null
+                    )
+                    Spacer(Modifier.width(8.dp))
 
                     Text(
-                        text = provider.name,
+                        text = it.getName().toString(),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )
 
-                    RadioButton(
-                        selected = provider.isConnected,
-                        onClick = null
-                    )
                 }
+
             }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -106,10 +89,9 @@ fun ChangeDataProviderSheet(
                 Button(
                     modifier = Modifier.weight(1f),
                     shapes = ButtonDefaults.shapes(),
-
                     onClick = { onSave() }
                 ) {
-                    Text(text = "Set goal")
+                    Text(text = "Set Frequency")
                 }
 
                 OutlinedButton(
