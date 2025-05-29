@@ -1,5 +1,6 @@
 package com.charan.stepstreak.presentation.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +50,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.charan.stepstreak.presentation.home.components.DailyStepsCard
+import com.charan.stepstreak.presentation.home.components.SimpleBarChartWithAxes
 import com.charan.stepstreak.presentation.home.components.StreakCard
 import com.charan.stepstreak.presentation.home.components.TodayProgressCard
 import com.charan.stepstreak.presentation.navigation.SettingsScreenNav
@@ -137,6 +139,12 @@ fun HomeScreen(
                     TodayProgressCard(
                         steps = state.value.todayStepsData.steps,
                         targetSteps = state.value.todayStepsData.targetSteps,
+                    )
+                    Spacer(Modifier.height(15.dp))
+                    SimpleBarChartWithAxes(
+                        weeklySteps = state.value.currentWeekData,
+                        targetStep = state.value.currentTargetSteps
+
                     )
                     Spacer(Modifier.height(15.dp))
                     DailyStepsCard(

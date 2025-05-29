@@ -8,7 +8,9 @@ data class HomeState(
     val isPermissionGranted : Boolean = true,
     val streakCount : String = "0",
     val motivationText : String = "",
-    val todayStepsData : StepsData = StepsData()
+    val todayStepsData : StepsData = StepsData(),
+    val currentWeekData : List<StepsData> = emptyList(),
+    val currentTargetSteps : Long = 0L,
 )
 
 

@@ -15,6 +15,7 @@ import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
 import com.charan.stepstreak.utils.toStepsData
+import com.charan.stepstreak.utils.toWeekData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -44,6 +45,7 @@ class HomeScreenViewModel @Inject constructor(
     init {
         fetchSteps()
         observeSteps()
+        getCurrentTargetSteps()
     }
 
     private fun fetchSteps() = viewModelScope.launch(Dispatchers.IO){
@@ -72,9 +74,11 @@ class HomeScreenViewModel @Inject constructor(
                     streakCount = status.getStreak().toString(),
                     motivationText = status.getMotivationQuote(),
                     allStepsData = status.toStepsData(),
+
                 )
             }
             getTodaysData()
+            getCurrentWeekData()
             widgetRepo.updateWidget()
         }
     }
@@ -82,6 +86,18 @@ class HomeScreenViewModel @Inject constructor(
     private fun getTodaysData() = viewModelScope.launch (Dispatchers.IO){
         _state.update {
             it.copy(todayStepsData = stepsRecordRepo.getTodayStepData().toStepsData())
+        }
+    }
+
+    private fun getCurrentWeekData() = viewModelScope.launch (Dispatchers.IO){
+        _state.update {
+            it.copy(currentWeekData = stepsRecordRepo.getWeeklyStepsRecords().toWeekData())
+        }
+    }
+
+    private fun getCurrentTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
+        _state.update {
+            it.copy(currentTargetSteps = userSettingsRepo.getStepsTargetInGivenTime(System.currentTimeMillis()))
         }
     }
 

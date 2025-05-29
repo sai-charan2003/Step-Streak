@@ -23,20 +23,22 @@ fun StepsRecordEntity.toStepsData(): StepsData = StepsData(
     targetSteps = stepTarget ?: 0L,
     day = DateUtils.getWeekdayName(date ?: ""),
     formattedDate = DateUtils.formatDateForDisplay(date ?: ""),
-    targetCompleted = (steps ?: 0L) >= (stepTarget ?: 0L)
+    targetCompleted = (steps ?: 0L) >= (stepTarget ?: 0L),
 )
 
 fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>): WidgetState {
-    val weekList = DateUtils.SHORT_DAY_NAMES_MON_TO_SUN
-    val currentWeekData = this.toStepsData()
-    val paddedWeekData = weekList.map { day ->
-        currentWeekData.find { it.day == day } ?: StepsData(day = day)
-    }
     return WidgetState(
-        currentWeekStepData = paddedWeekData,
+        currentWeekStepData = this.toWeekData(),
         streak = allData.getStreak(),
         motivationText = allData.getMotivationQuote(),
     )
+}
+fun List<StepsRecordEntity>.toWeekData(): List<StepsData> {
+    val weekList = DateUtils.SHORT_DAY_NAMES_MON_TO_SUN
+    val currentWeekData = this.toStepsData()
+    return weekList.map { day ->
+        currentWeekData.find { it.day == day } ?: StepsData(day = day)
+    }
 }
 
 
