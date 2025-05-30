@@ -2,26 +2,22 @@ package com.charan.stepstreak.presentation.home.components
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,23 +29,22 @@ import com.charan.stepstreak.presentation.common.StepsData
 fun SimpleBarChartWithAxes(
     modifier: Modifier = Modifier,
     weeklySteps: List<StepsData>,
-    targetStep : Long = 6000L
+    targetStep: Long = 6000L
 ) {
-    Log.d("TAG", "SimpleBarChartWithAxes: $weeklySteps")
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface.toArgb()
-
-    val maxValue = weeklySteps.maxByOrNull { it.steps }?.steps ?: 5000
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val teritiaryColor = MaterialTheme.colorScheme.tertiary
+    val hapticFeedback = LocalHapticFeedback.current
+    val highestValue = weeklySteps.maxOfOrNull { it.steps } ?: 0
+    val maxValue = if (highestValue > targetStep) highestValue else targetStep
     val ySteps = 5
-    ElevatedCard (
-        modifier = Modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
+    val selectedBarIndex = remember { mutableStateOf<Int?>(null) }
+
+    ElevatedCard(
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Weekly Progress",
                 style = MaterialTheme.typography.titleMediumEmphasized.copy(
@@ -61,29 +56,54 @@ fun SimpleBarChartWithAxes(
             Spacer(modifier = Modifier.height(20.dp))
 
             Canvas(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(250.dp)
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val canvasWidth = size.width
+                                val paddingLeft = 90f
+                                val chartWidth = canvasWidth - paddingLeft
+                                val barWidth = chartWidth / (weeklySteps.size * 2)
+                                val space = barWidth
+                                val barStartX = paddingLeft
+                                val fullBarWidth = barWidth + space
+
+                                event.changes.forEach { change ->
+                                    val xOffset = change.position.x - barStartX
+                                    if (xOffset >= 0) {
+                                        val index = (xOffset / fullBarWidth).toInt()
+                                        if (index in weeklySteps.indices) {
+                                            selectedBarIndex.value = index
+                                        }
+                                    }
+
+                                    if (change.pressed) {
+                                        change.consume()
+                                    }
+                                }
+                            }
+                        }
+                    }
             ) {
                 val canvasWidth = size.width
                 val canvasHeight = size.height
-
                 val paddingLeft = 90f
                 val paddingBottom = 40f
                 val chartHeight = canvasHeight - paddingBottom
                 val chartWidth = canvasWidth - paddingLeft
-
                 val barWidth = chartWidth / (weeklySteps.size * 2)
                 val space = barWidth
-
+                val targetY = chartHeight - (targetStep / maxValue.toFloat()) * chartHeight
                 val yLabelPaint = Paint().asFrameworkPaint().apply {
                     isAntiAlias = true
                     textSize = 24f
                     color = onSurfaceColor
                 }
-
-                val targetY = chartHeight - (targetStep / maxValue.toFloat()) * chartHeight
                 drawRoundRect(
-                    color = Color.Red,
+                    color = teritiaryColor,
                     topLeft = Offset(paddingLeft, targetY - 1f),
                     size = Size(canvasWidth - paddingLeft, 2f),
                     cornerRadius = CornerRadius(80f, 80f)
@@ -107,15 +127,32 @@ fun SimpleBarChartWithAxes(
                 weeklySteps.forEachIndexed { index, data ->
                     val barHeight = (data.steps / maxValue.toFloat()) * chartHeight
                     val x = paddingLeft + index * (barWidth + space)
-
+                    val barColor = if (data.targetCompleted) Color(0xFF4CAF50) else primaryColor
 
                     drawRoundRect(
-                        color = if (data.targetCompleted) Color(0xFF4CAF50) else Color.Blue,
+                        color = barColor,
                         topLeft = Offset(x, chartHeight - barHeight),
                         size = Size(barWidth, barHeight),
                         cornerRadius = CornerRadius(80f, 80f)
                     )
 
+                    if (selectedBarIndex.value == index) {
+                        hapticFeedback.performHapticFeedback(
+                            LongPress
+                        )
+                        val paint = Paint().asFrameworkPaint().apply {
+                            isAntiAlias = true
+                            textSize = 32f
+                            color = onSurfaceColor
+                            textAlign = android.graphics.Paint.Align.CENTER
+                        }
+                        drawContext.canvas.nativeCanvas.drawText(
+                            data.steps.toString(),
+                            x + barWidth / 2,
+                            chartHeight - barHeight - 10f,
+                            paint
+                        )
+                    }
 
 
                     drawContext.canvas.nativeCanvas.drawText(
@@ -129,6 +166,7 @@ fun SimpleBarChartWithAxes(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
