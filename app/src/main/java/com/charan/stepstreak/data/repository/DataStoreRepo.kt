@@ -10,6 +10,8 @@ interface DataStoreRepo {
     suspend fun setOnBoardingStatus(status : Boolean)
     val syncFrequency : Flow<Long>
     suspend fun setSyncFrequency(frequency : Long)
+    suspend fun shouldShowMilestone(milestone : Int) : Boolean
+    suspend fun markMilestoneAsShown(milestone : Int)
 
 
 

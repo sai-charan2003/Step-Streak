@@ -10,7 +10,9 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
+import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.worker.StepsUpdateWorker
+import com.charan.stepstreak.utils.NotificationHelper
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -29,7 +31,9 @@ class StepStreakApplication : Application(), Configuration.Provider {
 
 class WorkerFactorClass @Inject constructor(
     private val healthConnectRepo: HealthConnectRepo,
-    private val dataStoreRepo: DataStoreRepo) : WorkerFactory(){
+    private val dataStoreRepo: DataStoreRepo,
+    private val notificationHelper: NotificationHelper,
+    private val stepRecord : StepsRecordRepo) : WorkerFactory(){
     override fun createWorker(
         appContext: Context,
         workerClassName: String,
@@ -37,7 +41,7 @@ class WorkerFactorClass @Inject constructor(
     ): ListenableWorker?  {
         return when(workerClassName){
             StepsUpdateWorker::class.java.name ->
-                StepsUpdateWorker(appContext,workerParameters,healthConnectRepo,dataStoreRepo)
+                StepsUpdateWorker(appContext,workerParameters,healthConnectRepo,dataStoreRepo,notificationHelper,stepRecord)
             else ->
                 return null
 

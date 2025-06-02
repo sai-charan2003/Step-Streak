@@ -188,5 +188,33 @@ object Constants {
         "Walking is winning 🏅"
     )
 
+    val milestone25Notifications = listOf(
+        "Strong Start!" to "You've hit 25% of your step goal. Keep it going! 💪",
+        "Good Momentum!" to "Nice! 25% done — let's keep stepping 🚶",
+        "First Milestone!" to "A quarter down. Stay on the move 👟",
+        "Off to a Great Start!" to "You’ve completed 25% — solid beginning! 🔥"
+    )
+
+    val milestone50Notifications = listOf(
+        "Halfway There!" to "You're 50% in! Keep the pace strong 💨",
+        "Midpoint Mastery!" to "Half your goal is done — let’s crush the rest! 🏃‍♀️",
+        "50% Complete!" to "You're making great progress! 👣",
+        "Half Done!" to "You're right on track. Keep going! 🎯"
+    )
+
+    val milestone75Notifications = listOf(
+        "Almost There!" to "You've hit 75% of your step goal. Final push! 🔥",
+        "Keep Pushing!" to "Just 25% left. You got this! 💪",
+        "So Close!" to "Only a little more to go — finish strong! 🏁",
+        "Nearly Done!" to "You're close to the goal. Step it out! 👟"
+    )
+
+    val milestone100Notifications = listOf(
+        "Goal Achieved!" to "You’ve completed your step goal for today! 🎉",
+        "Mission Complete!" to "Steps crushed — awesome work! ✅",
+        "You Did It!" to "100% reached. Now take a bow 👏",
+        "Streak Secured!" to "Step goal smashed! See you tomorrow 🏆"
+    )
+
     const val STEPS_TARGET_SETTING = "steps_target_setting"
 }
