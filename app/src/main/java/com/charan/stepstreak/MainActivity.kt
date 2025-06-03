@@ -45,6 +45,7 @@ import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.worker.StepsUpdateWorker
 import com.charan.stepstreak.presentation.navigation.NavAppHost
 import com.charan.stepstreak.ui.theme.StepStreakTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +61,7 @@ import kotlin.collections.containsAll
 class MainActivity : ComponentActivity() {
     @Inject lateinit var dataStoreRepo: DataStoreRepo
     private var isOnBoardingCompleted = mutableStateOf<Boolean>(true)
-    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StepsUpdateWorker.setup(this)
@@ -70,6 +71,10 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
+            val notificationPermission = rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS)
+            LaunchedEffect(Unit) {
+                notificationPermission.launchPermissionRequest()
+            }
             StepStreakTheme{
                 Surface {
                     NavAppHost(
