@@ -46,7 +46,6 @@ class NotificationHelper @Inject constructor(
             .setContentText(message)
             .setSmallIcon(R.drawable.applogo)
             .setAutoCancel(true)
-            .setProgress(100, stepsPercentage, false)
             .setContentIntent(pendingIntent)
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
