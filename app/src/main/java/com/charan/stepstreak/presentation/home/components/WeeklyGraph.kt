@@ -119,41 +119,6 @@ fun SimpleBarChartWithAxes(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val canvasWidth = size.width
-                                val paddingLeft = 120f
-                                val paddingBottom = 50f
-                                val chartWidth = canvasWidth - paddingLeft - 20f
-                                val barWidth = chartWidth / (weeklySteps.size * 2)
-                                val space = barWidth
-                                val barStartX = paddingLeft
-                                val fullBarWidth = barWidth + space
-                                val anyPressed = event.changes.any { it.pressed }
-
-                                if (anyPressed) {
-                                    event.changes.forEach { change ->
-                                        val xOffset = change.position.x - barStartX
-                                        if (xOffset >= 0) {
-                                            val index = (xOffset / fullBarWidth).toInt()
-                                            if (index in weeklySteps.indices) {
-                                                if(weeklySteps.get(index).steps == 0L) {
-                                                    selectedBarIndex.value = null
-                                                } else{
-                                                    selectedBarIndex.value = index
-                                                }
-                                            }
-                                        }
-                                        change.consume()
-                                    }
-                                } else {
-                                    selectedBarIndex.value = null
-                                }
-                            }
-                        }
-                    }
             ) {
                 val canvasWidth = size.width
                 val canvasHeight = size.height
@@ -227,6 +192,20 @@ fun SimpleBarChartWithAxes(
                     val scaledBarHeight = animatedBarHeight
                     val scaledBarWidth = barWidth
                     val offsetX = x +2 + (barWidth - scaledBarWidth) / 2
+                    val stepsPaint = Paint().asFrameworkPaint().apply {
+                        isAntiAlias = true
+                        textSize = 24f
+                        color = Color(onSurfaceColor.toArgb()).copy(alpha = barAnimationProgress).toArgb()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    }
+
+                    drawContext.canvas.nativeCanvas.drawText(
+                        "${data.steps}",
+                        x + barWidth / 2,
+                        paddingTop + chartHeight - animatedBarHeight - 12f,
+                        stepsPaint
+                    )
 
                     drawRoundRect(
                         color = barColor.copy(alpha = barAnimationProgress),
