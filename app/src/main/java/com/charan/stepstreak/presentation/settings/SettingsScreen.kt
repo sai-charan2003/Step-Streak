@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charan.stepstreak.presentation.settings.components.ChangeDataProviderSheet
 import com.charan.stepstreak.presentation.settings.components.ChangeSyncFrequencySheet
 import com.charan.stepstreak.presentation.settings.components.SetStepGoalDialog
@@ -40,7 +42,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val state by viewModel.settingsState.collectAsState()
+    val state by viewModel.settingsState.collectAsStateWithLifecycle()
     val goalsBottomSheetState = rememberModalBottomSheetState()
     val dataProviderSheetState = rememberModalBottomSheetState()
     val syncFrequencySheetState = rememberModalBottomSheetState()
@@ -125,35 +127,6 @@ fun SettingsScreen(
                         viewModel.onEvent(SettingsEvents.ToggleGoalsSheet(true))
                     }
                 )
-
-//                ListItem(
-//                    headlineContent = { Text("Health Provider") },
-//                    trailingContent = {
-//                        Text(
-//                            text = state.selectedDataProvider?.name ?: "",
-//                            style = MaterialTheme.typography.bodyLargeEmphasized
-//                        )
-//                    },
-//                    leadingContent = {
-//                        Icon(Icons.Rounded.Favorite,null)
-//                    },
-//                    modifier = Modifier.clickable {
-//                        viewModel.onEvent(SettingsEvents.ToggleDataProviderSheet(true))
-//                    }
-//                )
-
-//                ListItem(
-//                    headlineContent = { Text("Sync Frequency") },
-//                    trailingContent = {
-//                        Text(
-//                            text = state.frequencyString,
-//                            style = MaterialTheme.typography.bodyLarge
-//                        )
-//                    },
-//                    modifier = Modifier.clickable {
-//                        viewModel.onEvent(SettingsEvents.ToggleFrequencySheet(true))
-//                    }
-//                )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
             }

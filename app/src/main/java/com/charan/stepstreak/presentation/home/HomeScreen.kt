@@ -36,6 +36,7 @@ import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -47,7 +48,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.SimpleBarChartWithAxes
@@ -64,17 +68,18 @@ fun HomeScreen(
     onSettingNavigate : () -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ){
-    val state = viewModel.state.collectAsState()
-    val effects = viewModel.effects.collectAsState(initial = null)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val state = viewModel.state.collectAsStateWithLifecycle()
+    val effect by viewModel.effects.collectAsStateWithLifecycle(
+        initialValue = null,
+        lifecycle = lifecycleOwner.lifecycle
+    )
     val scroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val pullToRefreshState = rememberPullToRefreshState()
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
-    when(lifecycleState){
-        Lifecycle.State.RESUMED -> {
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             viewModel.onEvent(HomeEvent.OnRefresh)
         }
-        else -> Unit
     }
 
 
@@ -86,7 +91,11 @@ fun HomeScreen(
                 title = {
                     Text(
                         text = DateUtils.getGreetings(),
-
+                    )
+                },
+                subtitle = {
+                    Text(
+                        text = state.value.motivationText
                     )
                 },
                 actions = {
