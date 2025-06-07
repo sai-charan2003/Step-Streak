@@ -1,6 +1,7 @@
 package com.charan.stepstreak.presentation.settings
 
 import com.charan.stepstreak.data.model.DataProviders
+import com.charan.stepstreak.data.model.ThemeEnum
 
 sealed interface SettingsEvents {
     data class ToggleDataProviderSheet(var shouldShow : Boolean) : SettingsEvents
@@ -14,5 +15,8 @@ sealed interface SettingsEvents {
     data object OnSaveDataProvider : SettingsEvents
     data object OnSaveFrequency : SettingsEvents
     data class OnChangeFrequency(val frequency : Long) : SettingsEvents
+    data class SetDynamicColor(val value : Boolean) : SettingsEvents
+    data class SetTheme(val theme: String) : SettingsEvents
+    object ToggleThemeMenu : SettingsEvents
 
 }

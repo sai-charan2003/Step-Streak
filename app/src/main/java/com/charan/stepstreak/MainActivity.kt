@@ -1,10 +1,12 @@
 package com.charan.stepstreak
 
 
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +26,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.expressiveLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +43,7 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.navigation.compose.rememberNavController
+import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.worker.StepsUpdateWorker
@@ -60,31 +64,47 @@ import kotlin.collections.containsAll
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var dataStoreRepo: DataStoreRepo
-    private var isOnBoardingCompleted = mutableStateOf<Boolean>(true)
+    val keepScreen = mutableStateOf(true)
+
     @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StepsUpdateWorker.setup(this)
-        CoroutineScope(Dispatchers.Main).launch {
-            isOnBoardingCompleted.value = dataStoreRepo.isOnBoardingCompleted.first()
+        installSplashScreen().setKeepOnScreenCondition {
+            keepScreen.value
         }
-        installSplashScreen()
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+        )
         setContent {
+            val systemTheme = if (isSystemInDarkTheme()) ThemeEnum.DARK else ThemeEnum.LIGHT
+            val isDynamicColor by dataStoreRepo.isDynamicColor.collectAsState(initial = true)
+            val themeData by dataStoreRepo.theme.collectAsState(initial = systemTheme)
+            val isOnBoardingCompleted by dataStoreRepo.isOnBoardingCompleted.collectAsState(initial = true)
             val notificationPermission = rememberPermissionState(android.Manifest.permission.POST_NOTIFICATIONS)
             LaunchedEffect(Unit) {
+                keepScreen.value = false
+            }
+            LaunchedEffect(notificationPermission) {
                 notificationPermission.launchPermissionRequest()
             }
-            StepStreakTheme{
-                Surface {
-                    NavAppHost(
-                        isOnBoardingCompleted = isOnBoardingCompleted.value == true
-                    )
+
+            StepStreakTheme(
+                dynamicColor = isDynamicColor,
+                darkTheme = when (themeData) {
+                    ThemeEnum.SYSTEM -> isSystemInDarkTheme()
+                    ThemeEnum.LIGHT -> false
+                    ThemeEnum.DARK -> true
+                }
+            ) {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    NavAppHost(isOnBoardingCompleted = isOnBoardingCompleted)
                 }
             }
         }
     }
-
 }
+
 
 

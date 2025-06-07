@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,8 @@ class DataStoreRepoImp (
         val MILESTONE_75_SHOWN = booleanPreferencesKey("milestone_75_shown")
         val MILESTONE_100_SHOWN = booleanPreferencesKey("milestone_100_shown")
         val LAST_MILESTONE_DATE = stringPreferencesKey("last_milestone_date")
+        val DYNAMIC_COLOR_STATUS = booleanPreferencesKey("dynamic_color_status")
+        val THEME = stringPreferencesKey("theme")
     }
 
     override val dataProviders: Flow<String>
@@ -114,6 +117,28 @@ class DataStoreRepoImp (
                 it[MILESTONE_75_SHOWN] = false
                 it[MILESTONE_100_SHOWN] = false
             }
+        }
+    }
+
+    override val isDynamicColor: Flow<Boolean>
+        get() = context.dataStore.data.map {
+            it[DYNAMIC_COLOR_STATUS] ?: true
+        }
+
+    override suspend fun changeDynamicColorStatus(status: Boolean) {
+        context.dataStore.edit {
+            it[DYNAMIC_COLOR_STATUS] = status
+        }
+    }
+
+    override val theme: Flow<ThemeEnum>
+        get() = context.dataStore.data.map {
+            ThemeEnum.fromName(it[THEME] ?: ThemeEnum.SYSTEM.getName())
+        }
+
+    override suspend fun setTheme(theme: ThemeEnum) {
+        context.dataStore.edit {
+            it[THEME] = theme.getName()
         }
     }
 }

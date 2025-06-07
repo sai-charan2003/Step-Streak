@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.BuildConfig
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.model.SyncTime
+import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
@@ -42,6 +43,8 @@ class SettingsViewModel @Inject constructor(
         setSelectedDataProvider()
 //        setSyncFrequency()
         setAppVersion()
+        getDynamicColorStatus()
+        getThemeData()
     }
 
     private fun setTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
@@ -135,6 +138,19 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvents.ToggleFrequencySheet -> {
                 _settingsState.update { it.copy(showFrequencySheet = event.shouldShow) }
             }
+
+            is SettingsEvents.SetDynamicColor -> {
+                setDynamicColorStatus(event.value)
+
+            }
+
+            is SettingsEvents.SetTheme -> {
+                setTheme(event.theme)
+            }
+
+            SettingsEvents.ToggleThemeMenu -> {
+                _settingsState.update { it.copy(showThemeMenu = !_settingsState.value.showThemeMenu) }
+            }
         }
     }
 
@@ -188,6 +204,27 @@ class SettingsViewModel @Inject constructor(
     fun onSaveSyncFrequency() = viewModelScope.launch(Dispatchers.IO) {
         dataStoreRepo.setSyncFrequency(_settingsState.value.frequency)
         _settingsState.update { it.copy(showFrequencySheet = false) }
+    }
+
+    fun getDynamicColorStatus() = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.isDynamicColor.collectLatest { isDynamicColor ->
+            _settingsState.update { it.copy(isDynamicColor = isDynamicColor) }
+        }
+    }
+
+    fun setDynamicColorStatus(value : Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.changeDynamicColorStatus(value)
+    }
+
+    fun getThemeData() = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.theme.collectLatest { themeData ->
+            _settingsState.update { it.copy(theme = themeData) }
+        }
+    }
+
+    fun setTheme(theme: String) = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.setTheme(ThemeEnum.fromName(theme))
+        _settingsState.update { it.copy(showThemeMenu = false) }
     }
 
 

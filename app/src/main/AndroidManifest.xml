@@ -17,7 +17,7 @@
         android:name=".StepStreakApplication"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyApp.MySplash"
+        android:theme="@style/Theme.StepStreak"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
         <receiver
