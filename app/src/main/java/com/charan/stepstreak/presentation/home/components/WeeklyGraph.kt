@@ -149,7 +149,7 @@ fun SimpleBarChartWithAxes(
                         textAlign = android.graphics.Paint.Align.RIGHT
                     }
                     drawContext.canvas.nativeCanvas.drawText(
-                        targetStep.toString(),
+                        "%,d".format(targetStep),
                         paddingLeft - 10f,
                         targetY + 8f,
                         animatedTargetPaint
@@ -164,12 +164,12 @@ fun SimpleBarChartWithAxes(
                     if(yValue.toLong() != targetStep.toLong()) {
                         val animatedYLabelPaint = Paint().asFrameworkPaint().apply {
                             isAntiAlias = true
-                            textSize = 28f
+                            textSize = 32f
                             color = Color(onSurfaceColor.toArgb()).copy(alpha = animationProgress.value).toArgb()
                             textAlign = android.graphics.Paint.Align.RIGHT
                         }
                         drawContext.canvas.nativeCanvas.drawText(
-                            yValue.toString(),
+                            "%,d".format(yValue),
                             paddingLeft - 10f,
                             yPosition + 8f,
                             animatedYLabelPaint
@@ -194,16 +194,16 @@ fun SimpleBarChartWithAxes(
                     val offsetX = x +2 + (barWidth - scaledBarWidth) / 2
                     val stepsPaint = Paint().asFrameworkPaint().apply {
                         isAntiAlias = true
-                        textSize = 24f
+                        textSize = 32f
                         color = Color(onSurfaceColor.toArgb()).copy(alpha = barAnimationProgress).toArgb()
                         textAlign = android.graphics.Paint.Align.CENTER
                         typeface = android.graphics.Typeface.DEFAULT_BOLD
                     }
 
                     drawContext.canvas.nativeCanvas.drawText(
-                        "${data.steps}",
+                        "%,d".format(data.steps),
                         x + barWidth / 2,
-                        paddingTop + chartHeight - animatedBarHeight - 12f,
+                        paddingTop + chartHeight - animatedBarHeight - 20f,
                         stepsPaint
                     )
 

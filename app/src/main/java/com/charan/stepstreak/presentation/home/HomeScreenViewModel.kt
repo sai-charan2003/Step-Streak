@@ -67,21 +67,26 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun observeSteps() = viewModelScope.launch (Dispatchers.IO) {
+    private fun observeSteps() = viewModelScope.launch(Dispatchers.IO) {
+        var lastStepsData: List<StepsData>? = null
         stepsRecordRepo.getAllStepRecords().collectLatest { status ->
+            val currentStepsData = status.toStepsData()
+            val shouldUpdateMotivation = currentStepsData != lastStepsData
+            lastStepsData = currentStepsData
             _state.update {
                 it.copy(
                     streakCount = status.getStreak().toString(),
-                    motivationText = status.getMotivationQuote(),
-                    allStepsData = status.toStepsData(),
-
+                    motivationText = if (shouldUpdateMotivation) status.getMotivationQuote() else it.motivationText,
+                    allStepsData = currentStepsData,
                 )
             }
+
             getTodaysData()
             getCurrentWeekData()
             widgetRepo.updateWidget()
         }
     }
+
 
     private fun getTodaysData() = viewModelScope.launch (Dispatchers.IO){
         _state.update {

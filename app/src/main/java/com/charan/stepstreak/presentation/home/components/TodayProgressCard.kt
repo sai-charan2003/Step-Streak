@@ -1,6 +1,7 @@
 package com.charan.stepstreak.presentation.home.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -66,6 +67,7 @@ fun TodayProgressCard(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
+            .animateContentSize()
             ,
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
