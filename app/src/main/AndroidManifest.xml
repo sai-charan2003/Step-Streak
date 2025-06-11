@@ -22,9 +22,8 @@
         tools:targetApi="33">
         <receiver
             android:name=".presentation.widget.WeeklyStreakWidgetReceiver"
-            android:description="@string/weekly_streak"
             android:exported="true"
-            android:label="Weekly Streak"
+            android:label="@string/weekly_streak"
             >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -38,9 +37,8 @@
         </receiver>
         <receiver
             android:name=".presentation.widget.DailyProgressWidgetReceiver"
-            android:description="@string/daily_progress"
             android:exported="true"
-            android:label="Weekly Streak"
+            android:label="@string/daily_progress"
             >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

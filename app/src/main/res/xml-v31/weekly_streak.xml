@@ -4,7 +4,9 @@
     android:minWidth="300dp"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minHeight="70dp"
+    android:targetCellWidth="3"
+    android:previewLayout="@layout/widget_preview"
+    android:targetCellHeight="2"
     android:minResizeWidth="140dp"
-    android:previewImage="@drawable/weekly_progress_preview"
     android:minResizeHeight="70dp">
 </appwidget-provider>
