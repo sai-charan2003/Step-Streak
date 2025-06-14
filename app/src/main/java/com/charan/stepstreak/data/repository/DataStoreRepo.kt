@@ -1,5 +1,6 @@
 package com.charan.stepstreak.data.repository
 
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.ThemeEnum
 import kotlinx.coroutines.flow.Flow
 
@@ -17,6 +18,8 @@ interface DataStoreRepo {
     suspend fun changeDynamicColorStatus(status : Boolean)
     val theme : Flow<ThemeEnum>
     suspend fun setTheme(theme: ThemeEnum)
+    val startOfWeek : Flow<StartOfWeekEnums>
+    suspend fun setStartOfWeek(startOfWeek: StartOfWeekEnums)
 
 
 

@@ -47,8 +47,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideStepsRecordRepo(stepsRecordDao: StepsRecordDao,usersSettingsRepo: UsersSettingsRepo): StepsRecordRepo {
-        return StepsRecordRepoImp(stepsRecordDao,usersSettingsRepo)
+    fun provideStepsRecordRepo(stepsRecordDao: StepsRecordDao,usersSettingsRepo: UsersSettingsRepo,dataStoreRepo: DataStoreRepo): StepsRecordRepo {
+        return StepsRecordRepoImp(stepsRecordDao,usersSettingsRepo, dataStoreRepo)
 
     }
     @Provides
@@ -81,8 +81,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideWidgetRepo(@ApplicationContext context : Context,healthConnectRepo: HealthConnectRepo,stepsRecordRepo: StepsRecordRepo) : WidgetRepo{
-        return WidgetRepoImp(healthConnectRepo,stepsRecordRepo,context)
+    fun provideWidgetRepo(@ApplicationContext context : Context,healthConnectRepo: HealthConnectRepo,stepsRecordRepo: StepsRecordRepo,dataStoreRepo: DataStoreRepo) : WidgetRepo{
+        return WidgetRepoImp(healthConnectRepo,stepsRecordRepo,dataStoreRepo,context)
     }
 
     @Provides

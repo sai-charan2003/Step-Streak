@@ -3,6 +3,7 @@ package com.charan.stepstreak.utils
 import android.util.Log
 import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.home.HomeState
 import com.charan.stepstreak.presentation.widget.WidgetState
@@ -26,15 +27,15 @@ fun StepsRecordEntity.toStepsData(): StepsData = StepsData(
     targetCompleted = (steps ?: 0L) >= (stepTarget ?: 0L),
 )
 
-fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>): WidgetState {
+fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>,weekStartDate: StartOfWeekEnums): WidgetState {
     return WidgetState(
-        currentWeekStepData = this.toWeekData(),
+        currentWeekStepData = this.toWeekData(weekStartDate),
         streak = allData.getStreak(),
         motivationText = allData.getMotivationQuote(),
     )
 }
-fun List<StepsRecordEntity>.toWeekData(): List<StepsData> {
-    val weekList = DateUtils.SHORT_DAY_NAMES_MON_TO_SUN
+fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): List<StepsData> {
+    val weekList = DateUtils.getWeekDayList(weekStartDate)
     val currentWeekData = this.toStepsData()
     return weekList.map { day ->
         currentWeekData.find { it.day == day } ?: StepsData(day = day)

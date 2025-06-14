@@ -8,11 +8,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.NextWeek
 import androidx.compose.material.icons.automirrored.filled.SendAndArchive
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Contrast
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Today
 import androidx.compose.material.icons.rounded.WorkspacePremium
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -34,11 +39,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.presentation.settings.components.ChangeDataProviderSheet
 import com.charan.stepstreak.presentation.settings.components.ChangeSyncFrequencySheet
@@ -188,6 +195,30 @@ fun SettingsScreen(
                     },
                     modifier = Modifier.clickable {
                         viewModel.onEvent(SettingsEvents.ToggleGoalsSheet(true))
+                    }
+                )
+                ListItem(
+                    headlineContent = { Text("Start of week") },
+                    trailingContent = {
+                        TextButton(onClick = {
+                            viewModel.onEvent(SettingsEvents.ToggleStartOfWeekMenu)
+                        }) {
+                            Text(state.startOfWeek.getName())
+                            CustomDropDown(
+                                items = StartOfWeekEnums.entries.map { it.getName() },
+                                selectedItem = state.startOfWeek.getName(),
+                                onItemSelected = { viewModel.onEvent(SettingsEvents.SetStartOfWeek(it)) },
+                                isExpanded = state.showStartOfWeekMenu,
+                                onDismiss = { viewModel.onEvent(SettingsEvents.ToggleStartOfWeekMenu) }
+
+                            )
+                        }
+                    },
+                    leadingContent = {
+                        Icon(Icons.Rounded.Today,null)
+                    },
+                    modifier = Modifier.clickable {
+                        viewModel.onEvent(SettingsEvents.ToggleStartOfWeekMenu)
                     }
                 )
 

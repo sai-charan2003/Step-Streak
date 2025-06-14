@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.utils.DateUtils
@@ -30,6 +31,7 @@ class DataStoreRepoImp (
         val LAST_MILESTONE_DATE = stringPreferencesKey("last_milestone_date")
         val DYNAMIC_COLOR_STATUS = booleanPreferencesKey("dynamic_color_status")
         val THEME = stringPreferencesKey("theme")
+        val START_OF_WEEK = stringPreferencesKey("start_of_week")
     }
 
     override val dataProviders: Flow<String>
@@ -139,6 +141,19 @@ class DataStoreRepoImp (
     override suspend fun setTheme(theme: ThemeEnum) {
         context.dataStore.edit {
             it[THEME] = theme.getName()
+        }
+    }
+
+    override val startOfWeek: Flow<StartOfWeekEnums>
+        get() = context.dataStore.data.map {
+            it[START_OF_WEEK]?.let { week ->
+                StartOfWeekEnums.fromName(week)
+            } ?: StartOfWeekEnums.MONDAY
+        }
+
+    override suspend fun setStartOfWeek(startOfWeek: StartOfWeekEnums) {
+        context.dataStore.edit {
+            it[START_OF_WEEK] = startOfWeek.name
         }
     }
 }

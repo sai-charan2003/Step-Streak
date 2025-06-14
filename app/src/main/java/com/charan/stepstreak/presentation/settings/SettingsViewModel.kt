@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.charan.stepstreak.BuildConfig
 import com.charan.stepstreak.data.model.DataProviders
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.SyncTime
 import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
@@ -45,6 +46,7 @@ class SettingsViewModel @Inject constructor(
         setAppVersion()
         getDynamicColorStatus()
         getThemeData()
+        getStartOfWeek()
     }
 
     private fun setTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
@@ -151,6 +153,11 @@ class SettingsViewModel @Inject constructor(
             SettingsEvents.ToggleThemeMenu -> {
                 _settingsState.update { it.copy(showThemeMenu = !_settingsState.value.showThemeMenu) }
             }
+
+            is SettingsEvents.SetStartOfWeek -> setStartOfWeek(event.startOfWeek)
+            SettingsEvents.ToggleStartOfWeekMenu -> {
+                _settingsState.update { it.copy(showStartOfWeekMenu = !_settingsState.value.showStartOfWeekMenu) }
+            }
         }
     }
 
@@ -225,6 +232,18 @@ class SettingsViewModel @Inject constructor(
     fun setTheme(theme: String) = viewModelScope.launch(Dispatchers.IO) {
         dataStoreRepo.setTheme(ThemeEnum.fromName(theme))
         _settingsState.update { it.copy(showThemeMenu = false) }
+    }
+
+    fun getStartOfWeek() = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.startOfWeek.collectLatest { startOfWeek ->
+            _settingsState.update { it.copy(startOfWeek = startOfWeek) }
+        }
+    }
+
+
+    fun setStartOfWeek(startOfWeek: String) = viewModelScope.launch(Dispatchers.IO) {
+        dataStoreRepo.setStartOfWeek(StartOfWeekEnums.fromName(startOfWeek))
+        _settingsState.update { it.copy(showStartOfWeekMenu = false) }
     }
 
 

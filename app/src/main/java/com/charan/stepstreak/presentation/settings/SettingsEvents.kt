@@ -18,5 +18,7 @@ sealed interface SettingsEvents {
     data class SetDynamicColor(val value : Boolean) : SettingsEvents
     data class SetTheme(val theme: String) : SettingsEvents
     object ToggleThemeMenu : SettingsEvents
+    data class SetStartOfWeek(val startOfWeek: String) : SettingsEvents
+    object ToggleStartOfWeekMenu : SettingsEvents
 
 }

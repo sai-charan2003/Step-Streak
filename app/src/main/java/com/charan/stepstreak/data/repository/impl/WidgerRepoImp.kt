@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.glance.appwidget.updateAll
 import androidx.glance.appwidget.updateIf
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
@@ -26,6 +27,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,6 +37,7 @@ import javax.inject.Singleton
 class WidgetRepoImp @Inject constructor(
     private val healthConnectRepo: HealthConnectRepo,
     private val stepsRecordRepo: StepsRecordRepo,
+    private val dataStoreRepo: DataStoreRepo,
     @ApplicationContext val context : Context,
 ) :  WidgetRepo{
     val coroutineScope= CoroutineScope(Dispatchers.IO)
@@ -65,7 +68,7 @@ class WidgetRepoImp @Inject constructor(
         val allData = stepsRecordRepo.getAllStepsRecords()
         val weekData = stepsRecordRepo.getWeeklyStepsRecords()
 
-        emit(weekData.toWidgetState(allData).copy(todayData = stepsRecordRepo.getTodayStepData().toStepsData()))
+        emit(weekData.toWidgetState(allData,dataStoreRepo.startOfWeek.first()).copy(todayData = stepsRecordRepo.getTodayStepData().toStepsData()))
     }
 
 

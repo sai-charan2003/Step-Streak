@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +35,8 @@ class HomeScreenViewModel @Inject constructor(
     private val healthConnectRepo: HealthConnectRepo,
     private val stepsRecordRepo: StepsRecordRepo,
     private val widgetRepo: WidgetRepo,
-    private val userSettingsRepo: UsersSettingsRepo
+    private val userSettingsRepo: UsersSettingsRepo,
+    private val dataStoreRepo: DataStoreRepo,
 ): ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
@@ -96,7 +98,7 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun getCurrentWeekData() = viewModelScope.launch (Dispatchers.IO){
         _state.update {
-            it.copy(currentWeekData = stepsRecordRepo.getWeeklyStepsRecords().toWeekData())
+            it.copy(currentWeekData = stepsRecordRepo.getWeeklyStepsRecords().toWeekData(dataStoreRepo.startOfWeek.first()))
         }
     }
 

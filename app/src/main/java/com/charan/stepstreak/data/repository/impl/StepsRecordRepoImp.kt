@@ -1,18 +1,22 @@
 package com.charan.stepstreak.data.repository.impl
 
+import android.util.Log
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
+import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.utils.DateUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class StepsRecordRepoImp @Inject constructor(
     private val stepsRecordDao: StepsRecordDao,
-    private val usersSettingsRepo: UsersSettingsRepo
+    private val usersSettingsRepo: UsersSettingsRepo,
+    private val dataStoreRepo: DataStoreRepo
 ): StepsRecordRepo {
     override suspend fun insertStepsRecord(stepsRecordEntity: List<StepsRecordEntity>) {
         stepsRecordDao.insertStepsRecord(stepsRecordEntity)
@@ -28,7 +32,8 @@ class StepsRecordRepoImp @Inject constructor(
 
 
     override suspend fun getWeeklyStepsRecords(): List<StepsRecordEntity> {
-        return stepsRecordDao.getStepsRecordsByDateRange(DateUtils.getCurrentWeekStartDate().toString(), DateUtils.getCurrentWeekEndDate().toString())
+        Log.d("TAG", "getWeeklyStepsRecords: ${DateUtils.getCurrentWeekStartDate(dataStoreRepo.startOfWeek.first())}")
+        return stepsRecordDao.getStepsRecordsByDateRange(DateUtils.getCurrentWeekStartDate(dataStoreRepo.startOfWeek.first()).toString(), DateUtils.getCurrentWeekEndDate(dataStoreRepo.startOfWeek.first()).toString())
     }
 
     override suspend fun getAllStepsRecords(): List<StepsRecordEntity> {

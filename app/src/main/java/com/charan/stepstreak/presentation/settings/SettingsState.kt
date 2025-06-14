@@ -1,6 +1,7 @@
 package com.charan.stepstreak.presentation.settings
 
 import com.charan.stepstreak.data.model.DataProviders
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.ThemeEnum
 
 data class SettingsState(
@@ -16,4 +17,6 @@ data class SettingsState(
     val isDynamicColor : Boolean = false,
     val theme : ThemeEnum = ThemeEnum.SYSTEM,
     val showThemeMenu : Boolean = false,
+    val startOfWeek : StartOfWeekEnums = StartOfWeekEnums.MONDAY,
+    val showStartOfWeekMenu : Boolean = false
 )

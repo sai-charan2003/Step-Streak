@@ -1,6 +1,7 @@
 package com.charan.stepstreak.utils
 
 import android.util.Log
+import com.charan.stepstreak.data.model.StartOfWeekEnums
 import java.time.DayOfWeek
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -15,13 +16,27 @@ import java.util.Locale
 object DateUtils {
 
     val ISO_LOCAL_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
-    private val SHORT_WEEK_MONTH_DAY_FORMATTER = DateTimeFormatter.ofPattern("E, MMM d", Locale.ENGLISH)
+    private val SHORT_WEEK_MONTH_DAY_FORMATTER =
+        DateTimeFormatter.ofPattern("E, MMM d", Locale.ENGLISH)
 
     val SHORT_DAY_NAMES_MON_TO_SUN = listOf(
         "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
     )
+    val SHORT_DAY_NAMES_SUN_TO_SAT = listOf(
+        "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+    )
 
-    fun formatInstantAsIsoLocalDateString(utcTimeString: Instant, zoneOffsetString: ZoneOffset?): String {
+    fun getWeekDayList(userSetWeekStart: StartOfWeekEnums) : List<String>{
+        return when(userSetWeekStart){
+            StartOfWeekEnums.SUNDAY -> SHORT_DAY_NAMES_SUN_TO_SAT
+            StartOfWeekEnums.MONDAY -> SHORT_DAY_NAMES_MON_TO_SUN
+        }
+    }
+
+    fun formatInstantAsIsoLocalDateString(
+        utcTimeString: Instant,
+        zoneOffsetString: ZoneOffset?
+    ): String {
         val localDateTime =
             ZonedDateTime.ofInstant(utcTimeString, zoneOffsetString ?: ZoneOffset.systemDefault())
         return localDateTime.format(ISO_LOCAL_DATE_FORMATTER)
@@ -39,17 +54,24 @@ object DateUtils {
         return LocalDate.now()
     }
 
-    fun getCurrentWeekStartDate(): LocalDate {
+    fun getCurrentWeekStartDate(userSetWeekStart: StartOfWeekEnums): LocalDate {
         val today = LocalDate.now()
-        return today.with(DayOfWeek.MONDAY)
+        val currentDayOfWeek = today.dayOfWeek
 
+        val startOfWeekDay = when (userSetWeekStart) {
+            StartOfWeekEnums.SUNDAY -> DayOfWeek.SUNDAY
+            StartOfWeekEnums.MONDAY -> DayOfWeek.MONDAY
+        }
+
+        val daysToSubtract = (7 + currentDayOfWeek.value - startOfWeekDay.value) % 7
+        return today.minusDays(daysToSubtract.toLong())
     }
 
-    fun getCurrentWeekEndDate(): LocalDate {
-        val today = LocalDate.now()
-        return today.with(DayOfWeek.SUNDAY)
-
+    fun getCurrentWeekEndDate(userSetWeekStart: StartOfWeekEnums): LocalDate {
+        val startOfWeek = getCurrentWeekStartDate(userSetWeekStart)
+        return startOfWeek.plusDays(6)
     }
+
 
     fun getGreetings(): String {
         val hour = LocalDateTime.now().hour
