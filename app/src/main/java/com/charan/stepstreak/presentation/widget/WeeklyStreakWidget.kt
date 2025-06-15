@@ -20,6 +20,7 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.background
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -122,16 +123,6 @@ fun WeeklyStreakWidgetContent(
                 modifier = GlanceModifier.padding(top = 4.dp)
             )
         }
-        Text(
-            text = weeklyStreak.motivationText,
-            modifier = GlanceModifier.padding(bottom = 20.dp),
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = GlanceTheme.colors.primary
-            )
-
-        )
 
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
@@ -148,7 +139,8 @@ fun WeeklyStreakWidgetContent(
                         weekName = day.day.take(1),
                         isCompleted = day.targetCompleted,
                         steps = day.steps,
-                        targetSteps = day.targetSteps
+                        targetSteps = day.targetSteps,
+                        isToday = day.date == weeklyStreak.todayData.date
                     )
                 }
 
@@ -167,42 +159,54 @@ fun WeekStreakItem(
     weekName: String,
     steps: Long,
     targetSteps: Long,
-    isCompleted: Boolean
+    isCompleted: Boolean,
+    isToday : Boolean = false
 ) {
     val progressColor = Utils.getProgressColor(steps, targetSteps)
 
-    Column(
-        modifier = GlanceModifier
-            .padding(horizontal = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
+        Column(
             modifier = GlanceModifier
-                .size(20.dp)
-                .cornerRadius(100.dp)
-                .background(progressColor),
-            contentAlignment = Alignment.Center
+                .padding(horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (isCompleted) {
-                Image(
-                    provider = AndroidResourceImageProvider(R.drawable.rounded_check_24),
-                    contentDescription = null,
-                    modifier = GlanceModifier.size(12.dp),
-                    colorFilter = ColorFilter.tint(colorProvider = ColorProvider(Color.White))
+            Box(
+                modifier = GlanceModifier
+                    .size(20.dp)
+                    .cornerRadius(100.dp)
+                    .background(progressColor),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isCompleted) {
+                    Image(
+                        provider = AndroidResourceImageProvider(R.drawable.rounded_check_24),
+                        contentDescription = null,
+                        modifier = GlanceModifier.size(12.dp),
+                        colorFilter = ColorFilter.tint(colorProvider = ColorProvider(Color.White))
+                    )
+                }
+            }
+
+            Spacer(GlanceModifier.height(4.dp))
+            Text(
+                text = weekName.uppercase(),
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
                 )
+            )
+
+            if (isToday) {
+                Spacer(GlanceModifier.height(2.dp))
+                Box(
+                    modifier = GlanceModifier
+                        .size(5.dp)
+                        .cornerRadius(50.dp)
+                        .background(GlanceTheme.colors.error)
+                ) {}
             }
         }
 
-        Spacer(GlanceModifier.height(4.dp))
-        Text(
-            text = weekName.uppercase(),
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurface,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
-            )
-        )
-    }
 }
 

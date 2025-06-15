@@ -25,6 +25,7 @@ fun StepsRecordEntity.toStepsData(): StepsData = StepsData(
     day = DateUtils.getWeekdayName(date ?: ""),
     formattedDate = DateUtils.formatDateForDisplay(date ?: ""),
     targetCompleted = (steps ?: 0L) >= (stepTarget ?: 0L),
+    currentProgress = ((steps ?: 0L).toFloat() / (stepTarget ?: 1L).toFloat())
 )
 
 fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>,weekStartDate: StartOfWeekEnums): WidgetState {
