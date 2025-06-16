@@ -2,6 +2,7 @@ package com.charan.stepstreak.presentation.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -21,11 +22,13 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -43,6 +46,7 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.charan.stepstreak.MainActivity
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
@@ -60,7 +64,16 @@ class DailyProgressWidget : GlanceAppWidget() {
         val repo = WidgetRepoImp.getInstance(context)
         provideContent {
             GlanceTheme {
-                DailyProgressWidgetContent(repo)
+                DailyProgressWidgetContent(
+                    repo,
+                    GlanceModifier.clickable(
+                        actionStartActivity(
+                            Intent(context, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        )
+                    )
+                )
 
             }
         }
@@ -76,7 +89,8 @@ class DailyProgressWidgetReceiver : GlanceAppWidgetReceiver() {
 @SuppressLint("RestrictedApi")
 @Composable
 fun DailyProgressWidgetContent(
-    repo: WidgetRepo
+    repo: WidgetRepo,
+    modifier : GlanceModifier
 ) {
     var todayData by remember { mutableStateOf(WidgetState()) }
 
@@ -108,7 +122,8 @@ fun DailyProgressWidgetContent(
             .fillMaxSize()
             .background(GlanceTheme.colors.background)
             .padding(12.dp)
-            .cornerRadius(16.dp),
+            .cornerRadius(16.dp)
+            .then(modifier),
 
     ) {
         Column(

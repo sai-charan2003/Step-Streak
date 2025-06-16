@@ -2,6 +2,7 @@ package com.charan.stepstreak.presentation.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.accessibility.AccessibilityEventCompat.setAction
 import androidx.glance.AndroidResourceImageProvider
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceComposable
@@ -18,6 +20,9 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
+import androidx.glance.LocalContext
+import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.background
@@ -38,6 +43,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.charan.stepstreak.MainActivity
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.repository.WidgetRepo
 import com.charan.stepstreak.data.repository.impl.WidgetRepoImp
@@ -54,7 +60,16 @@ class WeeklyStreakWidget : GlanceAppWidget() {
         val repo = WidgetRepoImp.getInstance(context)
         provideContent {
             GlanceTheme {
-                WeeklyStreakWidgetContent(repo)
+                WeeklyStreakWidgetContent(
+                    repo,
+                    modifier = GlanceModifier.clickable(
+                        actionStartActivity(
+                            Intent(context, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        )
+                    )
+                )
             }
         }
     }
@@ -75,7 +90,8 @@ class WeeklyStreakWidgetReceiver() : GlanceAppWidgetReceiver(){
 @SuppressLint("RestrictedApi")
 @Composable
 fun WeeklyStreakWidgetContent(
-    repo: WidgetRepo
+    repo: WidgetRepo,
+    modifier : GlanceModifier
 ) {
     var weeklyStreak by remember { mutableStateOf(WidgetState()) }
 
@@ -91,7 +107,8 @@ fun WeeklyStreakWidgetContent(
         modifier = GlanceModifier
             .padding(12.dp)
             .cornerRadius(12.dp)
-            .background(GlanceTheme.colors.surface),
+            .background(GlanceTheme.colors.surface)
+            .then(modifier),
         verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.Start
     ) {
@@ -129,7 +146,7 @@ fun WeeklyStreakWidgetContent(
             horizontalAlignment = Alignment.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            weeklyStreak.currentWeekStepData.forEachIndexed { index, day ->
+            weeklyStreak.currentWeekStepData.stepsData.forEachIndexed { index, day ->
                 Column(
                     modifier = GlanceModifier.defaultWeight(),
                     horizontalAlignment = Alignment.Start,
@@ -164,49 +181,49 @@ fun WeekStreakItem(
 ) {
     val progressColor = Utils.getProgressColor(steps, targetSteps)
 
-        Column(
+    Column(
+        modifier = GlanceModifier
+            .padding(horizontal = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
             modifier = GlanceModifier
-                .padding(horizontal = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalAlignment = Alignment.CenterVertically
+                .size(20.dp)
+                .cornerRadius(100.dp)
+                .background(progressColor),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = GlanceModifier
-                    .size(20.dp)
-                    .cornerRadius(100.dp)
-                    .background(progressColor),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isCompleted) {
-                    Image(
-                        provider = AndroidResourceImageProvider(R.drawable.rounded_check_24),
-                        contentDescription = null,
-                        modifier = GlanceModifier.size(12.dp),
-                        colorFilter = ColorFilter.tint(colorProvider = ColorProvider(Color.White))
-                    )
-                }
-            }
-
-            Spacer(GlanceModifier.height(4.dp))
-            Text(
-                text = weekName.uppercase(),
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurface,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
+            if (isCompleted) {
+                Image(
+                    provider = AndroidResourceImageProvider(R.drawable.rounded_check_24),
+                    contentDescription = null,
+                    modifier = GlanceModifier.size(12.dp),
+                    colorFilter = ColorFilter.tint(colorProvider = ColorProvider(Color.White))
                 )
-            )
-
-            if (isToday) {
-                Spacer(GlanceModifier.height(2.dp))
-                Box(
-                    modifier = GlanceModifier
-                        .size(5.dp)
-                        .cornerRadius(50.dp)
-                        .background(GlanceTheme.colors.error)
-                ) {}
             }
         }
+
+        Spacer(GlanceModifier.height(4.dp))
+        Text(
+            text = weekName.uppercase(),
+            style = TextStyle(
+                color = GlanceTheme.colors.onSurface,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+        )
+
+        if (isToday) {
+            Spacer(GlanceModifier.height(2.dp))
+            Box(
+                modifier = GlanceModifier
+                    .size(5.dp)
+                    .cornerRadius(50.dp)
+                    .background(GlanceTheme.colors.error)
+            ) {}
+        }
+    }
 
 }
 

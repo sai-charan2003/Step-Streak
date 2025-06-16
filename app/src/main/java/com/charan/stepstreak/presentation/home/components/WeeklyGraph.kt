@@ -28,11 +28,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.charan.stepstreak.presentation.common.StepsData
+import com.charan.stepstreak.presentation.common.WeeklyData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -42,21 +44,21 @@ import kotlin.math.sin
 @Composable
 fun SimpleBarChartWithAxes(
     modifier: Modifier = Modifier,
-    weeklySteps: List<StepsData>,
+    weeklySteps: WeeklyData,
     targetStep: Long = 6000L
 ) {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val primaryColor = MaterialTheme.colorScheme.primary
     val teritiaryColor = MaterialTheme.colorScheme.tertiary
     val hapticFeedback = LocalHapticFeedback.current
-    val highestValue = weeklySteps.maxOfOrNull { it.steps } ?: 0
+    val highestValue = weeklySteps.stepsData.maxOfOrNull { it.steps } ?: 0
     val maxValue = if (highestValue > targetStep) highestValue else targetStep
     val ySteps = 5
     val selectedBarIndex = remember { mutableStateOf<Int?>(null) }
 
     val animationProgress = remember { Animatable(0f) }
-    val barAnimations = remember(weeklySteps.size) {
-        weeklySteps.map { Animatable(0f) }
+    val barAnimations = remember(weeklySteps.stepsData.size) {
+        weeklySteps.stepsData.map { Animatable(0f) }
     }
 
     LaunchedEffect(weeklySteps) {
@@ -128,7 +130,7 @@ fun SimpleBarChartWithAxes(
                 val paddingTop = 20f
                 val chartHeight = canvasHeight - paddingBottom - paddingTop
                 val chartWidth = canvasWidth - paddingLeft - paddingRight
-                val barWidth = chartWidth / (weeklySteps.size * 2)
+                val barWidth = chartWidth / (weeklySteps.stepsData.size * 2)
                 val space = barWidth
 
                 val targetY = paddingTop + chartHeight - (targetStep / maxValue.toFloat()) * chartHeight
@@ -177,7 +179,7 @@ fun SimpleBarChartWithAxes(
                     }
                 }
 
-                weeklySteps.forEachIndexed { index, data ->
+                weeklySteps.stepsData.forEachIndexed { index, data ->
                     val barAnimationProgress = if (index < barAnimations.size) {
                         barAnimations[index].value
                     } else {
@@ -296,7 +298,7 @@ private fun DrawScope.drawTooltip(
     val tooltipY = y - tooltipHeight - 8.dp.toPx()
 
 
-    // Text positioning
+
     val tooltipCenterX = tooltipX + tooltipWidth / 2f
     val totalTextHeight = dateHeight + spacing + mainHeight
     val textTop = tooltipY + (tooltipHeight - totalTextHeight) / 2f
@@ -304,7 +306,7 @@ private fun DrawScope.drawTooltip(
     val dateBaseline = textTop - dateMetrics.top
     val mainBaseline = (textTop + dateHeight + spacing) - mainMetrics.top
 
-    // Apply alpha
+
     datePaint.alpha = (255 * alpha).toInt()
     mainPaint.alpha = (255 * alpha).toInt()
 
@@ -329,11 +331,15 @@ fun SimpleBarChartPreview() {
         StepsData(steps = 9000, day = "Sat", targetCompleted = true,formattedDate = "23rd may"),
         StepsData(steps = 2000, day = "Sun", targetCompleted = false,formattedDate = "23rd may"),
     )
+    val weeklyData = WeeklyData(
+        averageSteps = sampleData.map { it.steps }.average().toLong(),
+        stepsData = sampleData
+    )
 
     SimpleBarChartWithAxes(
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp),
-        weeklySteps = sampleData
+        weeklySteps = weeklyData
     )
 }

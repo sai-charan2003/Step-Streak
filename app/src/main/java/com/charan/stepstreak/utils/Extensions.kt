@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.presentation.common.StepsData
+import com.charan.stepstreak.presentation.common.WeeklyData
 import com.charan.stepstreak.presentation.home.HomeState
 import com.charan.stepstreak.presentation.widget.WidgetState
 import com.charan.stepstreak.utils.Constants.walkingMotivationMessages
@@ -35,12 +36,16 @@ fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>,weekS
         motivationText = allData.getMotivationQuote(),
     )
 }
-fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): List<StepsData> {
+fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): WeeklyData{
     val weekList = DateUtils.getWeekDayList(weekStartDate)
     val currentWeekData = this.toStepsData()
-    return weekList.map { day ->
+    val stepsData = weekList.map { day ->
         currentWeekData.find { it.day == day } ?: StepsData(day = day)
     }
+    return WeeklyData(
+        averageSteps = currentWeekData.map { it.steps }.average().toLong(),
+        stepsData = stepsData
+    )
 }
 
 
