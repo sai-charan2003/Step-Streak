@@ -112,6 +112,7 @@ class HomeScreenViewModel @Inject constructor(
         when(event){
             HomeEvent.OnRefresh -> {
                 fetchSteps()
+                getCurrentTargetSteps()
             }
         }
 
