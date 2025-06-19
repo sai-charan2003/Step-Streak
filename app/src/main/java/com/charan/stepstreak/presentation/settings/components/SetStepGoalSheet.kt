@@ -1,6 +1,7 @@
 package com.charan.stepstreak.presentation.settings.components
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -36,7 +37,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SetStepGoalDialog(
-    targetSteps: Long,
+    targetSteps: String,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
     onValueChange: (String) -> Unit,
@@ -44,6 +45,7 @@ fun SetStepGoalDialog(
     onDismiss: () -> Unit,
     sheetState : SheetState
 ) {
+    Log.d("TAG", "SetStepGoalDialog: $targetSteps")
 
     ModalBottomSheet(
         sheetState = sheetState,
@@ -68,21 +70,23 @@ fun SetStepGoalDialog(
                 ) {
                 FilledTonalIconButton (
                     onClick = { onDecrement() },
-                    enabled = targetSteps>1L,
-                    shapes = IconButtonDefaults.shapes()
+                    shapes = IconButtonDefaults.shapes(),
+                    enabled = targetSteps.isNotEmpty() && (targetSteps.toLongOrNull() ?: 0L) > 0L
 
                     ) {
                     Icon(Icons.Default.Remove, contentDescription = "Remove")
                 }
                 BasicTextField(
-                    value = "%,d".format(targetSteps),
+                    value = if (targetSteps.isNotEmpty()) "%,d".format(targetSteps.toLongOrNull() ?: 0) else "",
                     onValueChange = {
                         val filteredInput = it.filter { char -> char.isDigit() }
                         onValueChange(filteredInput)
 
                     },
                     textStyle = MaterialTheme.typography.headlineLarge.copy(textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurface),
-                    modifier = Modifier.width(IntrinsicSize.Min).padding(horizontal = 15.dp),
+                    modifier = Modifier
+                        .width(IntrinsicSize.Min)
+                        .padding(horizontal = 15.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
 
@@ -90,7 +94,7 @@ fun SetStepGoalDialog(
 
                 FilledTonalIconButton(
                     onClick = { onIncrement()},
-                    shapes = IconButtonDefaults.shapes()
+                    shapes = IconButtonDefaults.shapes(),
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -105,7 +109,8 @@ fun SetStepGoalDialog(
                 Button(
                     modifier = Modifier.weight(1f),
                     shapes = ButtonDefaults.shapes(),
-                    onClick = { onSave() }
+                    onClick = { onSave() },
+                    enabled = targetSteps.isEmpty().not() && targetSteps.toLong() != 0L
                 ) {
                     Text(text = "Set goal")
                 }

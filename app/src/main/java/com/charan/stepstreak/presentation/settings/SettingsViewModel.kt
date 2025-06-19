@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+private const val MAX_TARGET_LENGTH = 7
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val dataStoreRepo: DataStoreRepo,
@@ -51,7 +53,7 @@ class SettingsViewModel @Inject constructor(
 
     private fun setTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
        usersSettingsRepo.getStepsTarget().collectLatest { target->
-           _settingsState.update { it.copy(targetSteps = target) }
+           _settingsState.update { it.copy(targetSteps = target.toString()) }
 
        }
     }
@@ -170,27 +172,39 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun onStepTargetValueChange(value: String) = viewModelScope.launch(Dispatchers.IO) {
-        if(value.length > 7) return@launch
-        val numericValue = value.filter { it.isDigit() }
-        val target = numericValue.toLongOrNull() ?: 0L
-        if(target <=0L) return@launch
+        if(value.length > MAX_TARGET_LENGTH) return@launch
+        val numericValue = value.filter { it.isDigit() }.ifEmpty { null }
+        val target = numericValue?.toString() ?: ""
         _settingsState.update { it.copy(targetSteps = target) }
     }
 
 
-    private fun onStepsDataIncrement() = viewModelScope.launch(Dispatchers.IO) {
-        _settingsState.update { it.copy(targetSteps = it.targetSteps + 1) }
+private fun onStepsDataIncrement() = viewModelScope.launch(Dispatchers.IO) {
+    _settingsState.update {
+        val currentSteps = it.targetSteps.toLongOrNull() ?: 0L
+        val nextSteps = if (currentSteps % 500 == 0L) currentSteps + 500 else ((currentSteps / 500) + 1) * 500
+        if(nextSteps.toString().length > MAX_TARGET_LENGTH) {
+            return@launch
+        }
+        it.copy(targetSteps = nextSteps.toString())
     }
+}
 
     private fun onStepsDataDecrement() = viewModelScope.launch(Dispatchers.IO) {
-        if(_settingsState.value.targetSteps == 1L) return@launch
-        _settingsState.update { it.copy(targetSteps = it.targetSteps - 1) }
+        _settingsState.update {
+            val currentSteps = it.targetSteps.toLongOrNull() ?: 0L
+            if(currentSteps <=0) {
+                it.copy(targetSteps = "0")
+                return@launch
+            }
+            val nextSteps = if (currentSteps % 500 == 0L) currentSteps - 500 else ((currentSteps / 500) - 1).coerceAtLeast(0L) * 500
+            it.copy(targetSteps = nextSteps.toString())
+        }
 
     }
     private fun saveTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
         usersSettingsRepo.insertSetting(setting = Constants.STEPS_TARGET_SETTING, value = _settingsState.value.targetSteps.toString())
         _settingsState.update { it.copy(showGoalsSheet = false) }
-
     }
 
     private fun onDataProviderChange(provider: DataProviders) = viewModelScope.launch(Dispatchers.IO) {

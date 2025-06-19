@@ -14,14 +14,14 @@ interface UserSettingsDao {
     @Insert(onConflict = REPLACE)
     suspend fun insertUserSetting(userSetting: UserSetting)
 
-    @Query("SELECT settingValue FROM user_settings WHERE settingType = :settingType order by timestamp desc limit 1")
+    @Query("SELECT settingValue FROM user_settings WHERE settingType = :settingType order by timestamp desc, id DESC limit 1")
     fun getTargetStep(settingType: String = Constants.STEPS_TARGET_SETTING): Flow<String?>
 
     @Query("""
     SELECT * FROM user_settings 
     WHERE settingType = :settingType 
     AND timestamp <= :givenTimestamp
-    ORDER BY timestamp DESC 
+    ORDER BY timestamp DESC, id DESC
     LIMIT 1
 """)
      suspend fun getTargetStepInGivenTime(settingType: String = Constants.STEPS_TARGET_SETTING, givenTimestamp: Long): UserSetting?

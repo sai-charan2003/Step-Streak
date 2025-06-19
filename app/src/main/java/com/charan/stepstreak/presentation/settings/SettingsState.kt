@@ -5,7 +5,7 @@ import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.ThemeEnum
 
 data class SettingsState(
-    val targetSteps: Long = 0,
+    val targetSteps: String = "0",
     val dataProviders: List<DataProviders> = emptyList(),
     val selectedDataProvider : DataProviders? = null,
     val showGoalsSheet : Boolean = false,

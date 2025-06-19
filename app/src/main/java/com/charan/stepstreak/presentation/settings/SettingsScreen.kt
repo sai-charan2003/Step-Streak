@@ -186,7 +186,7 @@ fun SettingsScreen(
                     headlineContent = { Text("Daily Steps Goal") },
                     trailingContent = {
                         Text(
-                            text = "%,d".format(state.targetSteps),
+                            text = if (state.targetSteps.isNotEmpty()) "%,d".format(state.targetSteps.toLongOrNull() ?: 0) else "",
                             style = MaterialTheme.typography.bodyLargeEmphasized
                         )
                     },
