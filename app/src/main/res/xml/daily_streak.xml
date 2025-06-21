@@ -4,8 +4,6 @@
     android:minWidth="70dp"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minHeight="70dp"
-    android:targetCellWidth="2"
-    android:targetCellHeight="2"
     android:minResizeWidth="140dp"
     android:previewImage="@drawable/daily_progress_preview"
 
