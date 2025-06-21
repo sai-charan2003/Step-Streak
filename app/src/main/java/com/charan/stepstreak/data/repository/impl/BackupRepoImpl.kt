@@ -11,8 +11,10 @@ import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.ProcessState
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class BackupRepoImpl @Inject constructor(
@@ -54,14 +56,16 @@ class BackupRepoImpl @Inject constructor(
             val inputStream = context.contentResolver.openInputStream(uri)
             inputStream?.use{ stream->
                 val data = stream.bufferedReader().readText()
-                val backupData = Gson().fromJson(data, BackupData::class.java)
+                val backupData: BackupData = Json.decodeFromString(data)
                 stepsRecordsRepo.insertStepsRecord(backupData.stepsData)
                 userSettingsRepo.insertSettings(backupData.settingsData)
                 emit(ProcessState.Success(true))
 
             }
+            inputStream?.close()
         } catch (e: Exception) {
             emit(ProcessState.Error("Failed to restore backup: ${e.message}"))
+            Log.d("TAG", "restoreBackup: $e")
             return@flow
         }
     }

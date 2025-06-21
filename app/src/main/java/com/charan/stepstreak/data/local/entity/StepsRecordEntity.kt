@@ -4,7 +4,9 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.charan.stepstreak.utils.DateUtils
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(
     tableName = "steps_record",
     indices = [Index(value = ["uuid"], unique = true)])
