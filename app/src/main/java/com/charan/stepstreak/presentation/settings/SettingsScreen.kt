@@ -1,9 +1,17 @@
 package com.charan.stepstreak.presentation.settings
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,11 +21,16 @@ import androidx.compose.material.icons.automirrored.filled.SendAndArchive
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Contrast
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Today
+import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -27,6 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -35,10 +49,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -47,10 +63,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.ThemeEnum
+import com.charan.stepstreak.data.repository.BackupRepo
+import com.charan.stepstreak.data.repository.impl.BackupRepoImpl
 import com.charan.stepstreak.presentation.settings.components.ChangeDataProviderSheet
 import com.charan.stepstreak.presentation.settings.components.ChangeSyncFrequencySheet
 import com.charan.stepstreak.presentation.settings.components.CustomDropDown
 import com.charan.stepstreak.presentation.settings.components.SetStepGoalDialog
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -64,6 +83,45 @@ fun SettingsScreen(
     val goalsBottomSheetState = rememberModalBottomSheetState()
     val dataProviderSheetState = rememberModalBottomSheetState()
     val syncFrequencySheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current
+
+    val createBackup =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument(
+                BackupRepo.FILE_TYPE
+            )
+        ) { uri ->
+            viewModel.onEvent(SettingsEvents.SaveBackup(uri))
+        }
+
+    val pickedFile =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument()
+        ) { uri ->
+            viewModel.onEvent(SettingsEvents.RestoreBackup(uri))
+        }
+
+    LaunchedEffect(Unit) {
+        viewModel.settingsViewEffect.collectLatest { effect ->
+            when (effect) {
+                is SettingsViewEffect.LaunchCreateDocument -> {
+                    createBackup.launch(effect.fileName)
+                }
+
+                is SettingsViewEffect.ShowToast -> {
+                    Toast.makeText(
+                        context,
+                        effect.message,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                is SettingsViewEffect.LaunchOpenDocument -> {
+                    pickedFile.launch(arrayOf(effect.fileType))
+                }
+            }
+        }
+    }
 
     if (state.showGoalsSheet) {
         SetStepGoalDialog(
@@ -223,6 +281,52 @@ fun SettingsScreen(
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+            }
+            item {
+                Text(
+                    text = "Backup",
+                    style = MaterialTheme.typography.titleSmallEmphasized,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+                ListItem(
+                    headlineContent = { Text("Export Data") },
+                    leadingContent = {
+                        Icon(Icons.Rounded.Upload,null)
+                    },
+                    trailingContent = {
+                        AnimatedVisibility(
+                            visible = state.isExportingData
+                        ) {
+                            ContainedLoadingIndicator(modifier = Modifier.size(32.dp))
+                        }
+
+                    },
+                    modifier = Modifier.clickable (enabled = !state.isExportingData){
+                        viewModel.onEvent(SettingsEvents.OnExportData)
+                    }
+
+                )
+                ListItem(
+                    headlineContent = { Text("Import Data") },
+                    leadingContent = {
+                        Icon(Icons.Rounded.Download,null)
+                    },
+                    trailingContent = {
+                        AnimatedVisibility(
+                            visible = state.isImportingData
+                        ) {
+                            ContainedLoadingIndicator(modifier = Modifier.size(32.dp))
+                        }
+
+                    },
+                    modifier = Modifier.clickable (enabled = !state.isImportingData){
+                        viewModel.onEvent(SettingsEvents.OnImportData)
+                    }
+
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
             }
 
             item {

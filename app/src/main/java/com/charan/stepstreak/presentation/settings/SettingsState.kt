@@ -18,5 +18,7 @@ data class SettingsState(
     val theme : ThemeEnum = ThemeEnum.SYSTEM,
     val showThemeMenu : Boolean = false,
     val startOfWeek : StartOfWeekEnums = StartOfWeekEnums.MONDAY,
-    val showStartOfWeekMenu : Boolean = false
+    val showStartOfWeekMenu : Boolean = false,
+    val isExportingData : Boolean = false,
+    val isImportingData : Boolean = false,
 )

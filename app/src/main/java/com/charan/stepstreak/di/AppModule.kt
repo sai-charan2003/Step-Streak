@@ -5,11 +5,13 @@ import androidx.health.connect.client.HealthConnectClient
 import com.charan.stepstreak.data.local.AppDatabase
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
 import com.charan.stepstreak.data.local.dao.UserSettingsDao
+import com.charan.stepstreak.data.repository.BackupRepo
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.UsersSettingsRepo
 import com.charan.stepstreak.data.repository.WidgetRepo
+import com.charan.stepstreak.data.repository.impl.BackupRepoImpl
 import com.charan.stepstreak.data.repository.impl.DataStoreRepoImp
 import com.charan.stepstreak.data.repository.impl.HealthConnectRepoImpl
 import com.charan.stepstreak.data.repository.impl.StepsRecordRepoImp
@@ -89,6 +91,17 @@ class AppModule {
     @Singleton
     fun provideNotificationHelper(@ApplicationContext context: Context): NotificationHelper {
         return NotificationHelper(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBackupRepo(
+        @ApplicationContext context: Context,
+        stepsRecordsRepo: StepsRecordRepo,
+        userSettingsRepo: UsersSettingsRepo,
+        dataStoreRepo: DataStoreRepo
+    ): BackupRepo {
+        return BackupRepoImpl(context, stepsRecordsRepo, userSettingsRepo, dataStoreRepo)
     }
 
 }

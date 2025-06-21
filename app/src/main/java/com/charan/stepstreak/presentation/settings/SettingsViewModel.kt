@@ -1,5 +1,6 @@
 package com.charan.stepstreak.presentation.settings
 
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,10 +10,12 @@ import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.data.model.SyncTime
 import com.charan.stepstreak.data.model.ThemeEnum
+import com.charan.stepstreak.data.repository.BackupRepo
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.data.repository.UsersSettingsRepo
+import com.charan.stepstreak.presentation.settings.SettingsViewEffect.*
 import com.charan.stepstreak.utils.Constants
 import com.charan.stepstreak.utils.ProcessState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +37,8 @@ class SettingsViewModel @Inject constructor(
     private val dataStoreRepo: DataStoreRepo,
     private val healthConnectRepo: HealthConnectRepo,
     private val stepsRecordRepo: StepsRecordRepo,
-    private val usersSettingsRepo: UsersSettingsRepo
+    private val usersSettingsRepo: UsersSettingsRepo,
+    private val backupRepo: BackupRepo
 ) : ViewModel() {
     private val _settingsState = MutableStateFlow(SettingsState())
     val settingsState = _settingsState.asStateFlow()
@@ -160,6 +164,25 @@ class SettingsViewModel @Inject constructor(
             SettingsEvents.ToggleStartOfWeekMenu -> {
                 _settingsState.update { it.copy(showStartOfWeekMenu = !_settingsState.value.showStartOfWeekMenu) }
             }
+
+            SettingsEvents.OnExportData -> {
+                _settingsViewEffect.emit(LaunchCreateDocument(backupRepo.fileName))
+
+            }
+            SettingsEvents.OnImportData -> {
+                _settingsViewEffect.emit(LaunchOpenDocument(BackupRepo.FILE_TYPE))
+
+            }
+
+            is SettingsEvents.SaveBackup -> {
+                backupData(event.uri)
+            }
+
+            is SettingsEvents.RestoreBackup -> {
+                importData(event.uri)
+
+
+            }
         }
     }
 
@@ -258,6 +281,43 @@ private fun onStepsDataIncrement() = viewModelScope.launch(Dispatchers.IO) {
     fun setStartOfWeek(startOfWeek: String) = viewModelScope.launch(Dispatchers.IO) {
         dataStoreRepo.setStartOfWeek(StartOfWeekEnums.fromName(startOfWeek))
         _settingsState.update { it.copy(showStartOfWeekMenu = false) }
+    }
+
+    private fun backupData(uri: Uri?) = viewModelScope.launch(Dispatchers.IO) {
+        backupRepo.createBackup(uri).collectLatest { state->
+            when(state){
+                is ProcessState.Error -> {
+                    _settingsViewEffect.emit(ShowToast(state.message))
+                    _settingsState.update { it.copy(isExportingData = false) }
+                }
+                ProcessState.Loading -> {
+                    _settingsState.update { it.copy(isExportingData = true) }
+                }
+                is ProcessState.Success<*> -> {
+                    _settingsState.update { it.copy(isExportingData = false) }
+                    _settingsViewEffect.emit(ShowToast("Backup created successfully"))
+                }
+            }
+
+        }
+    }
+
+    private fun importData(uri: Uri?) = viewModelScope.launch(Dispatchers.IO) {
+        backupRepo.restoreBackup(uri).collectLatest { state->
+            when(state){
+                is ProcessState.Error -> {
+                    _settingsViewEffect.emit(ShowToast(state.message))
+                    _settingsState.update { it.copy(isImportingData = false) }
+                }
+                ProcessState.Loading -> {
+                    _settingsState.update { it.copy(isImportingData = true) }
+                }
+                is ProcessState.Success<*> -> {
+                    _settingsViewEffect.emit(ShowToast("Backup restored successfully"))
+                    _settingsState.update { it.copy(isImportingData = false) }
+                }
+            }
+        }
     }
 
 

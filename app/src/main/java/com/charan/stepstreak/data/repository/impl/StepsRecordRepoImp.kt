@@ -32,7 +32,6 @@ class StepsRecordRepoImp @Inject constructor(
 
 
     override suspend fun getWeeklyStepsRecords(): List<StepsRecordEntity> {
-        Log.d("TAG", "getWeeklyStepsRecords: ${DateUtils.getCurrentWeekStartDate(dataStoreRepo.startOfWeek.first())}")
         return stepsRecordDao.getStepsRecordsByDateRange(DateUtils.getCurrentWeekStartDate(dataStoreRepo.startOfWeek.first()).toString(), DateUtils.getCurrentWeekEndDate(dataStoreRepo.startOfWeek.first()).toString())
     }
 

@@ -1,5 +1,6 @@
 package com.charan.stepstreak.presentation.settings
 
+import android.net.Uri
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.model.ThemeEnum
 
@@ -20,5 +21,9 @@ sealed interface SettingsEvents {
     object ToggleThemeMenu : SettingsEvents
     data class SetStartOfWeek(val startOfWeek: String) : SettingsEvents
     object ToggleStartOfWeekMenu : SettingsEvents
+    object OnExportData : SettingsEvents
+    object OnImportData : SettingsEvents
+    data class SaveBackup(val uri : Uri?) : SettingsEvents
+    data class RestoreBackup(val uri : Uri?) : SettingsEvents
 
 }

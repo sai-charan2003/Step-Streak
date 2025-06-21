@@ -12,6 +12,12 @@ class UserSettingsRepoImp @Inject constructor(
     private val userSettingsDao: UserSettingsDao
 
 ) : UsersSettingsRepo {
+
+    override suspend fun insertSettings(settings: List<UserSetting>) {
+        userSettingsDao.insertUserSetting(settings)
+
+    }
+
     override suspend fun insertSetting(setting: String, value: String) {
         userSettingsDao.insertUserSetting(
             UserSetting(
@@ -32,4 +38,7 @@ class UserSettingsRepoImp @Inject constructor(
 
     }
 
+    override suspend fun getAllSettings(): List<UserSetting> {
+        return userSettingsDao.getAllSettings()
+    }
 }
