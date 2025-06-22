@@ -3,6 +3,7 @@ package com.charan.stepstreak.presentation.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.widget.Space
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.background
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
@@ -34,6 +36,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -91,7 +94,7 @@ class WeeklyStreakWidgetReceiver() : GlanceAppWidgetReceiver(){
 @Composable
 fun WeeklyStreakWidgetContent(
     repo: WidgetRepo,
-    modifier : GlanceModifier
+    modifier: GlanceModifier
 ) {
     var weeklyStreak by remember { mutableStateOf(WidgetState()) }
 
@@ -108,8 +111,9 @@ fun WeeklyStreakWidgetContent(
             .padding(12.dp)
             .cornerRadius(12.dp)
             .background(GlanceTheme.colors.surface)
+            .fillMaxSize()
             .then(modifier),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
         horizontalAlignment = Alignment.Start
     ) {
         Row(
@@ -119,12 +123,12 @@ fun WeeklyStreakWidgetContent(
             Image(
                 provider = AndroidResourceImageProvider(R.drawable.streak),
                 contentDescription = null,
-                modifier = GlanceModifier.size(24.dp).padding(end = 6.dp)
+                modifier = GlanceModifier.size(26.dp).padding(end = 6.dp)
             )
             Text(
                 text = weeklyStreak.streak.toString(),
                 style = TextStyle(
-                    fontSize = 22.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = GlanceTheme.colors.primary
                 )
@@ -140,9 +144,67 @@ fun WeeklyStreakWidgetContent(
                 modifier = GlanceModifier.padding(top = 4.dp)
             )
         }
+        Spacer(GlanceModifier.height(5.dp))
+
+        Column(modifier = GlanceModifier.fillMaxWidth()) {
+            Text(
+                text = "Today’s Steps",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = GlanceTheme.colors.onSurfaceVariant
+                )
+            )
+
+            Spacer(GlanceModifier.height(6.dp))
+
+            Row {
+                Text(
+                    text = "${weeklyStreak.todayData.steps}",
+                    style = TextStyle(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = GlanceTheme.colors.onSurface
+                    )
+                )
+                Text(
+                    text = " / ${weeklyStreak.todayData.targetSteps}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = GlanceTheme.colors.onSurfaceVariant
+                    ),
+                    modifier = GlanceModifier.padding(start = 4.dp)
+                )
+            }
+
+            Spacer(GlanceModifier.height(14.dp))
+
+            LinearProgressIndicator(
+                progress = weeklyStreak.todayData.currentProgress,
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .cornerRadius(100.dp),
+                color = GlanceTheme.colors.primary,
+                backgroundColor = GlanceTheme.colors.secondaryContainer
+            )
+        }
+
+        Spacer(GlanceModifier.defaultWeight())
+        Text(
+            text = "This Week",
+            style = TextStyle(
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = GlanceTheme.colors.onSurfaceVariant
+            ),
+            modifier = GlanceModifier.padding(bottom = 6.dp)
+        )
+        Spacer(GlanceModifier.height(3.dp))
 
         Row(
-            modifier = GlanceModifier.fillMaxWidth(),
+            modifier = GlanceModifier.fillMaxWidth().padding(bottom = 5.dp),
             horizontalAlignment = Alignment.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -157,7 +219,7 @@ fun WeeklyStreakWidgetContent(
                         isCompleted = day.targetCompleted,
                         steps = day.steps,
                         targetSteps = day.targetSteps,
-                        isToday = day.date == weeklyStreak.todayData.date
+                        isToday = day.day == weeklyStreak.todayData.day
                     )
                 }
 
@@ -167,6 +229,7 @@ fun WeeklyStreakWidgetContent(
         }
     }
 }
+
 
 
 @SuppressLint("RestrictedApi")
