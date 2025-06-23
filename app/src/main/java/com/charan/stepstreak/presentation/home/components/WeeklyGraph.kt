@@ -45,7 +45,8 @@ import kotlin.math.sin
 fun SimpleBarChartWithAxes(
     modifier: Modifier = Modifier,
     weeklySteps: WeeklyData,
-    targetStep: Long = 6000L
+    targetStep: Long = 6000L,
+    isSidePane : Boolean = false
 ) {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -88,7 +89,7 @@ fun SimpleBarChartWithAxes(
     }
 
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxSize(),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -120,7 +121,15 @@ fun SimpleBarChartWithAxes(
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .then(
+                        if (isSidePane) {
+                            Modifier.fillMaxHeight()
+                        } else {
+                            Modifier.height(250.dp)
+                        }
+                    )
+
+
             ) {
                 val canvasWidth = size.width
                 val canvasHeight = size.height

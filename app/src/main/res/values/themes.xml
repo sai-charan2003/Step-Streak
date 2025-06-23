@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.StepStreak" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.StepStreak" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Make navigation bar transparent -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Make status bar transparent (optional) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- Enable drawing behind navigation bar -->
+        <item name="android:windowTranslucentNavigation">false</item>
+        <!-- Enable drawing behind status bar -->
+        <item name="android:windowTranslucentStatus">false</item>
+        <!-- Ensure window draws behind system bars -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+
 </resources>

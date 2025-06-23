@@ -6,7 +6,7 @@
     android:minHeight="70dp"
     android:targetCellWidth="3"
     android:previewLayout="@layout/widget_preview"
-    android:targetCellHeight="2"
+    android:targetCellHeight="1"
     android:minResizeWidth="140dp"
     android:minResizeHeight="70dp">
 </appwidget-provider>
