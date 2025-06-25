@@ -35,9 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.common.WeeklyData
+import com.charan.stepstreak.utils.roundTo500
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.max
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -45,7 +47,7 @@ import kotlin.math.sin
 fun SimpleBarChartWithAxes(
     modifier: Modifier = Modifier,
     weeklySteps: WeeklyData,
-    targetStep: Long = 6000L,
+    targetStep: Long = 5000L,
     isSidePane : Boolean = false
 ) {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
@@ -54,7 +56,7 @@ fun SimpleBarChartWithAxes(
     val hapticFeedback = LocalHapticFeedback.current
     val highestValue = weeklySteps.stepsData.maxOfOrNull { it.steps } ?: 0
     val maxValue = if (highestValue > targetStep) highestValue else targetStep
-    val ySteps = 5
+    val ySteps = 3
     val selectedBarIndex = remember { mutableStateOf<Int?>(null) }
 
     val animationProgress = remember { Animatable(0f) }
@@ -167,18 +169,30 @@ fun SimpleBarChartWithAxes(
                     )
                 }
 
-                repeat(ySteps + 1) { i ->
-                    val fraction = i / ySteps.toFloat()
-                    val yValue = (maxValue * fraction).toInt()
+                val yAxisLabels = mutableListOf(0L)
+                val halfTarget = (targetStep / 2).coerceAtLeast(1)
+                if (halfTarget !in yAxisLabels) yAxisLabels.add(halfTarget)
+                if (targetStep !in yAxisLabels) yAxisLabels.add(targetStep)
+                if (maxValue > targetStep && maxValue !in yAxisLabels) yAxisLabels.add(maxValue)
+
+                val sortedLabels = yAxisLabels.sortedDescending()
+                val minSpacingPx = 40f
+                var lastYPosition = -Float.MAX_VALUE
+
+                sortedLabels.forEach { yValue ->
+                    val fraction = yValue / maxValue.toFloat()
                     val yPosition = paddingTop + chartHeight - (chartHeight * fraction)
 
-                    if(yValue.toLong() != targetStep.toLong()) {
+                    if (kotlin.math.abs(yPosition - lastYPosition) < minSpacingPx) return@forEach
+
+                    if (yValue != targetStep) {
                         val animatedYLabelPaint = Paint().asFrameworkPaint().apply {
                             isAntiAlias = true
                             textSize = 32f
                             color = Color(onSurfaceColor.toArgb()).copy(alpha = animationProgress.value).toArgb()
                             textAlign = android.graphics.Paint.Align.RIGHT
                         }
+
                         drawContext.canvas.nativeCanvas.drawText(
                             "%,d".format(yValue),
                             paddingLeft - 10f,
@@ -186,7 +200,10 @@ fun SimpleBarChartWithAxes(
                             animatedYLabelPaint
                         )
                     }
+
+                    lastYPosition = yPosition
                 }
+
 
                 weeklySteps.stepsData.forEachIndexed { index, data ->
                     val barAnimationProgress = if (index < barAnimations.size) {
@@ -334,7 +351,7 @@ fun SimpleBarChartPreview() {
     val sampleData = listOf(
         StepsData(steps = 3000, day = "Mon", targetCompleted = false, formattedDate = "23rd may"),
         StepsData(steps = 6000, day = "Tue", targetCompleted = false,formattedDate = "23rd may"),
-        StepsData(steps = 10000, day = "Wed", targetCompleted = true,formattedDate = "23rd may"),
+        StepsData(steps = 5000, day = "Wed", targetCompleted = true,formattedDate = "23rd may"),
         StepsData(steps = 4000, day = "Thu", targetCompleted = false,formattedDate = "23rd may"),
         StepsData(steps = 7500, day = "Fri", targetCompleted = false,formattedDate = "23rd may"),
         StepsData(steps = 9000, day = "Sat", targetCompleted = true,formattedDate = "23rd may"),

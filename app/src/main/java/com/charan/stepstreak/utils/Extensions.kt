@@ -120,3 +120,11 @@ fun List<StepsRecordEntity>.getMotivationQuote(): String {
     return if (quotes.isNotEmpty()) quotes.random() else Constants.walkingMotivationMessages.random()
 }
 
+fun Int.roundTo500() : Int {
+    return if(this%500 ==0){
+        this
+    } else{
+        ((this/500)+1)*500
+    }
+}
+
