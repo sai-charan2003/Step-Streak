@@ -69,7 +69,6 @@ import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.SimpleBarChartWithAxes
 import com.charan.stepstreak.presentation.home.components.StreakCard
 import com.charan.stepstreak.presentation.home.components.TodayProgressCard
-import com.charan.stepstreak.presentation.navigation.SettingsScreenNav
 import com.charan.stepstreak.utils.DateUtils
 import kotlin.math.roundToInt
 
@@ -79,7 +78,6 @@ import kotlin.math.roundToInt
 @Composable
 
 fun HomeScreen(
-    onSettingNavigate : () -> Unit,
     viewModel: HomeScreenViewModel = hiltViewModel()
 ){
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -115,20 +113,6 @@ fun HomeScreen(
                         text = state.value.motivationText
                     )
                 },
-                actions = {
-                    IconButton (
-                        onClick = {
-                            onSettingNavigate.invoke()
-                        },
-                        shapes = IconButtonDefaults.shapes()
-                    ) {
-                        Icon(
-                            Icons.Default.Settings,
-                            null
-                        )
-                    }
-
-                },
                 scrollBehavior = scroll,
                 modifier = Modifier
 
@@ -141,7 +125,7 @@ fun HomeScreen(
             isRefreshing = state.value.isSyncing,
             onRefresh = { viewModel.onEvent(HomeEvent.OnRefresh) },
             state = pullToRefreshState,
-            modifier = Modifier.padding(padding),
+            modifier = Modifier.padding(top = padding.calculateTopPadding()),
             indicator = {
                 PullToRefreshDefaults.LoadingIndicator(
                     state = pullToRefreshState,
@@ -158,7 +142,7 @@ fun HomeScreen(
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(horizontal = 16.dp)
                         ) {
                             item {
                                 Spacer(Modifier.height(20.dp))

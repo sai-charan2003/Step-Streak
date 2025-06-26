@@ -74,7 +74,6 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(
-    onBackPress : () -> Unit,
     onLicenseScreenNavigate : () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -161,24 +160,13 @@ fun SettingsScreen(
             LargeFlexibleTopAppBar(
                 title = { Text("Settings") },
                 scrollBehavior = scroll,
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onBackPress.invoke() },
-                        shapes = IconButtonDefaults.shapes()
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
             )
         }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(top =  padding.calculateTopPadding())
+                .padding(horizontal = 16.dp)
         ) {
             item {
                 Text(

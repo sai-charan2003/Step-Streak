@@ -3,14 +3,21 @@ package com.charan.stepstreak.presentation.navigation
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-@Serializable
-object HomeScreenNav : NavKey
+sealed class Destinations : NavKey {
+    @Serializable
+    object OnBoardingScreenNav : Destinations()
 
-@Serializable
-object SettingsScreenNav : NavKey
+    @Serializable
+    object LicenseScreenNav : Destinations()
 
-@Serializable
-object OnBoardingScreenNav : NavKey
+    @Serializable
+    object BottomNavScreenNav : Destinations()
+}
 
-@Serializable
-object LicenseDataScreenNav : NavKey
+sealed class BottomNavScreenNav : NavKey {
+    @Serializable
+    object HomeScreenNav : BottomNavScreenNav()
+
+    @Serializable
+    object SettingsScreenNav : BottomNavScreenNav()
+}

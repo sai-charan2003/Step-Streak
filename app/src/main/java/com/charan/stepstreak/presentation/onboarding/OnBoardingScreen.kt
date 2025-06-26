@@ -63,7 +63,6 @@ import androidx.navigation.compose.rememberNavController
 import com.charan.stepstreak.R
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.repository.impl.permissions
-import com.charan.stepstreak.presentation.navigation.HomeScreenNav
 import com.charan.stepstreak.presentation.onboarding.components.HealthConnectAnimationItem
 import com.charan.stepstreak.presentation.onboarding.components.ProviderConnectImageitem
 import com.charan.stepstreak.utils.DateUtils

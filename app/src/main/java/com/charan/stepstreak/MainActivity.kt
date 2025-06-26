@@ -12,12 +12,24 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,10 +40,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -44,11 +59,15 @@ import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.worker.StepsUpdateWorker
 import com.charan.stepstreak.presentation.navigation.NavAppHost
+import com.charan.stepstreak.presentation.navigation.RootNavigation
+import com.charan.stepstreak.presentation.navigation.TopLevelBackStack
 import com.charan.stepstreak.ui.theme.StepStreakTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -99,13 +118,49 @@ class MainActivity : ComponentActivity() {
                     ThemeEnum.DARK -> true
                 }
             ) {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    NavAppHost(isOnBoardingCompleted = isOnBoardingCompleted)
-                }
+                AppRoot(isOnBoardingCompleted)
             }
         }
     }
 }
+
+@Composable
+fun AppRoot(
+    isOnBoardingCompleted : Boolean,
+) {
+    Surface {
+        RootNavigation(
+            isOnBoardingCompleted = isOnBoardingCompleted,
+        )
+
+    }
+}
+
+data class BottomNavigationItem(
+    val title : String,
+    val selectedItem : ImageVector,
+    val unSelectedItem : ImageVector,
+    val isSelected : Boolean = false
+)
+
+val navigationItem = listOf(
+    BottomNavigationItem(
+        title = "Home",
+        selectedItem = Icons.Default.Home,
+        unSelectedItem = Icons.Outlined.Home,
+        isSelected = true
+    ),
+    BottomNavigationItem(
+        title = "History",
+        selectedItem =Icons.Outlined.BarChart,
+        unSelectedItem = Icons.Filled.BarChart
+    ),
+    BottomNavigationItem(
+        title = "Settings",
+        selectedItem = Icons.Outlined.Settings,
+        unSelectedItem = Icons.Filled.Settings
+    )
+)
 
 
 
