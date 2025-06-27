@@ -8,10 +8,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.charan.stepstreak.presentation.BottomNavScreen
-import com.charan.stepstreak.presentation.home.HomeScreen
 import com.charan.stepstreak.presentation.onboarding.OnBoardingScreen
-import com.charan.stepstreak.presentation.settings.SettingsScreen
 import com.charan.stepstreak.presentation.settings.licenseScreen.LicensesScreen
 
 @Composable
@@ -38,7 +35,7 @@ fun RootNavigation(
             when (key) {
                 is Destinations.BottomNavScreenNav -> NavEntry(key){
                     BottomNavScreen(
-                        onLicienceNavigation = {
+                        onLicenceNavigation = {
                             backStack.add(Destinations.LicenseScreenNav)
                         }
                     )
@@ -49,6 +46,13 @@ fun RootNavigation(
                         onHomeScreenNavigate = {
                             backStack.removeLastOrNull()
                             backStack.add(Destinations.BottomNavScreenNav)
+                        }
+                    )
+                }
+                is Destinations.LicenseScreenNav -> NavEntry(key){
+                    LicensesScreen(
+                        onBackPress = {
+                            backStack.removeLastOrNull()
                         }
                     )
                 }

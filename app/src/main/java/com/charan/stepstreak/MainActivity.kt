@@ -65,9 +65,7 @@ import com.charan.stepstreak.data.model.ThemeEnum
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
 import com.charan.stepstreak.data.worker.StepsUpdateWorker
-import com.charan.stepstreak.presentation.navigation.NavAppHost
 import com.charan.stepstreak.presentation.navigation.RootNavigation
-import com.charan.stepstreak.presentation.navigation.TopLevelBackStack
 import com.charan.stepstreak.ui.theme.StepStreakTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -135,32 +133,6 @@ fun AppRoot(
 
     }
 }
-
-data class BottomNavigationItem(
-    val title : String,
-    val selectedItem : ImageVector,
-    val unSelectedItem : ImageVector,
-    val isSelected : Boolean = false
-)
-
-val navigationItem = listOf(
-    BottomNavigationItem(
-        title = "Home",
-        selectedItem = Icons.Default.Home,
-        unSelectedItem = Icons.Outlined.Home,
-        isSelected = true
-    ),
-    BottomNavigationItem(
-        title = "History",
-        selectedItem =Icons.Outlined.BarChart,
-        unSelectedItem = Icons.Filled.BarChart
-    ),
-    BottomNavigationItem(
-        title = "Settings",
-        selectedItem = Icons.Outlined.Settings,
-        unSelectedItem = Icons.Filled.Settings
-    )
-)
 
 
 

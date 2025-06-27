@@ -1,6 +1,7 @@
 package com.charan.stepstreak.utils
 
 import android.util.Log
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.StartOfWeekEnums
