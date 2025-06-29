@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
@@ -96,6 +97,31 @@ object DateUtils {
         } catch (e: Exception) {
             date
         }
+    }
+
+    fun getMonthStartDate(month: String, year: Int = LocalDate.now().year): String {
+        val monthEnum = Month.valueOf(month.trim().uppercase(Locale.getDefault()))
+        val startDate = LocalDate.of(year, monthEnum, 1)
+        return startDate.format(ISO_LOCAL_DATE_FORMATTER)
+    }
+
+    fun getMonthEndDate(month: String, year: Int = LocalDate.now().year): String {
+        val monthEnum = Month.valueOf(month.trim().uppercase(Locale.getDefault()))
+        val endDate = LocalDate.of(year, monthEnum, 1).withDayOfMonth(monthEnum.length(LocalDate.of(year, monthEnum, 1).isLeapYear))
+        return endDate.format(ISO_LOCAL_DATE_FORMATTER)
+    }
+    fun getMonthName(date : String) : String{
+        return LocalDate.parse(date).month.getDisplayName(
+            TextStyle.FULL,
+            Locale.getDefault()
+        )
+    }
+
+    fun getCurrentMonthName() : String{
+        return LocalDate.now().month.getDisplayName(
+            TextStyle.FULL,
+            Locale.getDefault()
+        )
     }
 
 

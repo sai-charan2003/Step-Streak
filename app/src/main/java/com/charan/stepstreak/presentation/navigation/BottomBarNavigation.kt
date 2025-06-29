@@ -39,6 +39,7 @@ import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.charan.stepstreak.presentation.home.HomeScreen
 import com.charan.stepstreak.presentation.settings.SettingsScreen
+import com.charan.stepstreak.presentation.stats.StatsScreen
 
 @Composable
 fun BottomNavScreen(
@@ -63,7 +64,10 @@ fun BottomNavScreen(
                 bottomBackStack.add(BottomNavScreenNav.SettingsScreenNav)
             }
 
-            else -> {}
+            BottomNavItem.HISTORY -> {
+                bottomBackStack.clear()
+                bottomBackStack.add(BottomNavScreenNav.StatsScreenNav)
+            }
         }
     }
 
@@ -133,6 +137,9 @@ fun BottomNavScreen(
                                 onLicenceNavigation.invoke()
                             }
                         )
+                    }
+                    is BottomNavScreenNav.StatsScreenNav -> NavEntry(key) {
+                        StatsScreen()
                     }
 
                     else -> NavEntry(key) {

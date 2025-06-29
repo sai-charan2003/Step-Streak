@@ -1,17 +1,10 @@
 package com.charan.stepstreak.utils
 
-import android.util.Log
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
-import androidx.compose.ui.unit.Constraints
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.presentation.common.StepsData
-import com.charan.stepstreak.presentation.common.WeeklyData
-import com.charan.stepstreak.presentation.home.HomeState
+import com.charan.stepstreak.presentation.common.PeriodStepsData
 import com.charan.stepstreak.presentation.widget.WidgetState
-import com.charan.stepstreak.utils.Constants.walkingMotivationMessages
-import com.himanshoe.charty.bar.model.BarData
-import java.util.Date
 
 
 fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
@@ -37,15 +30,27 @@ fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>,weekS
         motivationText = allData.getMotivationQuote(),
     )
 }
-fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): WeeklyData{
+fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): PeriodStepsData{
     val weekList = DateUtils.getWeekDayList(weekStartDate)
     val currentWeekData = this.toStepsData()
     val stepsData = weekList.map { day ->
         currentWeekData.find { it.day == day } ?: StepsData(day = day)
     }
-    return WeeklyData(
+    return PeriodStepsData(
         averageSteps = currentWeekData.map { it.steps }.average().toLong(),
         stepsData = stepsData
+    )
+}
+
+fun List<StepsRecordEntity>.toMonthData() : PeriodStepsData {
+    val firstDate = this.first().date ?: ""
+    val monthName = DateUtils.getMonthName(firstDate)
+    val stepsData = this.toStepsData()
+    return PeriodStepsData(
+        averageSteps = this.map { it.steps ?: 0L}.average().toLong(),
+        stepsData = stepsData,
+        totalSteps = stepsData.sumOf { it.steps },
+        periodLabel = monthName
     )
 }
 

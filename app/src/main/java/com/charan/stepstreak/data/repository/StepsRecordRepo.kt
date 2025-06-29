@@ -18,4 +18,6 @@ interface StepsRecordRepo {
     suspend fun deleteAllStepRecords()
 
     suspend fun getTodayStepData() : StepsRecordEntity
+
+    suspend fun getStepsByDateRange(monthStartDate: String, monthEndDate : String): List<StepsRecordEntity>
 }

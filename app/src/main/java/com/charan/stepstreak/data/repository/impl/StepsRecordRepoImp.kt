@@ -51,4 +51,11 @@ class StepsRecordRepoImp @Inject constructor(
             date = DateUtils.getCurrentDate().toString()
         )
     }
+
+    override suspend fun getStepsByDateRange(
+        monthStartDate: String,
+        monthEndDate: String
+    ): List<StepsRecordEntity> {
+        return stepsRecordDao.getStepsRecordsByDateRange(monthStartDate,monthEndDate)
+    }
 }
