@@ -2,6 +2,7 @@ package com.charan.stepstreak.presentation.stats
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -91,13 +92,33 @@ fun StatsScreen(
                     }
                 }
                 Spacer(Modifier.padding(bottom = 20.dp))
-                StatGraph(
-                    periodStepData = state.value.monthlyData,
-                    isSidePane = false,
-                    animationProgress = animationProgress,
-                    barAnimations = barAnimations
+                Box(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    when (state.value.selectedStatType) {
+                        StatType.WEEKLY -> {
+                            StatGraph(
+                                periodStepData = state.value.weeklySteps,
+                                isSidePane = false,
+                                animationProgress = animationProgress,
+                                barAnimations = barAnimations,
+                                statType = state.value.selectedStatType
+                            )
+                        }
 
-                )
+                        StatType.MONTHLY -> {
+                            StatGraph(
+                                periodStepData = state.value.monthlyData,
+                                isSidePane = false,
+                                animationProgress = animationProgress,
+                                barAnimations = barAnimations,
+                                statType = state.value.selectedStatType
+
+                            )
+                        }
+                    }
+                }
+
 
             }
 

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import com.charan.stepstreak.data.model.StatType
 import com.charan.stepstreak.presentation.common.PeriodStepsData
 import kotlin.math.max
 
@@ -32,7 +33,8 @@ fun StatGraph(
     isSidePane: Boolean,
     targetStep: Long = 5000L,
     animationProgress:  Animatable<Float, AnimationVector1D> = remember { Animatable(0f) },
-    barAnimations: List<Animatable<Float, AnimationVector1D>>
+    barAnimations: List<Animatable<Float, AnimationVector1D>>,
+    statType : StatType = StatType.WEEKLY
 ) {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -40,7 +42,6 @@ fun StatGraph(
     val hapticFeedback = LocalHapticFeedback.current
     val highestValue = periodStepData.stepsData.maxOfOrNull { it.steps } ?: 0
     val maxValue = if (highestValue > targetStep) highestValue else targetStep
-    val ySteps = 3
     val selectedBarIndex = remember { mutableStateOf<Int?>(null) }
     Canvas(
         modifier = Modifier
@@ -178,20 +179,28 @@ fun StatGraph(
             }
 
             if (barAnimationProgress > 0.3f) {
-                val labelAlpha = ((barAnimationProgress - 0.3f) / 0.7f).coerceIn(0f, 1f)
-                val animatedDayLabelPaint = Paint().asFrameworkPaint().apply {
-                    isAntiAlias = true
-                    textSize = 28f
-                    color = Color(onSurfaceColor.toArgb()).copy(alpha = labelAlpha).toArgb()
-                    textAlign = android.graphics.Paint.Align.CENTER
+                val showLabel = when (statType) {
+                    StatType.WEEKLY -> true
+                    StatType.MONTHLY -> index % 5 == 0
                 }
-                drawContext.canvas.nativeCanvas.drawText(
-                    data.day,
-                    x + barWidth / 2,
-                    canvasHeight - 10f,
-                    animatedDayLabelPaint
-                )
+
+                if (showLabel) {
+                    val labelAlpha = ((barAnimationProgress - 0.3f) / 0.7f).coerceIn(0f, 1f)
+                    val animatedDayLabelPaint = Paint().asFrameworkPaint().apply {
+                        isAntiAlias = true
+                        textSize = 28f
+                        color = Color(onSurfaceColor.toArgb()).copy(alpha = labelAlpha).toArgb()
+                        textAlign = android.graphics.Paint.Align.CENTER
+                    }
+                    drawContext.canvas.nativeCanvas.drawText(
+                        if (statType == StatType.WEEKLY) data.day else data.date,
+                        x + barWidth / 2,
+                        canvasHeight - 10f,
+                        animatedDayLabelPaint
+                    )
+                }
             }
+
         }
     }
 }
