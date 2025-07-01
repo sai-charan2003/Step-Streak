@@ -43,7 +43,7 @@ fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): Period
 }
 
 fun List<StepsRecordEntity>.toMonthData() : PeriodStepsData {
-    val firstDate = this.first().date ?: ""
+    val firstDate = this.firstOrNull()?.date ?: ""
     val monthName = DateUtils.getMonthName(firstDate)
     val stepsData = this.toStepsData()
     return PeriodStepsData(

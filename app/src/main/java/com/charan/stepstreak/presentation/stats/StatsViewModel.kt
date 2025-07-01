@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.charan.stepstreak.data.model.StatType
 import com.charan.stepstreak.data.repository.StepsRecordRepo
+import com.charan.stepstreak.presentation.common.PeriodStepsData
 import com.charan.stepstreak.presentation.common.components.StatEvents
 import com.charan.stepstreak.utils.DateUtils
 import com.charan.stepstreak.utils.toMonthData
@@ -48,7 +50,13 @@ class StatsViewModel @Inject constructor(
            )
            _state.update {
                it.copy(
-                   monthlyData =  stepsData.toMonthData(),
+                   monthlyData =  stepsData.let {
+                       if(it.isEmpty()){
+                           PeriodStepsData()
+                       } else{
+                           it.toMonthData()
+                       }
+                   },
                )
            }
 
