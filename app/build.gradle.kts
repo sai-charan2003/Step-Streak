@@ -147,4 +147,6 @@ dependencies {
     implementation(libs.androidx.adaptive.layout)
     implementation(libs.androidx.material3.adaptive.navigation)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+    implementation (libs.compose.charts)
+    implementation(libs.vico.compose)
 }

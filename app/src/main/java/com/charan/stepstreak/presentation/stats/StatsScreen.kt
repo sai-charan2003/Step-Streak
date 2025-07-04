@@ -21,6 +21,8 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,23 +48,6 @@ fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    val animationProgress = remember { Animatable(0f) }
-    val barAnimations = remember(state.value.monthlyData.stepsData.size) {
-        state.value.monthlyData.stepsData.map { Animatable(0f) }
-    }
-
-    LaunchedEffect(state.value.monthlyData) {
-        animationProgress.snapTo(0f)
-        barAnimations.forEach { it.snapTo(0f) }
-
-        animationProgress.animateTo(0.5f)
-
-        barAnimations.forEachIndexed { index, anim ->
-            launch {
-                anim.animateTo(1f)
-            }
-        }
-    }
     Scaffold (
         topBar = {
             MediumFlexibleTopAppBar(
@@ -101,48 +86,40 @@ fun StatsScreen(
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 10.dp),horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = {
+                            viewModel.onEvent(StatEvents.DecrementPeriod)
 
-                        }
+                        },
+                        shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowLeft,null)
                     }
                     Spacer(Modifier.weight(1f))
-                    Text(state.value.monthlyData.periodLabel)
+                    if(state.value.selectedStatType == StatType.WEEKLY) {
+                        Text(state.value.formatedWeek)
+                    } else {
+                        Text(state.value.currentMonth)
+                    }
                     Spacer(Modifier.weight(1f))
                     IconButton(
                         onClick = {
+                            viewModel.onEvent(StatEvents.IncrementPeriod)
 
-                        }
+                        },
+                        shapes = IconButtonDefaults.shapes()
                     ) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowRight,null)
                     }
 
                 }
+
                 Box(
                     modifier = Modifier.padding(20.dp)
                 ) {
-                    when (state.value.selectedStatType) {
-                        StatType.WEEKLY -> {
-                            StatGraph(
-                                periodStepData = state.value.weeklySteps,
-                                isSidePane = false,
-                                animationProgress = animationProgress,
-                                barAnimations = barAnimations,
-                                statType = state.value.selectedStatType
-                            )
-                        }
-
-                        StatType.MONTHLY -> {
-                            StatGraph(
-                                periodStepData = state.value.monthlyData,
-                                isSidePane = false,
-                                animationProgress = animationProgress,
-                                barAnimations = barAnimations,
-                                statType = state.value.selectedStatType
-
-                            )
-                        }
-                    }
+                    StatGraph(
+                        graphData = state.value.graphData,
+                        isSidePane = false,
+                        statType = state.value.selectedStatType
+                    )
                 }
 
 

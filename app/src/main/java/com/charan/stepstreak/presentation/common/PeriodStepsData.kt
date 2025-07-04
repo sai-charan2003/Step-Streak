@@ -5,5 +5,6 @@ data class PeriodStepsData(
     val averageSteps: Long = 0L,
     val stepsData : List<StepsData> = emptyList(),
     val totalSteps : Long = 0L,
-    val periodLabel : String = DateUtils.getCurrentMonthName(),
+    val periodLabel : String = DateUtils.getCurrentMonthWithYear(),
+
 )

@@ -1,5 +1,6 @@
 package com.charan.stepstreak.presentation.home.components
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.common.PeriodStepsData
 import com.charan.stepstreak.presentation.common.components.StatGraph
+import com.charan.stepstreak.presentation.home.GraphData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -27,7 +29,8 @@ fun SimpleBarChartWithAxes(
     modifier: Modifier = Modifier,
     weeklySteps: PeriodStepsData,
     targetStep: Long = 5000L,
-    isSidePane : Boolean = false
+    isSidePane : Boolean = false,
+    graphData : List<GraphData>
 ) {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -98,39 +101,39 @@ fun SimpleBarChartWithAxes(
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
-            StatGraph(
-                periodStepData = weeklySteps,
-                isSidePane = isSidePane,
-                targetStep = targetStep,
-                animationProgress = animationProgress,
-                barAnimations = barAnimations
-            )
+            if(weeklySteps.stepsData.isNotEmpty()) {
+                StatGraph(
+                    graphData = graphData,
+                    isSidePane = isSidePane,
+                    targetStep = targetStep,
+                )
+            }
         }
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun SimpleBarChartPreview() {
-    val sampleData = listOf(
-        StepsData(steps = 3000, day = "Mon", targetCompleted = false, formattedDate = "23rd may"),
-        StepsData(steps = 6000, day = "Tue", targetCompleted = false,formattedDate = "23rd may"),
-        StepsData(steps = 5000, day = "Wed", targetCompleted = true,formattedDate = "23rd may"),
-        StepsData(steps = 4000, day = "Thu", targetCompleted = false,formattedDate = "23rd may"),
-        StepsData(steps = 7500, day = "Fri", targetCompleted = false,formattedDate = "23rd may"),
-        StepsData(steps = 9000, day = "Sat", targetCompleted = true,formattedDate = "23rd may"),
-        StepsData(steps = 2000, day = "Sun", targetCompleted = false,formattedDate = "23rd may"),
-    )
-    val periodStepsData = PeriodStepsData(
-        averageSteps = sampleData.map { it.steps }.average().toLong(),
-        stepsData = sampleData
-    )
-
-    SimpleBarChartWithAxes(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(250.dp),
-        weeklySteps = periodStepsData
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SimpleBarChartPreview() {
+//    val sampleData = listOf(
+//        StepsData(steps = 3000, day = "Mon", targetCompleted = false, formattedDate = "23rd may"),
+//        StepsData(steps = 6000, day = "Tue", targetCompleted = false,formattedDate = "23rd may"),
+//        StepsData(steps = 5000, day = "Wed", targetCompleted = true,formattedDate = "23rd may"),
+//        StepsData(steps = 4000, day = "Thu", targetCompleted = false,formattedDate = "23rd may"),
+//        StepsData(steps = 7500, day = "Fri", targetCompleted = false,formattedDate = "23rd may"),
+//        StepsData(steps = 9000, day = "Sat", targetCompleted = true,formattedDate = "23rd may"),
+//        StepsData(steps = 2000, day = "Sun", targetCompleted = false,formattedDate = "23rd may"),
+//    )
+//    val periodStepsData = PeriodStepsData(
+//        averageSteps = sampleData.map { it.steps }.average().toLong(),
+//        stepsData = sampleData
+//    )
+//
+//    SimpleBarChartWithAxes(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(250.dp),
+//
+//    )
+//}

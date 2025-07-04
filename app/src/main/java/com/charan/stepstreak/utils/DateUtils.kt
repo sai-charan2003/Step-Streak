@@ -10,8 +10,11 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
+import java.time.YearMonth
 import java.time.ZoneId
+import java.time.format.DateTimeParseException
 import java.time.format.TextStyle
+import java.time.temporal.IsoFields
 import java.util.Locale
 
 object DateUtils {
@@ -33,6 +36,7 @@ object DateUtils {
             StartOfWeekEnums.MONDAY -> SHORT_DAY_NAMES_MON_TO_SUN
         }
     }
+    private val INPUT_FORMATTER = DateTimeFormatter.ofPattern("MMM yyyy", Locale.getDefault())
 
     fun formatInstantAsIsoLocalDateString(
         utcTimeString: Instant,
@@ -99,15 +103,24 @@ object DateUtils {
         }
     }
 
-    fun getMonthStartDate(month: String, year: Int = LocalDate.now().year): String {
-        val monthEnum = Month.valueOf(month.trim().uppercase(Locale.getDefault()))
-        val startDate = LocalDate.of(year, monthEnum, 1)
+    fun getDayFromDate(date: String): String {
+        return try {
+            val localDate = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
+            localDate.dayOfMonth.toString()
+        } catch (e: DateTimeParseException) {
+            ""
+        }
+    }
+
+    fun getMonthStartDate(monthYear: String): String {
+        val yearMonth = YearMonth.parse(monthYear, INPUT_FORMATTER)
+        val startDate = yearMonth.atDay(1)
         return startDate.format(ISO_LOCAL_DATE_FORMATTER)
     }
 
-    fun getMonthEndDate(month: String, year: Int = LocalDate.now().year): String {
-        val monthEnum = Month.valueOf(month.trim().uppercase(Locale.getDefault()))
-        val endDate = LocalDate.of(year, monthEnum, 1).withDayOfMonth(monthEnum.length(LocalDate.of(year, monthEnum, 1).isLeapYear))
+    fun getMonthEndDate(monthYear: String): String {
+        val yearMonth = YearMonth.parse(monthYear, INPUT_FORMATTER)
+        val endDate = yearMonth.atEndOfMonth()
         return endDate.format(ISO_LOCAL_DATE_FORMATTER)
     }
     fun getMonthName(date : String) : String{
@@ -117,11 +130,10 @@ object DateUtils {
         )
     }
 
-    fun getCurrentMonthName() : String{
-        return LocalDate.now().month.getDisplayName(
-            TextStyle.FULL,
-            Locale.getDefault()
-        )
+    fun getCurrentMonthWithYear(): String {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.getDefault())
+        return currentDate.format(formatter)
     }
 
 
@@ -129,6 +141,61 @@ object DateUtils {
         val zonedDateTime = ZonedDateTime.ofInstant(date, zoneOffset ?: ZoneOffset.systemDefault())
         return zonedDateTime.toInstant().toEpochMilli()
     }
+
+    fun getAllDatesInMonth(date: String): List<String> {
+        return try {
+            val localDate = LocalDate.parse(date, ISO_LOCAL_DATE_FORMATTER)
+            val year = localDate.year
+            val month = localDate.month
+            val daysInMonth = month.length(localDate.isLeapYear)
+
+            (1..daysInMonth).map { day ->
+                LocalDate.of(year, month, day).format(ISO_LOCAL_DATE_FORMATTER)
+            }
+        } catch (e: DateTimeParseException) {
+            emptyList()
+        }
+    }
+
+    fun getPreviousMonth(currentMonthYear: String): String {
+        val formatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.getDefault())
+        val yearMonth = YearMonth.parse(currentMonthYear, formatter)
+        val previousYearMonth = yearMonth.minusMonths(1)
+        return previousYearMonth.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " ${previousYearMonth.year}"
+    }
+
+    fun getNextMonth(currentMonthYear: String): String {
+        val formatter = DateTimeFormatter.ofPattern("MMM yyyy", Locale.getDefault())
+        val yearMonth = YearMonth.parse(currentMonthYear, formatter)
+        val nextYearMonth = yearMonth.plusMonths(1)
+        return nextYearMonth.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " ${nextYearMonth.year}"
+    }
+
+    fun getCurrentWeekRange(userSetWeekStart: StartOfWeekEnums): Pair<String, String> {
+        val startDate = getCurrentWeekStartDate(userSetWeekStart)
+        val endDate = getCurrentWeekEndDate(userSetWeekStart)
+        return Pair(startDate.format(ISO_LOCAL_DATE_FORMATTER), endDate.format(ISO_LOCAL_DATE_FORMATTER))
+    }
+
+    fun getNextWeekRange(userSetWeekStart: StartOfWeekEnums, weekLastDate: String): Pair<String, String> {
+        val lastWeekEndDate = LocalDate.parse(weekLastDate, ISO_LOCAL_DATE_FORMATTER)
+        val nextWeekStart = lastWeekEndDate.plusDays(1)
+        val nextWeekEnd = nextWeekStart.plusDays(6)
+        return Pair(nextWeekStart.format(ISO_LOCAL_DATE_FORMATTER), nextWeekEnd.format(ISO_LOCAL_DATE_FORMATTER))
+    }
+
+    fun getPreviousWeekRange(userSetWeekStart: StartOfWeekEnums, weekFirstDate: String): Pair<String, String> {
+        val firstWeekDate = LocalDate.parse(weekFirstDate, ISO_LOCAL_DATE_FORMATTER)
+        val previousWeekEnd = firstWeekDate.minusDays(1)
+        val previousWeekStart = previousWeekEnd.minusDays(6)
+        return Pair(previousWeekStart.format(ISO_LOCAL_DATE_FORMATTER), previousWeekEnd.format(ISO_LOCAL_DATE_FORMATTER))
+    }
+
+    fun getFormattedDate(date : String) : String {
+        val date  = LocalDate.parse(date,ISO_LOCAL_DATE_FORMATTER )
+        return date.format(SHORT_WEEK_MONTH_DAY_FORMATTER)
+    }
+
 
     val startOfCurrentDayMillis = ZonedDateTime.now()
         .toLocalDate()

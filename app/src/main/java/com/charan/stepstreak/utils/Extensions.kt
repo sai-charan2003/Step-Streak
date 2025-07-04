@@ -1,9 +1,11 @@
 package com.charan.stepstreak.utils
 
+import android.util.Log
 import com.charan.stepstreak.data.local.entity.StepsRecordEntity
 import com.charan.stepstreak.data.model.StartOfWeekEnums
 import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.common.PeriodStepsData
+import com.charan.stepstreak.presentation.home.GraphData
 import com.charan.stepstreak.presentation.widget.WidgetState
 
 
@@ -42,17 +44,39 @@ fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): Period
     )
 }
 
-fun List<StepsRecordEntity>.toMonthData() : PeriodStepsData {
-    val firstDate = this.firstOrNull()?.date ?: ""
+fun PeriodStepsData.toWeeklyGraphData() : List<GraphData>{
+    return this.stepsData.map {
+        GraphData(
+            yAxis = it.steps.toFloat(),
+            xAxis = it.day
+        )
+    }
+}
+
+fun PeriodStepsData.toMonthlyGraphData() : List<GraphData>{
+    return this.stepsData.map {
+        GraphData(
+            yAxis = it.steps.toFloat(),
+            xAxis = DateUtils.getDayFromDate(it.date)
+        )
+    }
+}
+
+fun List<StepsRecordEntity>.toMonthData(currentMonth: String): PeriodStepsData {
+    val firstDate = this.firstOrNull()?.date ?: DateUtils.getMonthStartDate(currentMonth)
     val monthName = DateUtils.getMonthName(firstDate)
-    val stepsData = this.toStepsData()
+    val allDatesInMonth = DateUtils.getAllDatesInMonth(firstDate)
+    val stepsData = allDatesInMonth.map { date ->
+        this.find { it.date == date }?.toStepsData() ?: StepsData(date = date, steps = 0L)
+    }
     return PeriodStepsData(
-        averageSteps = this.map { it.steps ?: 0L}.average().toLong(),
+        averageSteps = stepsData.map { it.steps }.average().toLong(),
         stepsData = stepsData,
         totalSteps = stepsData.sumOf { it.steps },
         periodLabel = monthName
     )
 }
+
 
 
 

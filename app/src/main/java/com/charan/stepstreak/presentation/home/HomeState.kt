@@ -11,7 +11,13 @@ data class HomeState(
     val motivationText : String = "",
     val todayStepsData : StepsData = StepsData(),
     val currentWeekData : PeriodStepsData = PeriodStepsData(),
+    val graphData: List<GraphData> = emptyList(),
     val currentTargetSteps : Long = 0L,
+)
+
+data class GraphData(
+    val yAxis : Float = 0f,
+    val xAxis : String = "",
 )
 
 

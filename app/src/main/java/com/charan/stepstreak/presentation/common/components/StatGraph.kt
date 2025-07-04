@@ -1,150 +1,124 @@
 package com.charan.stepstreak.presentation.common.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.units.percent
 import com.charan.stepstreak.data.model.StatType
 import com.charan.stepstreak.presentation.common.PeriodStepsData
 import com.charan.stepstreak.presentation.common.StepsData
+import com.charan.stepstreak.presentation.home.GraphData
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.ProvideVicoTheme
+import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.vicoTheme
+import com.patrykandpatrick.vico.compose.m3.common.rememberM3VicoTheme
+import com.patrykandpatrick.vico.core.cartesian.Zoom
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer.ColumnProvider
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.core.common.Defaults
+import com.patrykandpatrick.vico.core.common.data.ExtraStore
+import com.patrykandpatrick.vico.core.common.shape.CorneredShape
+import com.patrykandpatrick.vico.core.common.shape.Shape
 
 @Composable
 fun StatGraph(
-    periodStepData: PeriodStepsData,
+    graphData: List<GraphData> = emptyList(),
     isSidePane: Boolean,
     targetStep: Long = 5000L,
-    animationProgress: Animatable<Float, AnimationVector1D> = remember { Animatable(0f) },
-    barAnimations: List<Animatable<Float, AnimationVector1D>>,
     statType: StatType = StatType.WEEKLY
 ) {
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val maxHeight = 200.dp
-    val stepsList = periodStepData.stepsData
+    val modelProducer = remember { CartesianChartModelProducer() }
+    val labelListKey = remember { ExtraStore.Key<List<String>>() }
+    val labels = graphData.map{ it.xAxis }
+    val values = graphData.map{ it.yAxis }
 
-    val highestSteps = stepsList.maxOfOrNull { it.steps } ?: 0
-    val maxSteps = targetStep.toFloat()
-    val yLabels = listOf(
-        targetStep.toInt(),
-        (targetStep / 2).toInt(),
-        0
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(maxHeight)
-            .padding(horizontal = 8.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .height(maxHeight)
-                .padding(end = 4.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            yLabels.forEach { value ->
-                Text(
-                    text = value.toString(),
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            }
-        }
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(maxHeight),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                stepsList.forEachIndexed { index, stepData ->
-                    Bar(
-                        value = stepData.steps.toFloat(),
-                        maxValue = maxSteps,
-                        color = onSurfaceColor,
-                        maxHeight = maxHeight,
-                        isTargetReached = stepData.steps >= targetStep.toInt()
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                stepsList.forEach {
-                    Text(
-                        text = it.day,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = onSurfaceColor.copy(alpha = 0.6f)
-                    )
-                }
+    LaunchedEffect(graphData) {
+        if(graphData.isNotEmpty()) {
+            modelProducer.runTransaction {
+                columnSeries { series(values) }
+                extras { it[labelListKey] = labels }
             }
         }
     }
+
+    ProvideVicoTheme(rememberM3VicoTheme()) {
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberColumnCartesianLayer(
+                    columnProvider =ColumnProvider.series(
+                        vicoTheme.columnCartesianLayerColors.map { color ->
+                            rememberLineComponent(
+                                fill(color),
+                                shape = CorneredShape.Pill,
+                                thickness = 8.dp
+
+                            )
+                        }
+                    ),
+                ),
+                startAxis = VerticalAxis.rememberStart(
+                    guideline = null,
+                    line = null,
+                    tick = null,
+                    itemPlacer = VerticalAxis.ItemPlacer.count(
+                        count = {3}
+                    )
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    valueFormatter = CartesianValueFormatter { context, x, _ ->
+                        val index = x.toInt()
+                        context.model.extraStore[labelListKey]
+                            ?.getOrNull(index)
+                            ?: ""
+                    },
+                    guideline = null,
+                    line = null,
+                    tick = null,
+                    itemPlacer = if(statType == StatType.MONTHLY) HorizontalAxis.ItemPlacer.aligned(spacing = {4}) else HorizontalAxis.ItemPlacer.aligned()
+                ),
+            ),
+            modelProducer = modelProducer,
+            zoomState = rememberVicoZoomState(zoomEnabled = false, maxZoom = Zoom.Content),
+            scrollState = rememberVicoScrollState(scrollEnabled = false)
+        )
+
+    }
+
+
 }
 
 @Composable
-private fun Bar(
-    value: Float,
-    maxValue: Float,
-    color: Color,
-    maxHeight: Dp,
-    isTargetReached : Boolean
-) {
-    val barHeightRatio = if (maxValue == 0f) 0f else value / maxValue
-    Box(
-        modifier = Modifier
-            .width(20.dp)
-            .fillMaxHeight(fraction = barHeightRatio)
-            .clip(RoundedCornerShape(100.dp))
-            .background(
-                if(isTargetReached){
-                    Color(0xFF4CAF50)
-                } else{
-                    MaterialTheme.colorScheme.primary
-                }
-            )
-    )
-
-}
-
 @Preview
-@Composable
 fun StatGraphPreview() {
     val sampleSteps = listOf(
-        StepsData(day = "Mon", steps = 1000),
-        StepsData(day = "Tue", steps = 2000),
-        StepsData(day = "Wed", steps = 3000),
-        StepsData(day = "Thu", steps = 4000),
-        StepsData(day = "Fri", steps = 6000),
-        StepsData(day = "Sat", steps = 2500),
-        StepsData(day = "Sun", steps = 1000)
+        GraphData(xAxis = "Mon", yAxis = 5000f),
+        GraphData(xAxis = "Tue", yAxis = 6000f),
+        GraphData(xAxis = "Wed", yAxis = 7000f),
+        GraphData(xAxis = "Thu", yAxis = 8000f),
+        GraphData(xAxis = "Fri", yAxis = 9000f),
+
     )
-    val periodStepsData = PeriodStepsData(stepsData = sampleSteps)
 
     StatGraph(
-        periodStepData = periodStepsData,
+        graphData = sampleSteps,
         isSidePane = false,
         targetStep = 5000L,
-        animationProgress = remember { Animatable(0f) },
-        barAnimations = List(sampleSteps.size) { Animatable(0f) },
     )
 }
