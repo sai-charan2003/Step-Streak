@@ -20,4 +20,7 @@ sealed class BottomNavScreenNav : NavKey {
 
     @Serializable
     object SettingsScreenNav : BottomNavScreenNav()
+
+    @Serializable
+    object StatsScreenNav : BottomNavScreenNav()
 }

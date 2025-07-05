@@ -16,6 +16,7 @@ import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
 import com.charan.stepstreak.utils.toStepsData
 import com.charan.stepstreak.utils.toWeekData
+import com.charan.stepstreak.utils.toWeeklyGraphData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,6 +49,7 @@ class HomeScreenViewModel @Inject constructor(
         fetchSteps()
         observeSteps()
         getCurrentTargetSteps()
+        updateWeeklyGraphData()
     }
 
     private fun fetchSteps() = viewModelScope.launch(Dispatchers.IO){
@@ -105,6 +107,16 @@ class HomeScreenViewModel @Inject constructor(
     private fun getCurrentTargetSteps() = viewModelScope.launch(Dispatchers.IO) {
         _state.update {
             it.copy(currentTargetSteps = userSettingsRepo.getStepsTargetInGivenTime(System.currentTimeMillis()))
+        }
+    }
+
+    private fun updateWeeklyGraphData() = viewModelScope.launch(Dispatchers.IO) {
+        _state.collectLatest { list->
+            _state.update {
+                it.copy(
+                    graphData = list.currentWeekData.toWeeklyGraphData()
+                )
+            }
         }
     }
 

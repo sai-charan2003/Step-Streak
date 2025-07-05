@@ -159,7 +159,8 @@ fun HomeScreen(
                                     Spacer(Modifier.height(15.dp))
                                     SimpleBarChartWithAxes(
                                         weeklySteps = state.value.currentWeekData,
-                                        targetStep = state.value.currentTargetSteps
+                                        targetStep = state.value.currentTargetSteps,
+                                        graphData = state.value.graphData
 
                                     )
                                 }
@@ -182,7 +183,8 @@ fun HomeScreen(
                             SimpleBarChartWithAxes(
                                 weeklySteps = state.value.currentWeekData,
                                 targetStep = state.value.currentTargetSteps,
-                                isSidePane = true
+                                isSidePane = true,
+                                graphData = state.value.graphData
                             )
                         }
                     }

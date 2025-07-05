@@ -1,7 +1,7 @@
 package com.charan.stepstreak.presentation.home
 
 import com.charan.stepstreak.presentation.common.StepsData
-import com.charan.stepstreak.presentation.common.WeeklyData
+import com.charan.stepstreak.presentation.common.PeriodStepsData
 
 data class HomeState(
     val allStepsData : List<StepsData> = emptyList(),
@@ -10,8 +10,14 @@ data class HomeState(
     val streakCount : String = "0",
     val motivationText : String = "",
     val todayStepsData : StepsData = StepsData(),
-    val currentWeekData : WeeklyData = WeeklyData(),
+    val currentWeekData : PeriodStepsData = PeriodStepsData(),
+    val graphData: List<GraphData> = emptyList(),
     val currentTargetSteps : Long = 0L,
+)
+
+data class GraphData(
+    val yAxis : Float = 0f,
+    val xAxis : String = "",
 )
 
 
