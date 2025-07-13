@@ -14,9 +14,9 @@ import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.utils.ProcessState
 import com.charan.stepstreak.utils.getMotivationQuote
 import com.charan.stepstreak.utils.getStreak
+import com.charan.stepstreak.utils.toGraphData
 import com.charan.stepstreak.utils.toStepsData
 import com.charan.stepstreak.utils.toWeekData
-import com.charan.stepstreak.utils.toWeeklyGraphData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -114,7 +114,7 @@ class HomeScreenViewModel @Inject constructor(
         _state.collectLatest { list->
             _state.update {
                 it.copy(
-                    graphData = list.currentWeekData.toWeeklyGraphData()
+                    graphData = list.currentWeekData.toGraphData()
                 )
             }
         }

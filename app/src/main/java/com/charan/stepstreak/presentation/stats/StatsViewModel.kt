@@ -10,10 +10,9 @@ import com.charan.stepstreak.data.repository.StepsRecordRepo
 import com.charan.stepstreak.presentation.common.PeriodStepsData
 import com.charan.stepstreak.presentation.common.components.StatEvents
 import com.charan.stepstreak.utils.DateUtils
+import com.charan.stepstreak.utils.toGraphData
 import com.charan.stepstreak.utils.toMonthData
-import com.charan.stepstreak.utils.toMonthlyGraphData
 import com.charan.stepstreak.utils.toWeekData
-import com.charan.stepstreak.utils.toWeeklyGraphData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -171,7 +170,7 @@ class StatsViewModel @Inject constructor(
         val weekData = state.value.stepData
         _state.update {
             it.copy(
-                graphData = weekData.toWeeklyGraphData()
+                graphData = weekData.toGraphData()
             )
 
 
@@ -193,7 +192,7 @@ class StatsViewModel @Inject constructor(
     }
 
     private fun updateMonthlyGraphData() = viewModelScope.launch(Dispatchers.IO) {
-        val graphData = state.value.stepData.toMonthlyGraphData()
+        val graphData = state.value.stepData.toGraphData()
         _state.update {
             it.copy(
                 graphData = graphData

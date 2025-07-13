@@ -36,7 +36,10 @@ fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): Period
     val weekList = DateUtils.getWeekDayList(weekStartDate)
     val currentWeekData = this.toStepsData()
     val stepsData = weekList.map { day ->
-        currentWeekData.find { it.day == day } ?: StepsData(day = day)
+        currentWeekData.find { it.day == day } ?: StepsRecordEntity(
+            date = DateUtils.getDateFromWeekday(day, weekStartDate),
+            steps = 0L,
+        ).toStepsData()
     }
     return PeriodStepsData(
         averageSteps = currentWeekData.map { it.steps }.average().toLong(),
@@ -44,20 +47,13 @@ fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): Period
     )
 }
 
-fun PeriodStepsData.toWeeklyGraphData() : List<GraphData>{
-    return this.stepsData.map {
-        GraphData(
-            yAxis = it.steps.toFloat(),
-            xAxis = it.day
-        )
-    }
-}
+fun PeriodStepsData.toGraphData() : List<GraphData>{
 
-fun PeriodStepsData.toMonthlyGraphData() : List<GraphData>{
     return this.stepsData.map {
         GraphData(
-            yAxis = it.steps.toFloat(),
-            xAxis = DateUtils.getDayFromDate(it.date)
+            steps = it.steps.toFloat(),
+            day = it.day,
+            date = DateUtils.getDayFromDate(it.date),
         )
     }
 }
@@ -67,7 +63,10 @@ fun List<StepsRecordEntity>.toMonthData(currentMonth: String): PeriodStepsData {
     val monthName = DateUtils.getMonthName(firstDate)
     val allDatesInMonth = DateUtils.getAllDatesInMonth(firstDate)
     val stepsData = allDatesInMonth.map { date ->
-        this.find { it.date == date }?.toStepsData() ?: StepsData(date = date, steps = 0L)
+        this.find { it.date == date }?.toStepsData() ?: StepsRecordEntity(
+            date = date,
+            steps = 0L,
+        ).toStepsData()
     }
     return PeriodStepsData(
         averageSteps = stepsData.map { it.steps }.average().toLong(),

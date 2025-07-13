@@ -112,6 +112,11 @@ object DateUtils {
         }
     }
 
+    fun getDayAndDate(date: String) : String{
+        val localDate = LocalDate.parse(date,DateTimeFormatter.ISO_LOCAL_DATE)
+        return "${localDate.dayOfMonth} ${localDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())}"
+    }
+
     fun getMonthStartDate(monthYear: String): String {
         val yearMonth = YearMonth.parse(monthYear, INPUT_FORMATTER)
         val startDate = yearMonth.atDay(1)
@@ -195,6 +200,28 @@ object DateUtils {
         val date  = LocalDate.parse(date,ISO_LOCAL_DATE_FORMATTER )
         return date.format(SHORT_WEEK_MONTH_DAY_FORMATTER)
     }
+
+fun getDateFromWeekday(weekday: String, weekStart: StartOfWeekEnums): String {
+    val today = LocalDate.now()
+    val startOfWeekDay = when (weekStart) {
+        StartOfWeekEnums.SUNDAY -> DayOfWeek.SUNDAY
+        StartOfWeekEnums.MONDAY -> DayOfWeek.MONDAY
+    }
+    val shortDays = when (weekStart) {
+        StartOfWeekEnums.SUNDAY -> SHORT_DAY_NAMES_SUN_TO_SAT
+        StartOfWeekEnums.MONDAY -> SHORT_DAY_NAMES_MON_TO_SUN
+    }
+    val index = shortDays.indexOf(weekday.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            Locale.ROOT
+        ) else it.toString()
+    })
+    val daysToAdd = if (index >= 0) index else 0
+    return today.minusDays(((today.dayOfWeek.value - startOfWeekDay.value + 7) % 7).toLong())
+        .plusDays(daysToAdd.toLong())
+        .format(ISO_LOCAL_DATE_FORMATTER)
+}
+
 
 
     val startOfCurrentDayMillis = ZonedDateTime.now()
