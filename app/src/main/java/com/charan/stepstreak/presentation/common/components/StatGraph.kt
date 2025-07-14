@@ -1,12 +1,16 @@
 package com.charan.stepstreak.presentation.common.components
 
+import android.graphics.Color
 import android.graphics.Typeface
 import android.icu.text.DecimalFormat
 import android.util.Log
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.charan.stepstreak.data.model.StatType
@@ -29,6 +33,7 @@ import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.rememberVerticalLegend
 import com.patrykandpatrick.vico.compose.common.shape.markerCorneredShape
 import com.patrykandpatrick.vico.compose.common.vicoTheme
 import com.patrykandpatrick.vico.compose.m3.common.rememberM3VicoTheme
@@ -38,17 +43,22 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.data.ColumnCartesianLayerModel
+import com.patrykandpatrick.vico.core.cartesian.decoration.HorizontalLine
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer.ColumnProvider
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.ColumnCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Defaults
+import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.Insets
+import com.patrykandpatrick.vico.core.common.component.LineComponent
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import com.patrykandpatrick.vico.core.common.shape.MarkerCorneredShape
 import com.patrykandpatrick.vico.core.common.shape.Shape
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun StatGraph(
@@ -70,27 +80,40 @@ fun StatGraph(
             }
         }
     }
+    val targetReachedLine = rememberLineComponent(
+        fill = Fill("#FF4CAF50".toColorInt()),
+        shape = CorneredShape.Pill,
+        thickness = 8.dp
+
+
+
+    )
+    val targetNotReachedLine = rememberLineComponent(
+        fill = Fill(MaterialTheme.colorScheme.primary.toArgb()),
+        shape = CorneredShape.Pill,
+        thickness = 8.dp
+
+    )
 
     ProvideVicoTheme(rememberM3VicoTheme()) {
         CartesianChartHost(
+            modifier = Modifier.fillMaxHeight(),
             chart = rememberCartesianChart(
                 rememberColumnCartesianLayer(
-                    columnProvider =ColumnProvider.series(
-                        vicoTheme.columnCartesianLayerColors.map { color ->
-                            rememberLineComponent(
-                                fill(color),
-                                shape = CorneredShape.Pill,
-                                thickness = 8.dp
+                    columnProvider = remember(targetReachedLine, targetNotReachedLine,graphData) {
+                        getColumnProvider(
+                            targetReachedLine,
+                            targetNotReachedLine,
+                            graphData
+                        )
+                    },
 
-                            )
-                        }
-                    ),
                 ),
                 marker = rememberDefaultCartesianMarker(
                     label = rememberTextComponent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         padding = Insets(horizontalDp = 12f, verticalDp = 8f),
-                        margins = Insets(verticalDp = 10f),
+                        margins = Insets(verticalDp = 2f),
                         background = rememberShapeComponent(
                             shape = CorneredShape.rounded(100f),
                             fill = fill(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)),
@@ -118,7 +141,7 @@ fun StatGraph(
                     line = null,
                     tick = null,
                     itemPlacer = VerticalAxis.ItemPlacer.count(
-                        count = {3}
+                        count = { if (values.none { it.toInt() != 0 }) 1 else 3 }
                     )
                 ),
                 bottomAxis = HorizontalAxis.rememberBottom(
@@ -144,3 +167,24 @@ fun StatGraph(
 
 }
 
+private fun getColumnProvider(targetReachedLine: LineComponent, targetNotReachedLine: LineComponent,values : List<GraphData>) =
+    object : ColumnCartesianLayer.ColumnProvider {
+        override fun getColumn(
+            entry: ColumnCartesianLayerModel.Entry,
+            seriesIndex: Int,
+            extraStore: ExtraStore,
+        ) : LineComponent{
+            val data = values.getOrNull(entry.x.toInt())
+            val isTargetCompleted = data?.isTargetCompleted ?: false
+
+            return if (isTargetCompleted) {
+                targetReachedLine
+            } else {
+                targetNotReachedLine
+            }
+
+
+        }
+
+        override fun getWidestSeriesColumn(seriesIndex: Int, extraStore: ExtraStore) = targetReachedLine
+    }

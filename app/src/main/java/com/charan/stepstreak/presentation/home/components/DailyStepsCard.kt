@@ -84,20 +84,23 @@ fun DailyStepsCard(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StepsCard(
+    modifier: Modifier = Modifier,
     totalSteps: Long,
     targetSteps: Long,
     formatDate: String,
     isFirst : Boolean,
     isLast : Boolean,
     isTargetReached : Boolean = totalSteps >= targetSteps,
-    progress : Float = (totalSteps.toFloat() / targetSteps.toFloat())
+    progress : Float = (totalSteps.toFloat() / targetSteps.toFloat()),
+
 ) {
     val badgeColor = MaterialTheme.colorScheme.tertiary
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 1.dp),
+            .padding(vertical = 1.dp)
+            .then(modifier),
         color = MaterialTheme.colorScheme.surfaceContainer,
         shape = if (isFirst) {
             firstShape
@@ -111,7 +114,7 @@ fun StepsCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(

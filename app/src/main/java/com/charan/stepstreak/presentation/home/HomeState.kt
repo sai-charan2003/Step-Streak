@@ -19,7 +19,8 @@ data class GraphData(
     val steps : Float = 0f,
     val day : String = "",
     val date : String = "",
-    val monthName : String = ""
+    val monthName : String = "",
+    val isTargetCompleted : Boolean = false
 )
 
 

@@ -21,7 +21,7 @@ fun StepsRecordEntity.toStepsData(): StepsData = StepsData(
     targetSteps = stepTarget ?: 0L,
     day = DateUtils.getWeekdayName(date ?: ""),
     formattedDate = DateUtils.formatDateForDisplay(date ?: ""),
-    targetCompleted = (steps ?: 0L) >= (stepTarget ?: 0L),
+    targetCompleted = this.isTargetAchieved(),
     currentProgress = ((steps ?: 0L).toFloat() / (stepTarget ?: 1L).toFloat())
 )
 
@@ -54,6 +54,7 @@ fun PeriodStepsData.toGraphData() : List<GraphData>{
             steps = it.steps.toFloat(),
             day = it.day,
             date = DateUtils.getDayFromDate(it.date),
+            isTargetCompleted = it.targetCompleted
         )
     }
 }

@@ -19,6 +19,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
@@ -163,18 +166,18 @@ enum class BottomNavItem(
 ) {
     HOME(
         title = "Home",
-        selectedIcon = Icons.Filled.Home,
+        selectedIcon = Icons.Rounded.Home,
         unselectedIcon = Icons.Outlined.Home,
 
     ),
     HISTORY(
         title = "History",
-        selectedIcon = Icons.Filled.BarChart,
+        selectedIcon = Icons.Rounded.BarChart,
         unselectedIcon = Icons.Outlined.BarChart,
     ),
     SETTINGS(
         title = "Settings",
-        selectedIcon = Icons.Filled.Settings,
+        selectedIcon = Icons.Rounded.Settings,
         unselectedIcon = Icons.Outlined.Settings,
     )
 }
