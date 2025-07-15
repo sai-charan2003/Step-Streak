@@ -7,4 +7,5 @@ sealed interface OnBoardingViewEffect {
     data class ScrollPage(val page : Int) : OnBoardingViewEffect
     data object RequestPermission : OnBoardingViewEffect
     object OnBoardingComplete : OnBoardingViewEffect
+    data object InstallHealthConnect : OnBoardingViewEffect
 }

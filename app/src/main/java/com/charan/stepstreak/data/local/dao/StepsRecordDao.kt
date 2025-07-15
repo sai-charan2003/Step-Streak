@@ -16,12 +16,17 @@ interface StepsRecordDao {
     suspend fun insertStepsRecord(stepsRecordEntity: List<StepsRecordEntity>)
 
     @Query("""
-    SELECT * FROM (
-        SELECT *, ROW_NUMBER() OVER (PARTITION BY date ORDER BY steps DESC, id ASC) as rn
-        FROM steps_record
+    SELECT a.*
+    FROM steps_record AS a
+    WHERE a.id = (
+      SELECT b.id
+      FROM steps_record AS b
+      WHERE b.date = a.date
+      ORDER BY b.steps DESC, b.id ASC
+      LIMIT 1
     )
-    WHERE rn = 1
-    ORDER BY date DESC
+    ORDER BY a.date DESC;
+
 """)
 
     fun getAllStepsRecords(): Flow<List<StepsRecordEntity>>

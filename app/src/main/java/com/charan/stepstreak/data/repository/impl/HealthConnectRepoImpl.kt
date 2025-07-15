@@ -1,10 +1,17 @@
 package com.charan.stepstreak.data.repository.impl
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import android.health.connect.HealthConnectManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -28,15 +35,18 @@ import kotlinx.coroutines.flow.flow
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
+import androidx.core.net.toUri
+import com.charan.stepstreak.BuildConfig
 
 val permissions = setOf(
     HealthPermission.getReadPermission(StepsRecord::class),
     HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND,
     HealthPermission.PERMISSION_READ_HEALTH_DATA_HISTORY
 )
+private const val packageName = "com.google.android.apps.healthdata"
 
 class HealthConnectRepoImpl @Inject constructor(
-    private val healthConnectClient: HealthConnectClient,
+    private val healthConnectClient: HealthConnectClient?,
     private val stepsRecordDao: StepsRecordDao,
     private val context : Context,
     private val dataStore : DataStoreRepo,
@@ -44,8 +54,14 @@ class HealthConnectRepoImpl @Inject constructor(
 
 ) : HealthConnectRepo {
 
+    override fun hasHealthConnectClient(): Boolean {
+        val status = HealthConnectClient.getSdkStatus(context)
+        return status != HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
+    }
+
     override suspend fun hasPermission(): Boolean {
-        return healthConnectClient.permissionController.getGrantedPermissions().containsAll(permissions)
+        return healthConnectClient?.permissionController?.getGrantedPermissions()
+            ?.containsAll(permissions) ?: false
     }
 
     override suspend fun fetchAndSaveAllStepRecords(): Flow<ProcessState<Boolean>> = flow {
@@ -53,7 +69,7 @@ class HealthConnectRepoImpl @Inject constructor(
         try {
             var pageToken: String? = null
             do {
-                val response = healthConnectClient.readRecords(
+                val response = healthConnectClient?.readRecords(
                     ReadRecordsRequest<StepsRecord>(
                         timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
                         ascendingOrder = true,
@@ -61,20 +77,26 @@ class HealthConnectRepoImpl @Inject constructor(
                     )
                 )
 
-                response.records.forEach {
+                response?.records?.forEach {
                     stepsRecordDao.insertStepsRecord(
                         StepsRecordEntity(
                             steps = it.count,
                             stepTarget = usersSettingsRepo.getStepsTargetInGivenTime(
-                                DateUtils.convertInstantToEpochMillis(it.startTime, it.startZoneOffset)
+                                DateUtils.convertInstantToEpochMillis(
+                                    it.startTime,
+                                    it.startZoneOffset
+                                )
                             ),
                             uuid = it.metadata.id,
-                            date = DateUtils.formatInstantAsIsoLocalDateString(it.startTime, it.startZoneOffset)
+                            date = DateUtils.formatInstantAsIsoLocalDateString(
+                                it.startTime,
+                                it.startZoneOffset
+                            )
                         )
                     )
                 }
 
-                pageToken = response.pageToken
+                pageToken = response?.pageToken
             } while (pageToken.isNullOrEmpty().not())
             emit(ProcessState.Success(true))
         } catch (e: Exception) {
@@ -84,19 +106,20 @@ class HealthConnectRepoImpl @Inject constructor(
     }
 
 
-    override fun getOriginProviders(): Flow<ProcessState<List<DataProviders>>> = flow{
+    override fun getOriginProviders(): Flow<ProcessState<List<DataProviders>>> = flow {
         emit(ProcessState.Loading)
-        val dataProviders : MutableList<DataProviders> = mutableListOf()
+        val dataProviders: MutableList<DataProviders> = mutableListOf()
         val selectedDataProviderPackage = dataStore.dataProviders.first()
         try {
-            val response = healthConnectClient.readRecords(
+            val response = healthConnectClient?.readRecords(
                 ReadRecordsRequest<StepsRecord>(
                     timeRangeFilter = TimeRangeFilter.before(LocalDateTime.now()),
                     ascendingOrder = false
                 )
             )
-            val distinctProviders = response.records.map { it.metadata.dataOrigin.packageName }.distinct()
-            distinctProviders.forEach {
+            val distinctProviders =
+                response?.records?.map { it.metadata.dataOrigin.packageName }?.distinct()
+            distinctProviders?.forEach {
                 val dataProvider = DataProviders(
                     packageName = it,
                     name = getApplicationName(it),
@@ -108,7 +131,7 @@ class HealthConnectRepoImpl @Inject constructor(
             }
             emit(ProcessState.Success(dataProviders))
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             emit(ProcessState.Error(e.message ?: "Something went wrong"))
 
@@ -136,4 +159,25 @@ class HealthConnectRepoImpl @Inject constructor(
             packageName
         }
     }
+
+    override fun installHealthConnect() {
+        val packageManager: PackageManager = context.packageManager
+        val playStoreIntent =
+            Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri()).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        if (playStoreIntent.resolveActivity(packageManager) != null) {
+            context.startActivity(playStoreIntent)
+        }
+    }
+
+    override fun openSettingsPermission() {
+        val action =
+            HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS
+
+        val intent = Intent(action)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        context.startActivity(intent)
+    }
+
 }

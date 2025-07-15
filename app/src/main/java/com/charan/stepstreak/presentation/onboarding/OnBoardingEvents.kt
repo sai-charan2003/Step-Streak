@@ -12,5 +12,9 @@ sealed interface OnBoardingEvents {
 
     object OnPermissionGranted : OnBoardingEvents
 
+    data object OnPermissionDenied : OnBoardingEvents
+
     object OnNextButtonClick : OnBoardingEvents
+
+    data object OpenHealthConnectPermissionSettings : OnBoardingEvents
 }

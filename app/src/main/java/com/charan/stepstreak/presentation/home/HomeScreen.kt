@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
@@ -65,10 +66,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowSizeClass
-import com.charan.stepstreak.presentation.home.components.DailyStepsCard
 import com.charan.stepstreak.presentation.home.components.SimpleBarChartWithAxes
 import com.charan.stepstreak.presentation.home.components.StreakCard
 import com.charan.stepstreak.presentation.home.components.TodayProgressCard
+import com.charan.stepstreak.presentation.home.components.WeeklySummary
 import com.charan.stepstreak.utils.DateUtils
 import kotlin.math.roundToInt
 
@@ -165,9 +166,10 @@ fun HomeScreen(
                                     )
                                 }
                                 Spacer(Modifier.height(15.dp))
-                                DailyStepsCard(
-                                    stepsData = state.value.allStepsData
+                                WeeklySummary(
+                                    stepsData = state.value.currentWeekData
                                 )
+                                Spacer(Modifier.height(15.dp))
                             }
 
 

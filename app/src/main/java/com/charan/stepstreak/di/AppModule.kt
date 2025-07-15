@@ -1,6 +1,7 @@
 package com.charan.stepstreak.di
 
 import android.content.Context
+import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
 import com.charan.stepstreak.data.local.AppDatabase
 import com.charan.stepstreak.data.local.dao.StepsRecordDao
@@ -62,14 +63,19 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideHealthConnectClient(@ApplicationContext context: Context): HealthConnectClient {
-        return HealthConnectClient.getOrCreate(context)
+    fun provideHealthConnectClient(@ApplicationContext context: Context): HealthConnectClient? {
+        return try {
+            HealthConnectClient.getOrCreate(context)
+        } catch (e: Exception) {
+            Log.e("HealthConnect", "Error creating HealthConnectClient", e)
+            null
+        }
 
     }
 
     @Provides
     @Singleton
-    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context,dataStoreRepo: DataStoreRepo,usersSettingsRepo: UsersSettingsRepo): HealthConnectRepo {
+    fun provideHealthConnectRepo(healthConnectClient: HealthConnectClient?,stepsRecordDao: StepsRecordDao,@ApplicationContext context: Context,dataStoreRepo: DataStoreRepo,usersSettingsRepo: UsersSettingsRepo): HealthConnectRepo {
         return HealthConnectRepoImpl(healthConnectClient,stepsRecordDao,context,dataStoreRepo,usersSettingsRepo)
 
     }

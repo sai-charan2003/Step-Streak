@@ -6,5 +6,6 @@ data class PeriodStepsData(
     val stepsData : List<StepsData> = emptyList(),
     val totalSteps : Long = 0L,
     val periodLabel : String = DateUtils.getCurrentMonthWithYear(),
+    val highestSteps : StepsData = StepsData()
 
 )

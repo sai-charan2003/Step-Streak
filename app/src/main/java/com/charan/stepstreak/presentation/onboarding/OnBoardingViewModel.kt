@@ -3,6 +3,7 @@ package com.charan.stepstreak.presentation.onboarding
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.charan.stepstreak.data.model.DataProviders
 import com.charan.stepstreak.data.repository.DataStoreRepo
 import com.charan.stepstreak.data.repository.HealthConnectRepo
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,7 +36,7 @@ class OnBoardingViewModel @Inject constructor(
         getDataProviders()
     }
 
-    fun initData() = viewModelScope.launch(Dispatchers.IO){
+    private fun initData() = viewModelScope.launch(Dispatchers.IO){
         _state.update {
             it.copy(
                 isPermissionGranted = healthConnectRepo.hasPermission()
@@ -56,7 +58,7 @@ class OnBoardingViewModel @Inject constructor(
 
             }
             OnBoardingEvents.OnRequestPermission -> {
-                _event.emit(OnBoardingViewEffect.RequestPermission)
+                onRequestPermission()
             }
             is OnBoardingEvents.OnSelectProvider -> {
                 val updatedProviders = _state.value.dataProviders.map { provider ->
@@ -73,29 +75,19 @@ class OnBoardingViewModel @Inject constructor(
             }
 
             OnBoardingEvents.OnPermissionGranted -> {
-                getDataProviders()
-                initData()
+                onPermissionGranted()
             }
 
             OnBoardingEvents.OnNextButtonClick -> {
-                if(_state.value.currentPage == 0){
-                    _event.emit(OnBoardingViewEffect.ScrollPage(1))
-                    _state.update {
-                        it.copy(
-                            currentPage =  1
-                        )
-                    }
-                    return@launch
-                }
-                if(_state.value.currentPage == 1 && !_state.value.isPermissionGranted){
-                    _event.emit(OnBoardingViewEffect.RequestPermission)
-                    return@launch
-                }
-                if(_state.value.currentPage == 1 && _state.value.isPermissionGranted){
-                    _event.emit(OnBoardingViewEffect.OnBoardingComplete)
-                    dataStoreRepo.setOnBoardingStatus(true)
-                    return@launch
-                }
+                onNextButtonClick()
+            }
+
+            OnBoardingEvents.OpenHealthConnectPermissionSettings -> {
+                healthConnectRepo.openSettingsPermission()
+            }
+
+            OnBoardingEvents.OnPermissionDenied -> {
+                onRequestDenied()
             }
         }
     }
@@ -119,6 +111,58 @@ class OnBoardingViewModel @Inject constructor(
             }
 
         }
+    }
+
+    private fun onRequestPermission() =viewModelScope.launch{
+        if(healthConnectRepo.hasPermission()){
+            _state.update {
+                it.copy(isPermissionGranted = true)
+            }
+            return@launch
+        }
+        if(healthConnectRepo.hasHealthConnectClient()){
+            if(dataStoreRepo.permissionDeniedCount.first()  >=2){
+                healthConnectRepo.openSettingsPermission()
+                return@launch
+            }
+            _event.emit(OnBoardingViewEffect.RequestPermission)
+        } else{
+            _event.emit(OnBoardingViewEffect.InstallHealthConnect)
+            healthConnectRepo.installHealthConnect()
+
+        }
+    }
+
+    private fun onRequestDenied() = viewModelScope.launch {
+        dataStoreRepo.incrementPermissionDeniedCount()
+    }
+
+    private fun onPermissionGranted() = viewModelScope.launch {
+        getDataProviders()
+        initData()
+        dataStoreRepo.resetPermissionDeniedCount()
+    }
+
+    private fun onNextButtonClick() = viewModelScope.launch {
+        if(_state.value.currentPage == 0){
+            _event.emit(OnBoardingViewEffect.ScrollPage(1))
+            _state.update {
+                it.copy(
+                    currentPage =  1
+                )
+            }
+            return@launch
+        }
+        if(_state.value.currentPage == 1 && !_state.value.isPermissionGranted){
+            onRequestPermission()
+            return@launch
+        }
+        if(_state.value.currentPage == 1 && _state.value.isPermissionGranted){
+            _event.emit(OnBoardingViewEffect.OnBoardingComplete)
+            dataStoreRepo.setOnBoardingStatus(true)
+            return@launch
+        }
+
     }
 
 

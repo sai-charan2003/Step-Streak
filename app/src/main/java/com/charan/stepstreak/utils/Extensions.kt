@@ -43,7 +43,9 @@ fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): Period
     }
     return PeriodStepsData(
         averageSteps = currentWeekData.map { it.steps }.average().toLong(),
-        stepsData = stepsData
+        stepsData = stepsData,
+        totalSteps = currentWeekData.sumOf { it.steps },
+        highestSteps = currentWeekData.maxBy { it.steps }
     )
 }
 
@@ -73,7 +75,8 @@ fun List<StepsRecordEntity>.toMonthData(currentMonth: String): PeriodStepsData {
         averageSteps = stepsData.map { it.steps }.average().toLong(),
         stepsData = stepsData,
         totalSteps = stepsData.sumOf { it.steps },
-        periodLabel = monthName
+        periodLabel = monthName,
+        highestSteps = stepsData.maxBy { it.steps }
     )
 }
 

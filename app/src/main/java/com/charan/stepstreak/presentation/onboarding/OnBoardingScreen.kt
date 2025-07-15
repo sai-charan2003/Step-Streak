@@ -1,7 +1,12 @@
 package com.charan.stepstreak.presentation.onboarding
 
 
+import android.app.Activity
+import android.content.Intent
+import android.health.connect.HealthConnectManager
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -43,15 +48,18 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.content.ContextCompat.startActivity
 import androidx.glance.AndroidResourceImageProvider
 import androidx.glance.ButtonDefaults
-import androidx.glance.LocalContext
+import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
@@ -67,23 +75,29 @@ import com.charan.stepstreak.presentation.onboarding.components.HealthConnectAni
 import com.charan.stepstreak.presentation.onboarding.components.ProviderConnectImageitem
 import com.charan.stepstreak.utils.DateUtils
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun OnBoardingScreen(
     onHomeScreenNavigate : () -> Unit,
     viewModel: OnBoardingViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val state = viewModel.state.collectAsStateWithLifecycle()
     val pageState = rememberPagerState(initialPage = 0, pageCount = { state.value.totalPages })
     val permissionLaunch = rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { result->
         if(result == permissions){
             viewModel.onEvent(OnBoardingEvents.OnPermissionGranted)
+        } else if(result.isEmpty()){
+            viewModel.onEvent(OnBoardingEvents.OnPermissionDenied)
+
         }
 
     }
@@ -109,6 +123,10 @@ fun OnBoardingScreen(
 
                 OnBoardingViewEffect.OnBoardingComplete -> {
                     onHomeScreenNavigate.invoke()
+                }
+
+                OnBoardingViewEffect.InstallHealthConnect -> {
+                    Toast.makeText(context,"Please install Health Connect from Play Store", Toast.LENGTH_LONG).show()
                 }
             }
 

@@ -20,6 +20,9 @@ interface DataStoreRepo {
     suspend fun setTheme(theme: ThemeEnum)
     val startOfWeek : Flow<StartOfWeekEnums>
     suspend fun setStartOfWeek(startOfWeek: StartOfWeekEnums)
+    val permissionDeniedCount : Flow<Int>
+    suspend fun incrementPermissionDeniedCount()
+    suspend fun resetPermissionDeniedCount()
 
 
 

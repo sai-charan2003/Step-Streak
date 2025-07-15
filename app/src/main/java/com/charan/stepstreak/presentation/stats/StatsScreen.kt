@@ -51,7 +51,7 @@ import androidx.window.core.layout.WindowSizeClass
 import com.charan.stepstreak.data.model.StatType
 import com.charan.stepstreak.presentation.common.components.StatEvents
 import com.charan.stepstreak.presentation.common.components.StatGraph
-import com.charan.stepstreak.presentation.home.components.StepsCard
+import com.charan.stepstreak.presentation.stats.components.StepsCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

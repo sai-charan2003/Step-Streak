@@ -47,9 +47,6 @@ fun StreakCard(
     ElevatedCard (
         modifier = Modifier
             .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
     ) {
         Box(
             modifier = Modifier

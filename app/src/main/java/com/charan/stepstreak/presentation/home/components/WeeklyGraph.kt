@@ -35,7 +35,6 @@ fun SimpleBarChartWithAxes(
 
     ElevatedCard(
         modifier = modifier.fillMaxSize(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -53,13 +52,6 @@ fun SimpleBarChartWithAxes(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                    contentDescription = "Progress trend",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
             }
             if(weeklySteps.stepsData.isNotEmpty()) {
                 StatGraph(

@@ -82,7 +82,7 @@ import kotlin.collections.containsAll
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var dataStoreRepo: DataStoreRepo
-    val keepScreen = mutableStateOf(true)
+    private val keepScreen = mutableStateOf(true)
 
     @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +91,11 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             keepScreen.value
         }
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
-        )
+        enableEdgeToEdge()
+        val status = HealthConnectClient.getSdkStatus(this)
+        if(status == HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED){
+
+        }
         setContent {
             val systemTheme = if (isSystemInDarkTheme()) ThemeEnum.DARK else ThemeEnum.LIGHT
             val isDynamicColor by dataStoreRepo.isDynamicColor.collectAsState(initial = true)
