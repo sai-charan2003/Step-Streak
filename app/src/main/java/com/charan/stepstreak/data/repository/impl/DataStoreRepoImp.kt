@@ -78,9 +78,9 @@ class DataStoreRepoImp (
 
     }
 
-    override suspend fun shouldShowMilestone(percentage: Int): Boolean {
+    override suspend fun shouldShowMilestone(milestone: Int): Boolean {
         resetMilestonesIfNewDay()
-        val key = when (percentage) {
+        val key = when (milestone) {
             25 -> MILESTONE_25_SHOWN
             50 -> MILESTONE_50_SHOWN
             75 -> MILESTONE_75_SHOWN
@@ -92,8 +92,8 @@ class DataStoreRepoImp (
         return !alreadyShown
     }
 
-    override suspend fun markMilestoneAsShown(percentage: Int) {
-        val key = when (percentage) {
+    override suspend fun markMilestoneAsShown(milestone: Int) {
+        val key = when (milestone) {
             25 -> MILESTONE_25_SHOWN
             50 -> MILESTONE_50_SHOWN
             75 -> MILESTONE_75_SHOWN

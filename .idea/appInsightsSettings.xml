@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.charan.stepstreak.debug" />
+                  <option name="mobileSdkAppId" value="1:737007996873:android:ac3430a641ace75a5da218" />
+                  <option name="projectId" value="stepstreak-d9524" />
+                  <option name="projectNumber" value="737007996873" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
