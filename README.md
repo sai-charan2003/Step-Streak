@@ -3,8 +3,6 @@
   <h1>Step Streak</h1>
 </div>
 
-# Step Streak
-
 **Step Streak** is an Android app designed to keep you motivated by tracking your daily steps and streaks!  
 It acts as a wrapper around **Health Connect**, seamlessly fetching step data from apps that write data to Health Connect, such as **Fitbit**, **Samsung Health**, and **Google Fit**.
 
