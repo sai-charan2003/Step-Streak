@@ -8,12 +8,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface HealthConnectRepo {
 
+    fun hasHealthConnectClient() : Boolean
 
+    fun installHealthConnect()
     suspend fun fetchAndSaveAllStepRecords() : Flow<ProcessState<Boolean>>
 
     suspend fun hasPermission() : Boolean
 
     fun getOriginProviders() : Flow<ProcessState<List<DataProviders>>>
+
+    fun openSettingsPermission()
 
 
 }

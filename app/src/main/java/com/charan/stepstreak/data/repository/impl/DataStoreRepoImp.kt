@@ -33,6 +33,7 @@ class DataStoreRepoImp (
         val DYNAMIC_COLOR_STATUS = booleanPreferencesKey("dynamic_color_status")
         val THEME = stringPreferencesKey("theme")
         val START_OF_WEEK = stringPreferencesKey("start_of_week")
+        val PERMISSION_DENIED_COUNT = longPreferencesKey("permission_denied_count")
     }
 
     override val dataProviders: Flow<String>
@@ -77,9 +78,9 @@ class DataStoreRepoImp (
 
     }
 
-    override suspend fun shouldShowMilestone(percentage: Int): Boolean {
+    override suspend fun shouldShowMilestone(milestone: Int): Boolean {
         resetMilestonesIfNewDay()
-        val key = when (percentage) {
+        val key = when (milestone) {
             25 -> MILESTONE_25_SHOWN
             50 -> MILESTONE_50_SHOWN
             75 -> MILESTONE_75_SHOWN
@@ -91,8 +92,8 @@ class DataStoreRepoImp (
         return !alreadyShown
     }
 
-    override suspend fun markMilestoneAsShown(percentage: Int) {
-        val key = when (percentage) {
+    override suspend fun markMilestoneAsShown(milestone: Int) {
+        val key = when (milestone) {
             25 -> MILESTONE_25_SHOWN
             50 -> MILESTONE_50_SHOWN
             75 -> MILESTONE_75_SHOWN
@@ -157,4 +158,22 @@ class DataStoreRepoImp (
             it[START_OF_WEEK] = startOfWeek.name
         }
     }
+
+    override val permissionDeniedCount: Flow<Int>
+        get() = context.dataStore.data.map {
+            it[PERMISSION_DENIED_COUNT]?.toInt() ?: 0
+        }
+    override suspend fun incrementPermissionDeniedCount() {
+        context.dataStore.edit { pref ->
+            val currentCount = pref[PERMISSION_DENIED_COUNT] ?: 0L
+            pref[PERMISSION_DENIED_COUNT] = currentCount + 1
+        }
+    }
+    override suspend fun resetPermissionDeniedCount() {
+        context.dataStore.edit { pref ->
+            pref[PERMISSION_DENIED_COUNT] = 0L
+        }
+    }
+
+
 }

@@ -8,7 +8,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
@@ -19,14 +21,21 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -37,6 +46,8 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.window.core.layout.WindowHeightSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.charan.stepstreak.presentation.home.HomeScreen
 import com.charan.stepstreak.presentation.settings.SettingsScreen
 import com.charan.stepstreak.presentation.stats.StatsScreen
@@ -51,6 +62,45 @@ fun BottomNavScreen(
         mutableIntStateOf(0)
     }
     var previousSelectedItem by rememberSaveable { mutableIntStateOf(0) }
+    val navSuiteType = NavigationSuiteScaffoldDefaults.navigationSuiteType(currentWindowAdaptiveInfo())
+    val (entryAnimation, exitAnimation) = remember(selectedItem, previousSelectedItem, navSuiteType) {
+        val forward = selectedItem > previousSelectedItem
+        val enter = when (navSuiteType) {
+            NavigationSuiteType.ShortNavigationBarCompact,
+            NavigationSuiteType.ShortNavigationBarMedium -> {
+                slideInHorizontally(
+                    initialOffsetX = { if (forward) it else -it },
+                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                )
+            }
+            NavigationSuiteType.WideNavigationRailCollapsed -> {
+                slideInVertically(
+                    initialOffsetY = { if (forward) it else -it },
+                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                )
+            }
+            else -> fadeIn(animationSpec = tween(250))
+        }
+
+        val exit = when (navSuiteType) {
+            NavigationSuiteType.ShortNavigationBarCompact,
+            NavigationSuiteType.ShortNavigationBarMedium -> {
+                slideOutHorizontally(
+                    targetOffsetX = { if (forward) -it else it },
+                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                )
+            }
+            NavigationSuiteType.WideNavigationRailCollapsed -> {
+                slideOutVertically(
+                    targetOffsetY = { if (forward) -it else it },
+                    animationSpec = tween(250, easing = LinearOutSlowInEasing)
+                )
+            }
+            else -> fadeOut(animationSpec = tween(250))
+        }
+
+        enter to exit
+    }
 
     LaunchedEffect(selectedItem) {
         when (BottomNavItem.entries[selectedItem]) {
@@ -74,6 +124,7 @@ fun BottomNavScreen(
 
     NavigationSuiteScaffold(
         navigationItemVerticalArrangement = Arrangement.Center,
+        navigationSuiteType = navSuiteType,
         navigationItems = {
             BottomNavItem.entries.forEachIndexed { index, navItem ->
                 NavigationSuiteItem(
@@ -109,19 +160,7 @@ fun BottomNavScreen(
                 rememberViewModelStoreNavEntryDecorator()
             ),
             transitionSpec = {
-                val forward = selectedItem > previousSelectedItem
-
-                val enterTransition = slideInHorizontally(
-                    initialOffsetX = { if (forward) it else -it },
-                    animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
-                )
-
-                val exitTransition = slideOutHorizontally(
-                    targetOffsetX = { if (forward) -it else it },
-                    animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
-                )
-
-                enterTransition togetherWith exitTransition
+                entryAnimation togetherWith exitAnimation
             },
 
 
@@ -163,18 +202,18 @@ enum class BottomNavItem(
 ) {
     HOME(
         title = "Home",
-        selectedIcon = Icons.Filled.Home,
+        selectedIcon = Icons.Rounded.Home,
         unselectedIcon = Icons.Outlined.Home,
 
     ),
     HISTORY(
         title = "History",
-        selectedIcon = Icons.Filled.BarChart,
+        selectedIcon = Icons.Rounded.BarChart,
         unselectedIcon = Icons.Outlined.BarChart,
     ),
     SETTINGS(
         title = "Settings",
-        selectedIcon = Icons.Filled.Settings,
+        selectedIcon = Icons.Rounded.Settings,
         unselectedIcon = Icons.Outlined.Settings,
     )
 }

@@ -16,8 +16,11 @@ data class HomeState(
 )
 
 data class GraphData(
-    val yAxis : Float = 0f,
-    val xAxis : String = "",
+    val steps : Float = 0f,
+    val day : String = "",
+    val date : String = "",
+    val monthName : String = "",
+    val isTargetCompleted : Boolean = false
 )
 
 

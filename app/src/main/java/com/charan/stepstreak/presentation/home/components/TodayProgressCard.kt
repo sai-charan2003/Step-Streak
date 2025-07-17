@@ -69,9 +69,7 @@ fun TodayProgressCard(
             .fillMaxWidth()
             .animateContentSize()
             ,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
+
     ) {
 
         Box(

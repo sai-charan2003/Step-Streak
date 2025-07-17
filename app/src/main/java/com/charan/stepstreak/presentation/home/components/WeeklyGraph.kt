@@ -32,49 +32,9 @@ fun SimpleBarChartWithAxes(
     isSidePane : Boolean = false,
     graphData : List<GraphData>
 ) {
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val teritiaryColor = MaterialTheme.colorScheme.tertiary
-    val hapticFeedback = LocalHapticFeedback.current
-    val highestValue = weeklySteps.stepsData.maxOfOrNull { it.steps } ?: 0
-    val maxValue = if (highestValue > targetStep) highestValue else targetStep
-    val ySteps = 3
-    val selectedBarIndex = remember { mutableStateOf<Int?>(null) }
-
-    val animationProgress = remember { Animatable(0f) }
-    val barAnimations = remember(weeklySteps.stepsData.size) {
-        weeklySteps.stepsData.map { Animatable(0f) }
-    }
-
-    LaunchedEffect(weeklySteps) {
-        animationProgress.snapTo(0f)
-        barAnimations.forEach { it.snapTo(0f) }
-
-        animationProgress.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = 800,
-                easing = FastOutSlowInEasing
-            )
-        )
-
-        barAnimations.forEachIndexed { index, animatable ->
-            launch {
-                delay(index * 100L)
-                animatable.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = 600,
-                        easing = FastOutSlowInEasing
-                    )
-                )
-            }
-        }
-    }
 
     ElevatedCard(
         modifier = modifier.fillMaxSize(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -92,15 +52,7 @@ fun SimpleBarChartWithAxes(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                    contentDescription = "Progress trend",
-                    tint = primaryColor,
-                    modifier = Modifier.size(28.dp)
-                )
             }
-            Spacer(modifier = Modifier.height(20.dp))
             if(weeklySteps.stepsData.isNotEmpty()) {
                 StatGraph(
                     graphData = graphData,
