@@ -12,6 +12,8 @@ It acts as a wrapper around **Health Connect**, seamlessly fetching step data fr
 - **Material 3 Expressive Design**: Enjoy a modern, visually appealing interface built with Material Design 3.
 - **Widget Support**: Access your step count and streaks directly from your home screen.
 - **Material Adaptive UI**: A clean, responsive design that looks great on both phones and tablets.
+- **Visual Graphs**: Track your weekly and monthly step trends through bar charts built with [Vico](https://github.com/patrykandpatrick/vico).
+
 
 ## Tech Stack
 
