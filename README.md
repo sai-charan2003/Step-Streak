@@ -25,17 +25,17 @@ It acts as a wrapper around **Health Connect**, seamlessly fetching step data fr
 
 
 <div align="center">
-  <img style="border-radius: 50%" src="readme_images/home.png" width="800px" style = padding: 10px>
+  <img style="border-radius: 50%; padding: 10px" src="readme_images/home.png" width="800px">
 </div>
 <br>
 <div align="center">
-  <img style="border-radius: 50%" src="readme_images/settings.png" width="800px" style = padding: 10px>
+  <img style="border-radius: 50%; padding: 10px" src="readme_images/settings.png" width="800px">
 </div>
 <br>
 <div align="center">
-  <img style="border-radius: 50%" src="readme_images/tablet.png" width="800px" style = padding: 10px>
+  <img style="border-radius: 50%; padding: 10px" src="readme_images/tablet.png" width="800px">
 </div>
 <br>
 <div align="center">
-  <img style="border-radius: 50%" src="readme_images/widget.png" width="800px" style = padding: 10px>
+  <img style="border-radius: 50%; padding: 10px" src="readme_images/widget.png" width="800px">
 </div>
