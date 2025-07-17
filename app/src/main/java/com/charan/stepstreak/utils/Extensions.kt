@@ -42,10 +42,10 @@ fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): Period
         ).toStepsData()
     }
     return PeriodStepsData(
-        averageSteps = currentWeekData.map { it.steps }.average().toLong(),
+        averageSteps = stepsData.map { it.steps }.average().toLong(),
         stepsData = stepsData,
-        totalSteps = currentWeekData.sumOf { it.steps },
-        highestSteps = currentWeekData.maxByOrNull { it.steps } ?: StepsData()
+        totalSteps = stepsData.sumOf { it.steps },
+        highestSteps = stepsData.maxByOrNull { it.steps } ?: StepsData()
     )
 }
 
