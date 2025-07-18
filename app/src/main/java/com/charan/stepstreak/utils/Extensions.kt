@@ -7,6 +7,7 @@ import com.charan.stepstreak.presentation.common.StepsData
 import com.charan.stepstreak.presentation.common.PeriodStepsData
 import com.charan.stepstreak.presentation.home.GraphData
 import com.charan.stepstreak.presentation.widget.WidgetState
+import kotlin.collections.filter
 
 
 fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
@@ -35,17 +36,19 @@ fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>,weekS
 fun List<StepsRecordEntity>.toWeekData(weekStartDate : StartOfWeekEnums): PeriodStepsData{
     val weekList = DateUtils.getWeekDayList(weekStartDate)
     val currentWeekData = this.toStepsData()
+    val today = DateUtils.getCurrentDate()
     val stepsData = weekList.map { day ->
         currentWeekData.find { it.day == day } ?: StepsRecordEntity(
             date = DateUtils.getDateFromWeekday(day, weekStartDate),
             steps = 0L,
         ).toStepsData()
     }
+    val completedDays = stepsData.filter { it.date <= today.toString() }
     return PeriodStepsData(
-        averageSteps = currentWeekData.map { it.steps }.average().toLong(),
+        averageSteps = if (completedDays.isNotEmpty()) completedDays.map { it.steps }.average().toLong() else 0L,
         stepsData = stepsData,
-        totalSteps = currentWeekData.sumOf { it.steps },
-        highestSteps = currentWeekData.maxByOrNull { it.steps } ?: StepsData()
+        totalSteps = stepsData.sumOf { it.steps },
+        highestSteps = stepsData.maxByOrNull { it.steps } ?: StepsData()
     )
 }
 
@@ -71,8 +74,10 @@ fun List<StepsRecordEntity>.toMonthData(currentMonth: String): PeriodStepsData {
             steps = 0L,
         ).toStepsData()
     }
+    val today = DateUtils.getCurrentDate()
+    val completedDays = stepsData.filter { it.date <= today.toString() }
     return PeriodStepsData(
-        averageSteps = stepsData.map { it.steps }.average().toLong(),
+        averageSteps = if (completedDays.isNotEmpty()) completedDays.map { it.steps }.average().toLong() else 0L,
         stepsData = stepsData,
         totalSteps = stepsData.sumOf { it.steps },
         periodLabel = monthName,
