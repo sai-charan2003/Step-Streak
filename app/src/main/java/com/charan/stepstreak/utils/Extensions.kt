@@ -18,13 +18,18 @@ fun List<StepsRecordEntity>.toStepsData() : List<StepsData>{
 
 fun StepsRecordEntity.toStepsData(): StepsData = StepsData(
     steps = steps ?: 0L,
-    date = date ?: "",
+    date = date.orEmpty(),
     targetSteps = stepTarget ?: 0L,
-    day = DateUtils.getWeekdayName(date ?: ""),
-    formattedDate = DateUtils.formatDateForDisplay(date ?: ""),
+    day = DateUtils.getWeekdayName(date.orEmpty()),
+    formattedDate = DateUtils.formatDateForDisplay(date.orEmpty()),
     targetCompleted = this.isTargetAchieved(),
-    currentProgress = ((steps ?: 0L).toFloat() / (stepTarget ?: 1L).toFloat())
+    currentProgress = if (stepTarget != null && stepTarget > 0L) {
+        (steps ?: 0L).toFloat() / stepTarget.toFloat()
+    } else {
+        0f
+    }
 )
+
 
 fun List<StepsRecordEntity>.toWidgetState(allData: List<StepsRecordEntity>,weekStartDate: StartOfWeekEnums): WidgetState {
     return WidgetState(
