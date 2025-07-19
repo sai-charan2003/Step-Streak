@@ -18,9 +18,10 @@ data class StepsRecordEntity(
     val uuid : String? = null,
     val date : String? = null
 ) {
-    fun isTargetAchieved() : Boolean {
-        val steps = this.steps ?: 0L
-        val stepsTarget = this.stepTarget ?: 0L
+    fun isTargetAchieved(): Boolean {
+        val steps = this.steps ?: return false
+        val stepsTarget = this.stepTarget ?: return false
+        if (stepsTarget == 0L) return false
         return steps >= stepsTarget
     }
 
