@@ -2,7 +2,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
@@ -11,15 +10,20 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
 }
+val appName = "Step Streak"
 
 android {
     namespace = "com.charan.stepstreak"
-    compileSdk = 36
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 0
+        }
+    }
 
     defaultConfig {
         applicationId = "com.charan.stepstreak"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 2
         versionName = "1.1"
 
@@ -29,55 +33,53 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
+    }
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystoreProperties = Properties()
+
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(keystorePropertiesFile.inputStream())
     }
     signingConfigs {
-        create("release") {
-            val properties = Properties().apply {
-                load(project.rootProject.file("local.properties").inputStream())
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) }
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
             }
-            keyAlias = properties.getProperty("KEY_ALIAS") ?: ""
-            keyPassword = properties.getProperty("KEY_PASSWORD") ?: ""
-            storeFile = file(properties.getProperty("KEY_LOCATION") ?: "")
-            storePassword = properties.getProperty("KEY_STORE_PASSWORD") ?: ""
         }
     }
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            resValue("string", "app_name", appName)
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfigs.findByName("release")?.let {
+                signingConfig = it
+            }
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            isDebuggable = true
+            resValue("string", "app_name", "$appName-Debug")
+
         }
     }
     hilt {
         enableAggregatingTask = false
     }
-    applicationVariants.all {
-        val variant = this
-        variant.outputs.map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
-            .forEach { output ->
-                val outputFileName = "Step-Streak-${variant.buildType.name}-${variant.versionName}.apk"
-                output.outputFileName = outputFileName
-            }
-    }
 
-
-    buildTypes {
-        debug {
-            applicationIdSuffix = ".debug"
-            isDebuggable = true
-            resValue("string","app_name","Step Streak-Debug")
-
-
-        }
+    base {
+        archivesName.set("Step-Streak")
     }
 }
 
@@ -109,9 +111,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation (libs.converter.gson)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
     implementation (libs.hilt.android)
     ksp (libs.hilt.compiler)
     implementation (libs.androidx.hilt.navigation.compose)
